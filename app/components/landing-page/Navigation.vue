@@ -23,6 +23,7 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-4">
+          <ThemeToggle />
           <NuxtLink to="/login">
             <Button variant="ghost">Login</Button>
           </NuxtLink>
@@ -54,10 +55,13 @@
             Dashboard
           </a>
           <div class="flex flex-col space-y-2 pt-4">
+            <div class="flex justify-center">
+              <ThemeToggle />
+            </div>
             <NuxtLink to="/signup">
               <Button class="w-full" variant="hero">Get Started</Button>
             </NuxtLink>
-            <NuxtLink to="/signup">
+            <NuxtLink to="/login">
               <Button variant="ghost" class="w-full">Login</Button>
             </NuxtLink>
           </div>
@@ -69,6 +73,8 @@
 
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next"
+import { ThemeToggle } from "~/components/ui/theme-toggle"
+
 const isMenuOpen = ref(false)
 </script>
 
