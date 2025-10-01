@@ -9,7 +9,9 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/image',
     '@nuxt/test-utils',
-    'shadcn-nuxt'
+    'shadcn-nuxt',
+    '@vueuse/nuxt',
+    '@nuxtjs/color-mode'
   ],
   shadcn: {
     prefix: '',
