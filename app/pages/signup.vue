@@ -13,19 +13,10 @@
         <p class="text-muted-foreground">Start building better habits today</p>
       </CardHeader>
       <CardContent class="space-y-4">
-        <div class="space-y-2">
-          <Label for="name">Full Name</Label>
-          <Input id="name" placeholder="Enter your full name" />
-        </div>
-        <div class="space-y-2">
-          <Label for="email">Email</Label>
-          <Input id="email" type="email" placeholder="Enter your email" />
-        </div>
-        <div class="space-y-2">
-          <Label for="password">Password</Label>
-          <Input id="password" type="password" placeholder="Create a password" />
-        </div>
-        <Button  class="w-full">
+        <Input v-model="value" name="name" label="Full Name" placeholder="Enter your full name" />
+        <Input name="email" label="Email" placeholder="Enter your email" />
+        <Input name="password" label="Password" type="password" placeholder="Create a password" />
+        <Button class="w-full">
           Create Account
         </Button>
 
@@ -78,6 +69,11 @@ fill="currentColor"
 </template>
 
 <script setup lang="ts">
+// eslint-disable-next-line no-undef
+const { value, errorMessage } = useField('name', 'email', {
+  label: 'Name',
+  initialValue: '',
+});
 
 </script>
 
