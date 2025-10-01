@@ -27,7 +27,7 @@
               <Button variant="ghost">Login</Button>
             </NuxtLink>
             <NuxtLink to="/signup">
-              <Button>Get Started</Button>
+              <Button variant="hero">Get Started</Button>
             </NuxtLink>
           </div>
 
@@ -59,7 +59,7 @@
             </a>
             <div class="flex flex-col space-y-2 pt-4">
               <NuxtLink to="/signup">
-                <Button class="w-full">Get Started</Button>
+                <Button class="w-full" variant="hero">Get Started</Button>
               </NuxtLink>
               <NuxtLink to="/signup">
                 <Button variant="ghost" class="w-full">Login</Button>

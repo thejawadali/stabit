@@ -30,7 +30,7 @@
 
           <div class="flex flex-col sm:flex-row gap-4">
             <NuxtLink to="/signup">
-              <Button variant="secondary" size="lg" class="text-base px-8 py-3">
+              <Button variant="hero" size="lg" class="text-base px-8 py-3">
                 Start Your Journey
               </Button>
             </NuxtLink>

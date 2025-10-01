@@ -16,7 +16,7 @@
         <Input v-model="value" name="name" label="Full Name" placeholder="Enter your full name" />
         <Input name="email" label="Email" placeholder="Enter your email" />
         <Input name="password" label="Password" type="password" placeholder="Create a password" />
-        <Button class="w-full">
+        <Button class="w-full" variant="hero">
           Create Account
         </Button>
 
@@ -69,7 +69,7 @@ fill="currentColor"
 </template>
 
 <script setup lang="ts">
-// eslint-disable-next-line no-undef
+// eslint-disable-next-line no-undef, no-unused-vars
 const { value, errorMessage } = useField('name', 'email', {
   label: 'Name',
   initialValue: '',
