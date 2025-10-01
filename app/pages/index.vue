@@ -1,17 +1,23 @@
 <template>
   <div className="min-h-screen">
-      <LandingPageNavigation />
-      <LandingPageHero />
-      <LandingPageFeatures />
-      <LandingPageHowItWorks />
-      <LandingPageFooter /> 
+    <h1>Color mode: {{ $colorMode.value }}</h1>
+    <select v-model="$colorMode.preference">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+    <LandingPageNavigation />
+    <LandingPageHero />
+    <LandingPageFeatures />
+    <LandingPageHowItWorks />
+    <LandingPageFooter />
 
-    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+const colorMode = useColorMode()
+console.log(colorMode.value)
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

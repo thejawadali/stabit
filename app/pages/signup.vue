@@ -69,6 +69,8 @@ fill="currentColor"
 </template>
 
 <script setup lang="ts">
+import { TrendingUp } from "lucide-vue-next"
+
 // eslint-disable-next-line no-undef, no-unused-vars
 const { value, errorMessage } = useField('name', 'email', {
   label: 'Name',
