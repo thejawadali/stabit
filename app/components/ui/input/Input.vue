@@ -26,17 +26,24 @@ const modelValue = defineModel<string | number>({ default: '' })
 // change value when modelValue changes
 syncRefs(modelValue, value)
 
-
+let resetHasDone = false
 onMounted(() => {
   if (!modelValue.value) {
-    setTimeout(handleReset)
+    setTimeout(() => {
+      handleReset()
+      resetHasDone = true
+    })
   }
+})
+
+const showError = computed(() => {
+  return resetHasDone && errorMessage.value
 })
 
 
 const inputClasses = computed(() => {
   const baseClasses = 'flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 mt-1'
-  const borderClass = errorMessage.value ? 'border-destructive' : 'border-input focus-visible:ring-1 focus-visible:ring-ring'
+  const borderClass = showError.value ? 'border-destructive' : 'border-input focus-visible:ring-1 focus-visible:ring-ring'
   return cn(baseClasses, borderClass, props.class)
 })
 </script>
@@ -47,6 +54,6 @@ const inputClasses = computed(() => {
         class="text-destructive">*</span></Label>
     <input :id="props.name" v-model="modelValue" :class="inputClasses" :placeholder="props.placeholder"
       @blur="validateOnBlur ? validate() : null">
-    <p v-if="errorMessage" class="text-sm text-destructive">{{ customErrorMessage || errorMessage }}</p>
+    <p v-if="showError" class="text-sm text-destructive">{{ customErrorMessage || errorMessage }}</p>
   </div>
 </template>
