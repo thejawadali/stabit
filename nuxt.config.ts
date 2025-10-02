@@ -1,5 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: 'Stabit',
+      titleTemplate: '%s - Stabit',
+      meta: [
+        { name: 'description', content: 'Stabit is a platform for building better habits' },
+      ],
+    }
+  },
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['~/assets/css/index.css'],

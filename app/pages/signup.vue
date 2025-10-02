@@ -64,6 +64,10 @@ definePageMeta({
   layout: false,
 })
 
+useHead({
+  title: 'Sign Up'
+})
+
 const fullName = ref("")
 const email = ref("")
 const password = ref("")
