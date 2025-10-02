@@ -63,6 +63,9 @@
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next"
 
+definePageMeta({
+  layout: false,
+})
 
 const email = ref("")
 const password = ref("")

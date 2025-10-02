@@ -17,6 +17,9 @@
           <a href="#how-it-works" class="text-muted-foreground hover:text-foreground transition-colors">
             How it Works
           </a>
+          <a href="#dashboard" class="text-muted-foreground hover:text-foreground transition-colors">
+            Dashboard
+          </a>
         </div>
 
         <div class="hidden md:flex items-center space-x-4">

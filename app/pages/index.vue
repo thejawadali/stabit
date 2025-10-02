@@ -1,6 +1,5 @@
 <template>
   <div className="min-h-screen">
-    <LandingPageNavigation />
     <LandingPageHero />
     <LandingPageFeatures />
     <LandingPageHowItWorks />
