@@ -17,9 +17,6 @@
           <a href="#how-it-works" class="text-muted-foreground hover:text-foreground transition-colors">
             How it Works
           </a>
-          <a href="#dashboard" class="text-muted-foreground hover:text-foreground transition-colors">
-            Dashboard
-          </a>
         </div>
 
         <div class="hidden md:flex items-center space-x-4">
@@ -50,9 +47,6 @@
           </a>
           <a href="#how-it-works" class="text-muted-foreground hover:text-foreground transition-colors">
             How it Works
-          </a>
-          <a href="#dashboard" class="text-muted-foreground hover:text-foreground transition-colors">
-            Dashboard
           </a>
           <div class="flex flex-col space-y-2 pt-4">
             <div class="flex justify-center">
