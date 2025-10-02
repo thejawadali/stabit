@@ -13,12 +13,17 @@
         <p class="text-muted-foreground">Start building better habits today</p>
       </CardHeader>
       <CardContent class="space-y-4">
-        <Input v-model="value" name="name" label="Full Name" placeholder="Enter your full name" />
-        <Input name="email" label="Email" placeholder="Enter your email" />
-        <Input name="password" label="Password" type="password" placeholder="Create a password" />
-        <Button class="w-full" variant="hero">
-          Create Account
-        </Button>
+        <form class="space-y-4" @submit.prevent="handleSubmit">
+          <!-- full name -->
+          <Input v-model="fullName" rules="required" validate-on-blur custom-error-message="Full name is required" name="name" label="Full Name" placeholder="Enter your full name" />
+          <!-- email -->
+          <Input v-model="email" rules="required|email" validate-on-blur custom-error-message="Enter a valid email" name="email" label="Email" placeholder="Enter your email" />
+          <!-- password -->
+          <Input v-model="password" rules="required|min:8|max:16" validate-on-blur custom-error-message="Enter a password between 8 and 16 characters" name="password" label="Password" type="password" placeholder="Create a password" />
+          <Button class="w-full" variant="hero" type="submit">
+            Create Account
+          </Button>
+        </form>
 
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
@@ -71,12 +76,18 @@ fill="currentColor"
 <script setup lang="ts">
 import { TrendingUp } from "lucide-vue-next"
 
-// eslint-disable-next-line no-undef, no-unused-vars
-const { value, errorMessage } = useField('name', 'email', {
-  label: 'Name',
-  initialValue: '',
-});
+const fullName = ref("")
+const email = ref("")
+const password = ref("")
 
+// eslint-disable-next-line no-undef
+const {validate} = useForm()
+
+const handleSubmit = async () => {
+  const { valid } = await validate()
+  if (!valid) return
+  console.log(fullName.value, email.value, password.value)
+}
 </script>
 
 <style scoped></style>
