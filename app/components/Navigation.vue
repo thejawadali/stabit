@@ -4,7 +4,7 @@
       <div class="flex justify-between items-center h-16">
         <NuxtLink to="/" class="flex items-center space-x-2">
           <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <TrendingUp class="w-5 h-5 text-primary-foreground" />
+            <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
           </div>
           <span class="text-2xl font-bold text-foreground">Stabit</span>
         </NuxtLink>
@@ -70,7 +70,6 @@
 </template>
 
 <script setup lang="ts">
-import { TrendingUp } from "lucide-vue-next"
 import { ThemeToggle } from "~/components/ui/theme-toggle"
 
 const isMenuOpen = ref(false)

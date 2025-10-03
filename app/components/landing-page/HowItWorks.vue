@@ -37,7 +37,7 @@
             v-if="index < steps.length - 1"
             class="hidden md:block absolute -right-7 top-1/2 transform -translate-y-1/2 z-10"
           >
-            <ArrowRight class="w-6 h-6 text-primary" />
+            <IconArrowRight class="w-6 h-6 text-primary" />
           </div>
         </div>
       </div>
@@ -46,21 +46,21 @@
 </template>
 
 <script setup lang="ts">
-import { Target, TrendingUp, Calendar, ArrowRight } from "lucide-vue-next"
+import { IconTarget, IconTrendingUp, IconCalendar, IconArrowRight } from "#components"
 
 const steps = ref([
   {
-    icon: Target,
+    icon: IconTarget,
     title: "Start Small",
     description: "Begin with tiny habits that take just 1-2 minutes. Read one page, do 5 pushups, meditate for 2 minutes."
   },
   {
-    icon: TrendingUp,
+    icon: IconTrendingUp,
     title: "Gradual Growth",
     description: "As you build consistency, Stabit automatically suggests small increases based on your performance."
   },
   {
-    icon: Calendar,
+    icon: IconCalendar,
     title: "Track Progress",
     description: "Visualize your journey with beautiful calendars, streak counters, and progress charts."
   }

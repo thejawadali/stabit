@@ -7,16 +7,15 @@
       class="h-9 w-9"
       :title="`Switch to ${nextTheme} theme`"
     >
-      <Monitor v-if="colorMode.preference === 'system'" class="h-4 w-4" />
-      <Sun v-else-if="colorMode.preference === 'light'" class="h-4 w-4" />
-      <Moon v-else class="h-4 w-4" />
+      <IconMonitor v-if="colorMode.preference === 'system'" class="h-4 w-4" />
+      <IconSun v-else-if="colorMode.preference === 'light'" class="h-4 w-4" />
+      <IconMoon v-else class="h-4 w-4" />
       <span class="sr-only">Toggle theme</span>
     </Button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Monitor, Moon, Sun } from "lucide-vue-next"
 import { Button } from "~/components/ui/button"
 
 const colorMode = useColorMode()

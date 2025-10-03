@@ -35,13 +35,13 @@
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <NuxtLink to="/">
             <Button variant="hero" size="lg" class="text-base px-8 py-3">
-              <Home class="w-5 h-5 mr-2" />
+              <IconHome class="w-5 h-5 mr-2" />
               Return Home
             </Button>
           </NuxtLink>
 
           <Button variant="outline" size="lg" class="text-base px-8 py-3" @click="goBack">
-            <ArrowLeft class="w-5 h-5 mr-2" />
+            <IconArrowLeft class="w-5 h-5 mr-2" />
             Go Back
           </Button>
         </div>
@@ -52,13 +52,13 @@
           <div class="flex flex-wrap justify-center gap-4">
             <NuxtLink to="/signup" class="text-primary hover:text-primary/80 transition-colors">
               <Button variant="ghost" size="sm">
-                <UserPlus class="w-4 h-4 mr-2" />
+                <IconUserPlus class="w-4 h-4 mr-2" />
                 Sign Up
               </Button>
             </NuxtLink>
             <NuxtLink to="/login" class="text-primary hover:text-primary/80 transition-colors">
               <Button variant="ghost" size="sm">
-                <LogIn class="w-4 h-4 mr-2" />
+                <IconLogIn class="w-4 h-4 mr-2" />
                 Login
               </Button>
             </NuxtLink>
@@ -69,7 +69,7 @@
         <Card class="max-w-md mx-auto bg-gradient-card shadow-glow animate-pulse-soft">
           <CardContent class="p-6 text-center">
             <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Lightbulb class="w-6 h-6 text-primary" />
+              <IconLightbulb class="w-6 h-6 text-primary" />
             </div>
             <h3 class="font-semibold text-card-foreground mb-2">Did you know?</h3>
             <p class="text-sm text-muted-foreground">
@@ -84,12 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { Home, ArrowLeft, UserPlus, LogIn, Lightbulb } from "lucide-vue-next"
-
-
 const error = useError()
-
-
 
 // Function to go back in browser history
 const goBack = () => {

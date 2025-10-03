@@ -35,36 +35,36 @@ v-for="(feature, index) in features" :key="index"
 </template>
 
 <script setup lang="ts">
-import { Target, TrendingUp, Calendar, BarChart3, Bell, Zap } from "lucide-vue-next"
+import { IconTarget, IconTrendingUp, IconCalendar, IconBarChart3, IconBell, IconZap } from "#components"
 
 const features = ref([
   {
-    icon: Target,
+    icon: IconTarget,
     title: "Start Small, Grow Gradually",
     description: "Begin with tiny habits like reading 1 page, then gradually increase as you build consistency."
   },
   {
-    icon: TrendingUp,
+    icon: IconTrendingUp,
     title: "Smart Growth Rules",
     description: "Automatic habit scaling based on your performance. No overwhelming jumps, just steady progress."
   },
   {
-    icon: Calendar,
+    icon: IconCalendar,
     title: "Visual Progress Tracking",
     description: "Beautiful calendar views and streak counters to visualize your journey and celebrate wins."
   },
   {
-    icon: BarChart3,
+    icon: IconBarChart3,
     title: "Insightful Analytics",
     description: "Understand your patterns with detailed charts and progress insights to optimize your habits."
   },
   {
-    icon: Bell,
+    icon: IconBell,
     title: "Smart Reminders",
     description: "Gentle, encouraging notifications that adapt to your schedule and help maintain momentum."
   },
   {
-    icon: Zap,
+    icon: IconZap,
     title: "Burnout Prevention",
     description: "Built-in safeguards and flexible scheduling to prevent overwhelm and maintain long-term success."
   }

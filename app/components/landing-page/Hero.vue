@@ -13,7 +13,7 @@
         <div class="space-y-8 animate-slide-up">
           <div class="space-y-4">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              <Zap class="w-4 h-4 mr-2" />
+              <IconZap class="w-4 h-4 mr-2" />
               Start small, grow steadily
             </div>
 
@@ -39,15 +39,15 @@
           <!-- Social Proof -->
           <div class="flex items-center space-x-6 pt-4">
             <div class="flex items-center space-x-2">
-              <CheckCircle2 class="w-5 h-5 text-success" />
+              <IconCheckCircle2 class="w-5 h-5 text-success" />
               <span class="text-sm text-muted-foreground">Free to start</span>
             </div>
             <div class="flex items-center space-x-2">
-              <Flame class="w-5 h-5 text-primary" />
+              <IconFlame class="w-5 h-5 text-primary" />
               <span class="text-sm text-muted-foreground">Build streaks</span>
             </div>
             <div class="flex items-center space-x-2">
-              <Target class="w-5 h-5 text-primary" />
+              <IconTarget class="w-5 h-5 text-primary" />
               <span class="text-sm text-muted-foreground">Gradual growth</span>
             </div>
           </div>
@@ -66,7 +66,7 @@
               <CardContent class="p-4">
                 <div class="flex items-center space-x-3">
                   <div class="w-10 h-10 bg-success rounded-lg flex items-center justify-center">
-                    <CheckCircle2 class="w-5 h-5 text-success-foreground" />
+                    <IconCheckCircle2 class="w-5 h-5 text-success-foreground" />
                   </div>
                   <div>
                     <div class="text-sm font-medium">Reading</div>
@@ -80,7 +80,7 @@
               <CardContent class="p-4">
                 <div class="flex items-center space-x-3">
                   <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                    <TrendingUp class="w-5 h-5 text-primary-foreground" />
+                    <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
                   </div>
                   <div>
                     <div class="text-sm font-medium">25 Day Streak</div>
@@ -100,7 +100,6 @@
 </template>
 
 <script setup lang="ts">
-import { TrendingUp, Target, Zap, CheckCircle2, Flame } from "lucide-vue-next";
 </script>
 
 <style scoped></style>

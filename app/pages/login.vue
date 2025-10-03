@@ -5,7 +5,7 @@
       <CardHeader class="text-center">
         <div class="flex items-center justify-center space-x-2 mb-4">
           <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <TrendingUp class="w-5 h-5 text-primary-foreground" />
+            <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
           </div>
           <span class="text-2xl font-bold text-foreground">Stabit</span>
         </div>
@@ -61,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { TrendingUp } from "lucide-vue-next"
 
 definePageMeta({
   layout: false,

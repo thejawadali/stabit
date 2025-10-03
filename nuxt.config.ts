@@ -24,7 +24,8 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@vueuse/nuxt',
     '@vee-validate/nuxt',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
+    'nuxt-lucide-icons'
   ],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
@@ -38,5 +39,8 @@ export default defineNuxtConfig({
   shadcn: {
     prefix: '',
     componentDir: './app/components/ui'
+  },
+  lucide: {
+    namePrefix: 'Icon'
   }
 })
