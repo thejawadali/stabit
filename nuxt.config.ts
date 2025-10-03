@@ -7,7 +7,10 @@ export default defineNuxtConfig({
       meta: [
         { name: 'description', content: 'Stabit is a platform for building better habits' },
       ],
-    }
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/icon.png' },
+      ],
+    },
   },
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
