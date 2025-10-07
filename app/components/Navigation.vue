@@ -2,43 +2,45 @@
   <nav class="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <NuxtLink to="/" class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
+        <slot>
+          <NuxtLink to="/" class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+              <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span class="text-2xl font-bold text-foreground">Stabit</span>
+          </NuxtLink>
+
+          <!-- Desktop Navigation -->
+          <div v-if="isHomePage" class="hidden md:flex items-center space-x-8">
+            <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors">
+              Features
+            </a>
+            <a href="#how-it-works" class="text-muted-foreground hover:text-foreground transition-colors">
+              How it Works
+            </a>
           </div>
-          <span class="text-2xl font-bold text-foreground">Stabit</span>
-        </NuxtLink>
 
-        <!-- Desktop Navigation -->
-        <div v-if="isHomePage" class="hidden md:flex items-center space-x-8">
-          <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors">
-            Features
-          </a>
-          <a href="#how-it-works" class="text-muted-foreground hover:text-foreground transition-colors">
-            How it Works
-          </a>
-        </div>
+          <div class="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
+            <template v-if="isHomePage">
+              <NuxtLink to="/login">
+                <Button variant="ghost">Login</Button>
+              </NuxtLink>
+              <NuxtLink to="/signup">
+                <Button variant="hero">Get Started</Button>
+              </NuxtLink>
+            </template>
+          </div>
 
-        <div class="hidden md:flex items-center space-x-4">
-          <ThemeToggle />
-          <template v-if="isHomePage">
-            <NuxtLink to="/login">
-              <Button variant="ghost">Login</Button>
-            </NuxtLink>
-            <NuxtLink to="/signup">
-              <Button variant="hero">Get Started</Button>
-            </NuxtLink>
-          </template>
-        </div>
-
-        <!-- Mobile menu button -->
-        <div class="md:hidden">
-          <Button variant="ghost" size="icon" @click="isMenuOpen = !isMenuOpen">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </Button>
-        </div>
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <Button variant="ghost" size="icon" @click="isMenuOpen = !isMenuOpen">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </Button>
+          </div>
+        </slot>
       </div>
 
       <!-- Mobile menu -->
@@ -70,7 +72,6 @@
 </template>
 
 <script setup lang="ts">
-import { ThemeToggle } from "~/components/ui/theme-toggle"
 
 const isMenuOpen = ref(false)
 const route = useRoute()
