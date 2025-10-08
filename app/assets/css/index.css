@@ -21,6 +21,8 @@
     --accent-foreground: 124.4776 55.3719% 23.7255%;
     --success: 142 69% 58%;
     --success-foreground: 0 0% 100%;
+    --warning: 45 93% 58%;
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 66.3866% 46.6667%;
     --destructive-foreground: 0 0% 100%;
     --border: 33.9130 27.0588% 83.3333%;
@@ -109,6 +111,8 @@
     --accent-foreground: 32.7273 26.8293% 91.9608%;
     --success: 142 69% 58%;
     --success-foreground: 0 0% 100%;
+    --warning: 45 93% 58%;
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 66.3866% 46.6667%;
     --destructive-foreground: 32.7273 26.8293% 91.9608%;
     --border: 115.3846 9.6296% 26.4706%;

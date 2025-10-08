@@ -3,6 +3,8 @@
     <Navigation>
       <AppNavConent />
     </Navigation>
-    <slot />
+    <div class="mt-16">
+      <slot />
+    </div>
   </div>
 </template>
