@@ -7,46 +7,46 @@
     </div>
     <div class="space-y-6">
       <!-- Summary Bar -->
-      <DashboardSummaryBar :completed-today="9" :total-today="10" :current-streak="25" next-reminder="2:30 PM" />
+      <SummaryBar :completed-today="9" :total-today="10" :current-streak="25" next-reminder="2:30 PM" />
 
       <!-- Filters -->
-      <DashboardFilters :active-filter="'all'" />
+      <Filters :active-filter="'all'" />
 
       <!-- Quick Actions -->
-      <DashboardQuickActions @add-habit="undefined" @add-quick-log="undefined" />
+      <QuickActions @add-habit="undefined" @add-quick-log="undefined" />
 
       <!-- Main Content Grid -->
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Left Column - 2/3 width -->
         <div className="lg:col-span-2 space-y-6">
           <!-- Today's Habits -->
-          <DashboardTodayHabits :habits="todayHabits" />
+          <TodayHabits :habits="todayHabits" />
 
           <!-- Habit Cards List -->
           <div>
             <h3 className="text-lg font-semibold mb-4">All Habits</h3>
-            <DashboardHabitListView :habits="habitsList" @on-edit="undefined" @on-delete="undefined"
+            <HabitListView :habits="habitsList" @on-edit="undefined" @on-delete="undefined"
               @on-view-history="undefined" />
           </div>
 
           <!-- Missed Habits -->
-          <DashboardMissedHabits :habits="missedHabits" />
+          <MissedHabits :habits="missedHabits" />
 
           <!-- Recent Activity -->
-          <DashboardRecentActivity :activities="recentActivities" />
+          <RecentActivity :activities="recentActivities" />
         </div>
 
         <!-- Right Column - 1/3 width -->
         <div className="space-y-6">
           <!-- Calendar Widget -->
-          <DashboardCalendarWidget />
+          <CalendarWidget />
 
           <!-- Progress Snapshot -->
-          <DashboardProgressSnapshot :weekly-completion="85" :monthly-trend="12" :remaining-sessions="15"
+          <ProgressSnapshot :weekly-completion="85" :monthly-trend="12" :remaining-sessions="15"
             :total-sessions="247" :streak-text="'You\'re on a 25-day streak! 🔥'" />
 
           <!-- Milestones -->
-          <DashboardMilestonesPanel :milestones="milestones" />
+          <MilestonesPanel :milestones="milestones" />
         </div>
       </div>
     </div>

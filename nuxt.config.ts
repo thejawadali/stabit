@@ -42,5 +42,12 @@ export default defineNuxtConfig({
   },
   lucide: {
     namePrefix: 'Icon'
-  }
+  },
+  components: [
+    {
+      path: '~/components/dashboard',
+      pathPrefix: false,
+    },
+    '~/components',
+  ],
 })
