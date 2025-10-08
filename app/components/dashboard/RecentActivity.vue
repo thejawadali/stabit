@@ -29,7 +29,7 @@
 withDefaults(defineProps<{
   activities: Activity[]
 }>(), {
-  activities: [],
+  activities: () => [],
 })
 
 </script>

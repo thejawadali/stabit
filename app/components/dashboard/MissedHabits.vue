@@ -40,7 +40,7 @@
 const props = withDefaults(defineProps<{
   habits: Habit[]
 }>(), {
-  habits: [],
+  habits: () => [],
 })
 
 const emit = defineEmits<{

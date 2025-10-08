@@ -30,7 +30,7 @@
 withDefaults(defineProps<{
   milestones: Milestone[]
 }>(), {
-  milestones: [],
+  milestones: () => [],
 })
 </script>
 

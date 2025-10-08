@@ -19,11 +19,8 @@
     <CardContent>
       <div class="grid grid-cols-7 gap-1">
         <!-- Days of the week headers -->
-        <div 
-          v-for="day in daysOfWeek" 
-          :key="day" 
-          class="h-8 flex items-center justify-center text-xs font-medium text-muted-foreground"
-        >
+        <div v-for="day in daysOfWeek" :key="day"
+          class="h-8 flex items-center justify-center text-xs font-medium text-muted-foreground">
           {{ day }}
         </div>
 
@@ -31,17 +28,11 @@
         <div v-for="n in firstDayOfMonth" :key="'empty-' + n" class="h-8"></div>
 
         <!-- Days of the month -->
-        <Button
-          v-for="day in daysInMonth" 
-          :key="day"
-          variant="ghost"
-          class="h-8 w-8 p-0 text-sm relative"
-          :class="{
-            'bg-primary text-primary-foreground': isToday(day),
-            'bg-success/10 hover:bg-success/20': isCompleted(day),
-            'hover:bg-muted': !isToday(day) && !isCompleted(day)
-          }"
-        >
+        <Button v-for="day in daysInMonth" :key="day" variant="ghost" class="h-8 w-8 p-0 text-sm relative" :class="{
+          'bg-primary text-primary-foreground': isToday(day),
+          'bg-success/10 hover:bg-success/20': isCompleted(day),
+          'hover:bg-muted': !isToday(day) && !isCompleted(day)
+        }">
           <template v-if="isCompleted(day)">
             <Check class="h-4 w-4 text-success" />
           </template>
@@ -55,43 +46,41 @@
 </template>
 
 <script setup lang="ts">
-const currentDate = ref(new Date());
-    
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+const currentDate = ref(new Date())
 
-    const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+]
 
-    const daysInMonth = computed(() => {
-      return new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0).getDate();
-    });
+const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
-    const firstDayOfMonth = computed(() => {
-      return new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1).getDay();
-    });
+const daysInMonth = computed(() => {
+  return new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0).getDate()
+})
 
-    // Mock completed days
-    const completedDays = ref([1, 3, 5, 7, 8, 10, 12, 15, 17, 20, 22]);
+const firstDayOfMonth = computed(() => {
+  return new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1).getDay()
+})
 
-    const previousMonth = () => {
-      currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1);
-    };
+// Mock completed days
+const completedDays = ref([1, 3, 5, 7, 8, 10, 12, 15, 17, 20, 22])
 
-    const nextMonth = () => {
-      currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
-    };
+const previousMonth = () => {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
+}
 
-    const isCompleted = (day: number) => completedDays.value.includes(day);
-    const isToday = (day: number) => {
-      const today = new Date();
-      return day === today.getDate() &&
-             currentDate.value.getMonth() === today.getMonth() &&
-             currentDate.value.getFullYear() === today.getFullYear();
-    };
+const nextMonth = () => {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
+}
+
+const isCompleted = (day: number) => completedDays.value.includes(day)
+const isToday = (day: number) => {
+  const today = new Date()
+  return day === today.getDate() &&
+    currentDate.value.getMonth() === today.getMonth() &&
+    currentDate.value.getFullYear() === today.getFullYear()
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
