@@ -4,7 +4,7 @@
       <AppNavConent />
     </Navigation>
     <AppSidebar />
-    <main class="mt-16">
+    <main class="mt-16 w-full">
       <slot />
     </main>
   </SidebarProvider>
