@@ -1,175 +1,195 @@
 <template>
-  <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 max-w-[1600px] mx-auto w-full">
-    <!-- Header -->
-    <div class="mb-6 flex items-start justify-between">
-      <div>
-        <h1 class="text-3xl font-bold mb-2">My Habits</h1>
-        <p class="text-muted-foreground">Manage and track all your habits</p>
+  <div class="">
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 max-w-[1600px] mx-auto w-full">
+      <!-- Header -->
+      <div class="mb-6 flex items-start justify-between">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">My Habits</h1>
+          <p class="text-muted-foreground">Manage and track all your habits</p>
+        </div>
+        <Button @click="navigateToCreateHabit">
+          <IconPlus class="w-4 h-4 mr-2" />
+          Create Habit
+        </Button>
       </div>
-      <Button @click="navigateToCreateHabit">
-        <IconPlus class="w-4 h-4 mr-2" />
-        Create Habit
-      </Button>
-    </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <Card>
-        <CardContent class="p-4">
-          <div class="text-sm text-muted-foreground">Total Habits</div>
-          <div class="text-2xl font-bold">{{ totalHabits }}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent class="p-4">
-          <div class="text-sm text-muted-foreground">Active</div>
-          <div class="text-2xl font-bold text-success">{{ activeHabits }}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent class="p-4">
-          <div class="text-sm text-muted-foreground">Completed Today</div>
-          <div class="text-2xl font-bold text-primary">{{ completedToday }}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent class="p-4">
-          <div class="text-sm text-muted-foreground">Avg Progress</div>
-          <div class="text-2xl font-bold">{{ avgProgress }}%</div>
-        </CardContent>
-      </Card>
-    </div>
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <Card>
+          <CardContent class="p-4">
+            <div class="text-sm text-muted-foreground">Total Habits</div>
+            <div class="text-2xl font-bold">{{ totalHabits }}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent class="p-4">
+            <div class="text-sm text-muted-foreground">Active</div>
+            <div class="text-2xl font-bold text-success">{{ activeHabits }}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent class="p-4">
+            <div class="text-sm text-muted-foreground">Completed Today</div>
+            <div class="text-2xl font-bold text-primary">{{ completedToday }}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent class="p-4">
+            <div class="text-sm text-muted-foreground">Avg Progress</div>
+            <div class="text-2xl font-bold">{{ avgProgress }}%</div>
+          </CardContent>
+        </Card>
+      </div>
 
-    <!-- Filters and Actions -->
-    <div class="space-y-4 mb-6">
-      <div class="flex flex-wrap gap-3">
-        <div class="relative flex-1 min-w-[200px]">
-          <IconSearch class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search habits..." v-model="searchQuery" class="pl-10" />
+      <!-- Filters and Actions -->
+      <div class="space-y-4 mb-6">
+        <div class="flex flex-wrap gap-3">
+          <div class="relative flex-1 min-w-[200px]">
+            <IconSearch class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search habits..." v-model="searchQuery" class="pl-10" />
+          </div>
+
+          <!-- Filters -->
+          <Select v-model="categoryFilter">
+            <SelectTrigger class="w-[150px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="cat in categories" :key="cat" :value="cat">{{ cat === "all" ? "All Categories" : cat }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select v-model="recurrenceFilter">
+            <SelectTrigger class="w-[150px]">
+              <SelectValue placeholder="Recurrence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="rec in recurrences" :key="rec" :value="rec">
+                {{ rec === "all" ? "All Recurrence" : rec }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select v-model="statusFilter">
+            <SelectTrigger class="w-[130px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select v-model="streakFilter">
+            <SelectTrigger class="w-[150px]">
+              <SelectValue placeholder="Streak" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Streaks</SelectItem>
+              <SelectItem value="active">Active Streaks Only</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select v-model="goalFilter">
+            <SelectTrigger class="w-[150px]">
+              <SelectValue placeholder="Goal %" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Progress</SelectItem>
+              <SelectItem value="high">75-100%</SelectItem>
+              <SelectItem value="medium">50-74%</SelectItem>
+              <SelectItem value="low">0-49%</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div class="flex gap-2 ml-auto">
+            <Button :variant="viewMode === 'grid' ? 'default' : 'outline'" size="icon" @click="viewMode = 'grid'">
+              <IconLayoutGrid class="h-4 w-4" />
+            </Button>
+            <Button :variant="viewMode === 'list' ? 'default' : 'outline'" size="icon" @click="viewMode = 'list'">
+              <IconList class="h-4 w-4" />
+            </Button>
+            <!-- <Button @click="toast.info('Add habit - coming soon')"> -->
+            <Button @click="undefined">
+              <IconPlus class="h-4 w-4 mr-2" />
+              Add Habit
+            </Button>
+          </div>
         </div>
 
-        <!-- Filters -->
-        <Select v-model="categoryFilter">
-          <SelectTrigger class="w-[150px]">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="cat in categories" :key="cat" :value="cat">{{ cat === "all" ? "All Categories" : cat }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <!-- Bulk Actions -->
+        <Card v-if="selectedHabits.length > 1" class="bg-primary/5 border-primary/20">
+          <CardContent class="p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <Checkbox :checked="selectedHabits.length === filteredHabits.length" @change="selectAllHabits" />
+                <span class="font-medium">{{ selectedHabits.length }} habits selected</span>
+              </div>
+              <div class="flex gap-2">
+                <Button variant="outline" size="sm" @click="bulkActivate">
+                  <IconPlay class="h-4 w-4 mr-2" />
+                  Activate
+                </Button>
+                <Button variant="outline" size="sm" @click="bulkDeactivate">
+                  <IconPause class="h-4 w-4 mr-2" />
+                  Deactivate
+                </Button>
+                <Button variant="destructive" size="sm" @click="bulkDelete">
+                  <IconTrash2 class="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <Select v-model="recurrenceFilter">
-          <SelectTrigger class="w-[150px]">
-            <SelectValue placeholder="Recurrence" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="rec in recurrences" :key="rec" :value="rec">{{ rec === "all" ? "All Recurrence" : rec }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select v-model="statusFilter">
-          <SelectTrigger class="w-[130px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select v-model="streakFilter">
-          <SelectTrigger class="w-[150px]">
-            <SelectValue placeholder="Streak" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Streaks</SelectItem>
-            <SelectItem value="active">Active Streaks Only</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select v-model="goalFilter">
-          <SelectTrigger class="w-[150px]">
-            <SelectValue placeholder="Goal %" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Progress</SelectItem>
-            <SelectItem value="high">75-100%</SelectItem>
-            <SelectItem value="medium">50-74%</SelectItem>
-            <SelectItem value="low">0-49%</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div class="flex gap-2 ml-auto">
-          <Button :variant="viewMode === 'grid' ? 'default' : 'outline'" size="icon" @click="viewMode = 'grid'">
-            <IconLayoutGrid class="h-4 w-4" />
-          </Button>
-          <Button :variant="viewMode === 'list' ? 'default' : 'outline'" size="icon" @click="viewMode = 'list'">
-            <IconList class="h-4 w-4" />
-          </Button>
-          <!-- <Button @click="toast.info('Add habit - coming soon')"> -->
-          <Button @click="undefined">
+      <!-- Habits Display -->
+      <Card v-if="filteredHabits.length === 0">
+        <CardContent class="p-12 text-center">
+          <Target class="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h3 class="text-lg font-semibold mb-2">No habits found</h3>
+          <p class="text-muted-foreground mb-4">Try adjusting your filters or create a new habit</p>
+          <Button @click="navigateToCreateHabit">
             <IconPlus class="h-4 w-4 mr-2" />
             Add Habit
           </Button>
-        </div>
-      </div>
-
-      <!-- Bulk Actions -->
-      <Card v-if="selectedHabits.length > 1" class="bg-primary/5 border-primary/20">
-        <CardContent class="p-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <Checkbox :checked="selectedHabits.length === filteredHabits.length" @change="selectAllHabits" />
-              <span class="font-medium">{{ selectedHabits.length }} habits selected</span>
-            </div>
-            <div class="flex gap-2">
-              <Button variant="outline" size="sm" @click="bulkActivate">
-                <IconPlay class="h-4 w-4 mr-2" />
-                Activate
-              </Button>
-              <Button variant="outline" size="sm" @click="bulkDeactivate">
-                <IconPause class="h-4 w-4 mr-2" />
-                Deactivate
-              </Button>
-              <Button variant="destructive" size="sm" @click="bulkDelete">
-                <IconTrash2 class="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
-    </div>
-
-    <!-- Habits Display -->
-    <Card v-if="filteredHabits.length === 0">
-      <CardContent class="p-12 text-center">
-        <Target class="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <h3 class="text-lg font-semibold mb-2">No habits found</h3>
-        <p class="text-muted-foreground mb-4">Try adjusting your filters or create a new habit</p>
-        <Button @click="navigateToCreateHabit">
-          <IconPlus class="h-4 w-4 mr-2" />
-          Add Habit
-        </Button>
-      </CardContent>
-    </Card>
-    <template v-else>
-      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
-          @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
-          @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
-      </div>
-      <div v-else class="space-y-3">
-        <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
-          @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
-          @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
-      </div>
-    </template>
-  </main>
+      <template v-else>
+        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
+            @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
+            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
+        </div>
+        <div v-else class="space-y-3">
+          <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
+            @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
+            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
+        </div>
+      </template>
+    </main>
+    <AlertDialog :open="deleteDialogOpen" @update:open="setDeleteDialogOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Habit?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete the habit and all its data.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel @click="setDeleteDialogOpen(false)">Cancel</AlertDialogCancel>
+          <AlertDialogAction @click="confirmDelete"
+            class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -337,10 +357,22 @@ const toggleStatus = (habitId: string) => {
   // toast.success("Status toggled!");
 }
 
-const deleteHabit = (habitId: string) => {
-  habits.value = habits.value.filter(habit => habit.id !== habitId)
+const deleteDialogOpen = ref(false)
+let habitToDelete = null as string | null
+const setDeleteDialogOpen = (value: boolean) => {
+  deleteDialogOpen.value = value
+}
+
+const confirmDelete = () => {
+  setDeleteDialogOpen(false)
+  habits.value = habits.value.filter(habit => habit.id !== habitToDelete)
   // toast.success(`Deleted ${habitId}`)
-  selectedHabits.value = selectedHabits.value.filter(id => id !== habitId)
+  selectedHabits.value = selectedHabits.value.filter(id => id !== habitToDelete)
+}
+
+const deleteHabit = (habitId: string) => {
+  habitToDelete = habitId
+  setDeleteDialogOpen(true)
 }
 
 
