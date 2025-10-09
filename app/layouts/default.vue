@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <SidebarProvider>
     <Navigation>
       <AppNavConent />
     </Navigation>
-    <div class="mt-16">
+    <AppSidebar />
+    <main class="mt-16">
       <slot />
-    </div>
-  </div>
+    </main>
+  </SidebarProvider>
 </template>
