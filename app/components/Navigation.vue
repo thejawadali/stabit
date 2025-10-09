@@ -1,15 +1,14 @@
 <template>
   <nav class="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto px-4 sm:px-6 lg:px-8" :class="isHomePage ? 'max-w-7xl' : 'max-w-full'">
       <div class="flex justify-between items-center h-16">
+        <NuxtLink to="/" class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
+          </div>
+          <span class="text-2xl font-bold text-foreground">Stabit</span>
+        </NuxtLink>
         <slot>
-          <NuxtLink to="/" class="flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span class="text-2xl font-bold text-foreground">Stabit</span>
-          </NuxtLink>
-
           <!-- Desktop Navigation -->
           <div v-if="isHomePage" class="hidden md:flex items-center space-x-8">
             <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors">
