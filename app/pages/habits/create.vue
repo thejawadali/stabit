@@ -15,7 +15,7 @@
       </Button>
     </div>
 
-    <Tabs defaultValue="rewards" class="space-y-6 w-full">
+    <Tabs defaultValue="general" class="space-y-6 w-full">
       <TabsList class="grid w-full grid-cols-5">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -26,121 +26,13 @@
 
       <!-- General Information -->
       <TabsContent value="general" class="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>General Information</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="space-y-2">
-              <Label for="icon">Habit Icon</Label>
-              <div class="flex items-center gap-4">
-                <Button type="button" variant="outline" class="text-4xl h-16 w-16"
-                  @click="showEmojiPicker = !showEmojiPicker">
-                  {{ formData.icon }}
-                </Button>
-                <div v-if="showEmojiPicker" class="flex flex-wrap gap-2 p-4 border rounded-lg bg-background">
-                  <Button v-for="emoji in EMOJI_OPTIONS" :key="emoji" type="button" variant="ghost"
-                    @click="formData.icon = emoji; showEmojiPicker = false" class="text-2xl h-12 w-12">
-                    {{ emoji }}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <Input label="Habit Name" rules="required" name="name" placeholder="e.g., Daily Reading" validateOnBlur
-              v-model="formData.name" />
-
-            <Select label="Category" v-model="formData.category" rules="required" name="category"
-              placeholder="Select a category" validateOnBlur>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="cat in CATEGORIES" :key="cat" :value="cat">
-                  {{ cat }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Textarea name="description" label="Description / Motivation"
-              placeholder="Why is this habit important to you?" v-model="formData.description" />
-
-          </CardContent>
-        </Card>
+        <HabitGeneralInfo v-model:icon="formData.icon" v-model:name="formData.name" v-model:category="formData.category" v-model:description="formData.description" :categories="cateogries" />
       </TabsContent>
 
 
       <!-- Schedule & Recurrence  -->
       <TabsContent value="schedule" class="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <CalendarIcon class="w-5 h-5" />
-              Recurrence & Schedule
-            </CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <Select label="Recurrence Type" v-model="formData.recurrenceType">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="formData.timeOfDay" />
-
-            <div class="grid grid-cols-2 gap-4">
-              <Input name="startDate" type="date" v-model="formData.startDate" label="Start Date" />
-              <Input name="endDate" type="date" v-model="formData.endDate" label="End Date (Optional)" />
-            </div>
-
-            <!-- Notifications -->
-            <div class="pt-4 border-t space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <Label class="text-base">Notifications & Reminders</Label>
-                  <p class="text-sm text-muted-foreground">Get reminded to complete your habit</p>
-                </div>
-                <Switch v-model="formData.notificationsEnabled" />
-              </div>
-
-              <div class="space-y-2" v-if="formData.notificationsEnabled">
-                <Label>Reminder Times</Label>
-                <div v-for="(_, index) in formData.reminderTimes" :key="index" class="flex items-center gap-2">
-                  <Input type="time" v-model="formData.reminderTimes[index]" />
-                  <Button v-if="formData.reminderTimes.length > 1" type="button" variant="ghost" size="icon"
-                    @click="removeReminderTime(index)">
-                    <IconTrash2 class="w-4 h-4" />
-                  </Button>
-                </div>
-                <Button type="button" variant="outline" size="sm" @click="addReminderTime">
-                  <IconPlus class="w-4 h-4 mr-2" />
-                  Add Reminder Time
-                </Button>
-              </div>
-
-              <div class="space-y-3">
-                <Label>Smart Reminders</Label>
-                <div class="flex items-center justify-between">
-                  <Label for="missedYesterday" class="font-normal">
-                    Send gentle reminder if missed yesterday
-                  </Label>
-                  <Switch id="missedYesterday" v-model="formData.smartReminders.missedYesterday" />
-                </div>
-
-                <div class="flex items-center justify-between">
-                  <Label for="streakContinuation" class="font-normal">
-                    Encourage streak continuation
-                  </Label>
-                  <Switch id="streakContinuation" v-model="formData.smartReminders.streakContinuation" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <HabitSchedule v-model:recurrenceType="formData.recurrenceType" v-model:timeOfDay="formData.timeOfDay" v-model:startDate="formData.startDate" v-model:endDate="formData.endDate" v-model:notificationsEnabled="formData.notificationsEnabled" v-model:reminderTimes="formData.reminderTimes" v-model:missedYesterday="formData.smartReminders.missedYesterday" v-model:streakContinuation="formData.smartReminders.streakContinuation" />
       </TabsContent>
 
       <!-- Difficulty & Growth -->
@@ -401,15 +293,14 @@ type FormData = {
 }
 
 const icons = ["🎁", "🎉", "🏆", "⭐", "🎊", "💎", "🎈", "🍕", "🍰", "🎮"]
-const EMOJI_OPTIONS = ["📚", "🏃", "💪", "🎯", "🧘", "💧", "🎨", "🎵", "✍️", "🍎", "🌱", "🔥", "⭐", "🎮", "📱", "💼"]
-const CATEGORIES = ["Health", "Learning", "Productivity", "Fitness"]
+const cateogries = ["Health", "Learning", "Productivity", "Fitness"]
 
 const router = useRouter()
 const route = useRoute()
 const editMode = computed(() => route.query.edit === "true")
 
 
-const showEmojiPicker = ref(false)
+
 const formData = reactive<FormData>({
   name: "Daily Walk",
   category: "",
@@ -430,7 +321,7 @@ const formData = reactive<FormData>({
   reminderTimes: ["09:00"],
   smartReminders: {
     missedYesterday: true,
-    streakContinuation: true,
+    streakContinuation: false,
   },
 })
 
@@ -483,13 +374,6 @@ const deleteReward = (index: number) => {
 }
 
 
-function addReminderTime() {
-  formData.reminderTimes.push("09:00")
-}
-
-function removeReminderTime(index: number) {
-  formData.reminderTimes.splice(index, 1)
-}
 
 function handleSave(andAddAnother = false) {
   if (!formData.name) {

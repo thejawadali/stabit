@@ -1,0 +1,100 @@
+<template>
+  <Card>
+    <CardHeader>
+      <CardTitle class="flex items-center gap-2">
+        <CalendarIcon class="w-5 h-5" />
+        Recurrence & Schedule
+      </CardTitle>
+    </CardHeader>
+    <CardContent class="space-y-4">
+      <Select label="Recurrence Type" v-model="recurrenceType">
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="daily">Daily</SelectItem>
+          <SelectItem value="weekly">Weekly</SelectItem>
+          <SelectItem value="monthly">Monthly</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="timeOfDay" />
+
+      <div class="grid grid-cols-2 gap-4">
+        <Input name="startDate" type="date" v-model="startDate" label="Start Date" />
+        <Input name="endDate" type="date" v-model="endDate" label="End Date (Optional)" />
+      </div>
+
+      <!-- Notifications -->
+      <div class="pt-4 border-t space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <Label class="text-base">Notifications & Reminders</Label>
+            <p class="text-sm text-muted-foreground">Get reminded to complete your habit</p>
+          </div>
+          <Switch v-model="notificationsEnabled" />
+        </div>
+
+        <div class="space-y-2" v-if="notificationsEnabled">
+          <Label>Reminder Times</Label>
+          <div v-for="(_, index) in reminderTimes" :key="index" class="flex items-center gap-2">
+            <template v-if="reminderTimes">
+              <Input type="time" v-model="reminderTimes[index]" />
+              <Button v-if="reminderTimes.length > 1" type="button" variant="ghost" size="icon"
+                @click="removeReminderTime(index)">
+                <IconTrash2 class="w-4 h-4" />
+              </Button>
+            </template>
+          </div>
+          <Button type="button" variant="outline" size="sm" @click="addReminderTime">
+            <IconPlus class="w-4 h-4 mr-2" />
+            Add Reminder Time
+          </Button>
+        </div>
+
+        <div class="space-y-3">
+          <Label>Smart Reminders</Label>
+          <div class="flex items-center justify-between">
+            <Label for="missedYesterday" class="font-normal">
+              Send gentle reminder if missed yesterday
+            </Label>
+            <Switch id="missedYesterday" v-model="missedYesterday" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <Label for="streakContinuation" class="font-normal">
+              Encourage streak continuation
+            </Label>
+            <Switch id="streakContinuation" v-model="streakContinuation" />
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</template>
+
+<script setup lang="ts">
+
+const recurrenceType = defineModel<string>('recurrenceType')
+const timeOfDay = defineModel<string>('timeOfDay')
+const startDate = defineModel<string>('startDate')
+const endDate = defineModel<string>('endDate')
+const notificationsEnabled = defineModel<boolean>('notificationsEnabled')
+const reminderTimes = defineModel<string[]>('reminderTimes')
+const missedYesterday = defineModel<boolean>('missedYesterday')
+const streakContinuation = defineModel<boolean>('streakContinuation')
+
+
+
+
+const removeReminderTime = (index: number) => {
+  reminderTimes.value?.splice(index, 1)
+}
+
+const addReminderTime = () => {
+  reminderTimes.value?.push("00:00")
+}
+
+</script>
+
+<style scoped></style>
