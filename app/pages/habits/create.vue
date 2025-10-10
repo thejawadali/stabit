@@ -15,7 +15,7 @@
       </Button>
     </div>
 
-    <Tabs defaultValue="growth" class="space-y-6 w-full">
+    <Tabs defaultValue="custom" class="space-y-6 w-full">
       <TabsList class="grid w-full grid-cols-5">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -201,6 +201,77 @@
 
             <Input name="estimatedDate" type="date" v-model="formData.estimatedDate"
               label="Estimated Completion Date" />
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+
+      <!-- Custom Fields -->
+      <TabsContent value="custom" class="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Custom Fields</CardTitle>
+            <p class="text-sm text-muted-foreground">
+              Add custom fields unique to this habit that you can track with each session
+            </p>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div v-for="(field, index) in customFields" :key="field.id" class="border rounded-lg p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <IconGripVertical class="w-4 h-4 text-muted-foreground" />
+                  <span class="font-medium">Field {{ index + 1 }}</span>
+                </div>
+                <Button type="button" variant="ghost" size="icon" @click="undefined">
+                  <IconTrash2 class="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <Input name="title" label="Field Title" placeholder="e.g., Duration, Mood, Reps"
+                  v-model="field.title" />
+
+                <Select name="type" label="Field Type" v-model="field.type">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="text">Text</SelectItem>
+                    <SelectItem value="number">Number</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                    <SelectItem value="select">Select</SelectItem>
+                    <SelectItem value="boolean">Yes/No</SelectItem>
+                  </SelectContent>
+                </Select>
+
+              </div>
+            </div>
+            <!-- v-if="field.type === 'select'" -->
+            <Input name="options" placeholder="Option 1, Option 2, Option 3" label="Options (comma-separated)" />
+
+            <div class="flex items-center gap-2">
+              <Switch />
+              <Label class="font-normal">Required field</Label>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <Select>
+                <SelectTrigger class="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="number">Number</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="select">Select</SelectItem>
+                  <SelectItem value="boolean">Yes/No</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="outline" onClick={addCustomField}>
+                <IconPlus class="w-4 h-4 mr-2" />
+                Add Custom Field
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </TabsContent>
