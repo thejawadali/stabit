@@ -47,21 +47,19 @@
               </div>
             </div>
 
-            <Input label="Habit Name" rules="required" name="name" placeholder="e.g., Daily Reading" />
+            <Input label="Habit Name" rules="required" name="name" placeholder="e.g., Daily Reading" validateOnBlur
+              v-model="formData.name" />
 
-            <div class="space-y-2">
-              <Label for="category">Category *</Label>
-              <Select id="category">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="cat in CATEGORIES" :key="cat" :value="cat">
-                    {{ cat }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select label="Category" rules="required" name="category" placeholder="Select a category" validateOnBlur>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="cat in CATEGORIES" :key="cat" :value="cat">
+                  {{ cat }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
 
             <div class="space-y-2">
               <Label for="description">Description / Motivation</Label>
@@ -70,7 +68,7 @@
           </CardContent>
         </Card>
       </TabsContent>
-      
+
     </Tabs>
 
 
@@ -153,7 +151,7 @@ const editMode = computed(() => route.query.edit === "true")
 
 const showEmojiPicker = ref(false)
 const formData = reactive<FormData>({
-  name: "",
+  name: "Daily Walk",
   category: "",
   description: "",
   icon: "🏃",
