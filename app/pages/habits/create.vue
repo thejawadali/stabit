@@ -15,7 +15,7 @@
       </Button>
     </div>
 
-    <Tabs defaultValue="custom" class="space-y-6 w-full">
+    <Tabs defaultValue="rewards" class="space-y-6 w-full">
       <TabsList class="grid w-full grid-cols-5">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -276,6 +276,66 @@
         </Card>
       </TabsContent>
 
+
+      <!-- Rewards & Milestones -->
+      <TabsContent value="rewards" class="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center gap-2">
+              <IconGift class="w-5 h-5" />
+              Rewards & Milestones
+            </CardTitle>
+            <p class="text-sm text-muted-foreground">
+              Define rewards for reaching milestones to stay motivated
+            </p>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div v-for="(reward, index) in rewards" :key="reward.id" class="border rounded-lg p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">{{ reward.icon }}</span>
+                  <span class="font-medium">Reward {{ index + 1 }}</span>
+                </div>
+                <Button type="button" variant="ghost" size="icon">
+                  <IconTrash2 class="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-2">
+                  <Input type="number" label="Milestone Value" placeholder="e.g., 10" v-model="reward.milestoneValue" />
+                  <p class="text-xs text-muted-foreground">After how many {{ formData.goalMetric }}?</p>
+                </div>
+                <div class="space-y-2">
+                  <Select name="icon" label="Icon" v-model="reward.icon">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="icon in icons" :key="icon" :value="icon">
+                        {{ icon }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Input name="reward_name" label="Reward Name" placeholder="e.g., Cheat Meal, Movie Night"
+                v-model="reward.name" />
+
+              <div class="space-y-2">
+
+                <Textarea placeholder="Describe your reward..." v-model="reward.description" label="Description" />
+              </div>
+            </div>
+
+            <Button type="button" variant="outline">
+              <IconPlus class="w-4 h-4 mr-2" />
+              Add Reward
+            </Button>
+          </CardContent>
+        </Card>
+      </TabsContent>
     </Tabs>
 
 
@@ -347,7 +407,7 @@ type FormData = {
 //   editMode: false
 // })
 
-
+const icons = ["🎁", "🎉", "🏆", "⭐", "🎊", "💎", "🎈", "🍕", "🍰", "🎮"]
 const EMOJI_OPTIONS = ["📚", "🏃", "💪", "🎯"]
 const CATEGORIES = ["Health", "Learning", "Productivity", "Fitness"]
 
