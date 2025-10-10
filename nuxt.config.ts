@@ -44,13 +44,9 @@ export default defineNuxtConfig({
   lucide: {
     namePrefix: 'Icon'
   },
-  // supabase: {
-  //   redirectOptions: {
-  //     login: '/login',
-  //     callback: '/dashboard',
-  //     exclude: ['/']
-  //   }
-  // },
+  supabase: {
+    redirect: false,
+  },
   components: [
     {
       path: '~/components/dashboard',
