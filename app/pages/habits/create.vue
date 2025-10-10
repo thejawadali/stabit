@@ -1,5 +1,5 @@
 <template>
-  <main class="container mx-auto p-6 w-full">
+  <main class="container mx-auto p-6 w-full max-w-5xl">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-3xl font-bold">
@@ -15,7 +15,7 @@
       </Button>
     </div>
 
-    <Tabs defaultValue="general" class="space-y-6 w-full">
+    <Tabs defaultValue="schedule" class="space-y-6 w-full">
       <TabsList class="grid w-full grid-cols-5">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -63,6 +63,85 @@
             <Textarea name="description" label="Description / Motivation"
               placeholder="Why is this habit important to you?" />
 
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+
+      <!-- Schedule & Recurrence  -->
+      <TabsContent value="schedule" class="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center gap-2">
+              <CalendarIcon class="w-5 h-5" />
+              Recurrence & Schedule
+            </CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <Select label="Recurrence Type" v-model="formData.recurrenceType">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input v-if="formData.recurrenceType === 'custom'" label="Custom Recurrence Pattern" name="customRecurrence"
+              placeholder="e.g., Every 2 days, Mon-Wed-Fri" v-model="formData.customRecurrence" />
+
+            <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="formData.timeOfDay" />
+
+            <div class="grid grid-cols-2 gap-4">
+              <Input name="startDate" type="date" v-model="formData.startDate" label="Start Date" />
+              <Input name="endDate" type="date" v-model="formData.endDate" label="End Date (Optional)" />
+            </div>
+
+            <!-- Notifications -->
+            <div class="pt-4 border-t space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <Label class="text-base">Notifications & Reminders</Label>
+                  <p class="text-sm text-muted-foreground">Get reminded to complete your habit</p>
+                </div>
+                <Switch v-model="formData.notificationsEnabled" />
+              </div>
+
+              <div class="space-y-2" v-if="formData.notificationsEnabled">
+                <Label>Reminder Times</Label>
+                <div v-for="(time, index) in formData.reminderTimes" :key="index" class="flex items-center gap-2">
+                  <Input type="time" />
+                  <Button v-if="formData.reminderTimes.length > 1" type="button" variant="ghost" size="icon"
+                    @click="undefined">
+                    <IconTrash2 class="w-4 h-4" />
+                  </Button>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addReminderTime}>
+                  <IconPlus class="w-4 h-4 mr-2" />
+                  Add Reminder Time
+                </Button>
+              </div>
+
+              <div class="space-y-3">
+                <Label>Smart Reminders</Label>
+                <div class="flex items-center justify-between">
+                  <Label htmlFor="missedYesterday" class="font-normal">
+                    Send gentle reminder if missed yesterday
+                  </Label>
+                  <Switch id="missedYesterday" v-model="formData.smartReminders.missedYesterday" />
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <Label htmlFor="streakContinuation" class="font-normal">
+                    Encourage streak continuation
+                  </Label>
+                  <Switch id="streakContinuation" checked={formData.smartReminders.streakContinuation}
+                    v-model="formData.smartReminders.streakContinuation" />
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </TabsContent>
