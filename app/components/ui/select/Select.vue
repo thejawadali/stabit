@@ -31,18 +31,18 @@ const modelValue = defineModel<string | number>({ default: '' })
 // change value when modelValue changes
 syncRefs(modelValue, value)
 
-let resetHasDone = false
+let resetHasDone = ref(false)
 onMounted(() => {
   if (!modelValue.value) {
     setTimeout(() => {
       handleReset()
-      resetHasDone = true
+      resetHasDone.value = true
     })
   }
 })
 
 const showError = computed(() => {
-  return resetHasDone && errorMessage.value
+  return resetHasDone.value && errorMessage.value
 })
 
 const forwarded = useForwardPropsEmits(props, emits)
