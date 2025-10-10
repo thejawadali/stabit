@@ -60,11 +60,9 @@
                 </SelectItem>
               </SelectContent>
             </Select>
+            <Textarea name="description" label="Description / Motivation"
+              placeholder="Why is this habit important to you?" />
 
-            <div class="space-y-2">
-              <Label for="description">Description / Motivation</Label>
-              <Textarea id="description" placeholder="Why is this habit important to you?" />
-            </div>
           </CardContent>
         </Card>
       </TabsContent>

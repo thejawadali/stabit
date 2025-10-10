@@ -58,7 +58,7 @@ const handleBlur = () => {
   <div class="">
     <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
         class="text-destructive">*</span></Label>
-    <SelectRoot v-bind="forwarded" @blur="handleBlur">
+    <SelectRoot :id="props.name" v-bind="forwarded" @blur="handleBlur">
       <slot />
     </SelectRoot>
     <p v-if="showError" class="text-sm text-destructive">{{ customErrorMessage || errorMessage }}</p>
