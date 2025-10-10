@@ -37,63 +37,7 @@
 
       <!-- Difficulty & Growth -->
       <TabsContent value="growth" class="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <IconTrendingUp class="w-5 h-5" />
-              Difficulty & Growth Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <Input name="initialValue" label="Initial Value / Starting Point" type="number"
-              placeholder="e.g., 5 pushups" v-model="formData.initialValue" />
-
-            <Input label="Difficulty Increase Rate" name="difficultyRate" type="number" placeholder="e.g., +1"
-              v-model="formData.difficultyRate">
-            <template #suffix>
-              <span class="text-sm text-muted-foreground w-20">per week</span>
-            </template>
-            </Input>
-
-            <!-- TODO: in phase 2
-             <div class="flex items-center justify-between">
-              <div>
-                <Label for="autoGrowth" class="text-base">Auto-Growth</Label>
-                <p class="text-sm text-muted-foreground">Automatically increase difficulty over time</p>
-              </div>
-              <Switch id="autoGrowth" v-model="formData.autoGrowth" />
-            </div> -->
-
-
-            <div class="pt-4 border-t space-y-4">
-              <Label class="text-base flex items-center gap-2">
-                <IconTarget class="w-5 h-5" />
-                Goal Definition
-              </Label>
-            </div>
-
-
-            <Input name="goalValue" type="number" placeholder="e.g., 100" v-model="formData.goalValue"
-              label="Ultimate Goal" />
-
-            <Select name="goalMetric" v-model="formData.goalMetric" label="Goal Metric">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sessions">Sessions</SelectItem>
-                <SelectItem value="days">Days</SelectItem>
-                <SelectItem value="hours">Hours</SelectItem>
-                <SelectItem value="repetitions">Repetitions</SelectItem>
-                <SelectItem value="pages">Pages</SelectItem>
-                <SelectItem value="miles">Miles</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Input name="estimatedDate" type="date" v-model="formData.estimatedDate"
-              label="Estimated Completion Date" />
-          </CardContent>
-        </Card>
+        <HabitGrowth v-model:initialValue="formData.initialValue" v-model:difficultyRate="formData.difficultyRate" v-model:goalValue="formData.goalValue" v-model:goalMetric="formData.goalMetric" v-model:estimatedDate="formData.estimatedDate" />
       </TabsContent>
 
 
@@ -311,7 +255,7 @@ const formData = reactive<FormData>({
   timeOfDay: "09:00",
   startDate: new Date().toISOString().split("T")[0] || "",
   endDate: "",
-  initialValue: 1,
+  initialValue: 12,
   difficultyRate: 1,
   autoGrowth: false,
   goalValue: 30,
