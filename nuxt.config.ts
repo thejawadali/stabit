@@ -25,7 +25,8 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@vee-validate/nuxt',
     '@nuxtjs/color-mode',
-    'nuxt-lucide-icons'
+    'nuxt-lucide-icons',
+    '@nuxtjs/supabase',
   ],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
@@ -43,6 +44,13 @@ export default defineNuxtConfig({
   lucide: {
     namePrefix: 'Icon'
   },
+  // supabase: {
+  //   redirectOptions: {
+  //     login: '/login',
+  //     callback: '/dashboard',
+  //     exclude: ['/']
+  //   }
+  // },
   components: [
     {
       path: '~/components/dashboard',
