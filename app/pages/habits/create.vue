@@ -15,7 +15,7 @@
       </Button>
     </div>
 
-    <Tabs defaultValue="schedule" class="space-y-6 w-full">
+    <Tabs defaultValue="growth" class="space-y-6 w-full">
       <TabsList class="grid w-full grid-cols-5">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -40,7 +40,7 @@
                 </Button>
                 <div v-if="showEmojiPicker" class="flex flex-wrap gap-2 p-4 border rounded-lg bg-background">
                   <Button v-for="emoji in EMOJI_OPTIONS" :key="emoji" type="button" variant="ghost"
-                    @click="showEmojiPicker = false" class="text-2xl h-12 w-12">
+                    @click="formData.icon = emoji; showEmojiPicker = false" class="text-2xl h-12 w-12">
                     {{ emoji }}
                   </Button>
                 </div>
@@ -112,13 +112,13 @@
               <div class="space-y-2" v-if="formData.notificationsEnabled">
                 <Label>Reminder Times</Label>
                 <div v-for="(time, index) in formData.reminderTimes" :key="index" class="flex items-center gap-2">
-                  <Input type="time" />
+                  <Input type="time" v-model="formData.reminderTimes[index]" />
                   <Button v-if="formData.reminderTimes.length > 1" type="button" variant="ghost" size="icon"
-                    @click="undefined">
+                    @click="removeReminderTime(index)">
                     <IconTrash2 class="w-4 h-4" />
                   </Button>
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={addReminderTime}>
+                <Button type="button" variant="outline" size="sm" @click="addReminderTime">
                   <IconPlus class="w-4 h-4 mr-2" />
                   Add Reminder Time
                 </Button>
@@ -127,21 +127,80 @@
               <div class="space-y-3">
                 <Label>Smart Reminders</Label>
                 <div class="flex items-center justify-between">
-                  <Label htmlFor="missedYesterday" class="font-normal">
+                  <Label for="missedYesterday" class="font-normal">
                     Send gentle reminder if missed yesterday
                   </Label>
                   <Switch id="missedYesterday" v-model="formData.smartReminders.missedYesterday" />
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <Label htmlFor="streakContinuation" class="font-normal">
+                  <Label for="streakContinuation" class="font-normal">
                     Encourage streak continuation
                   </Label>
-                  <Switch id="streakContinuation" checked={formData.smartReminders.streakContinuation}
-                    v-model="formData.smartReminders.streakContinuation" />
+                  <Switch id="streakContinuation" v-model="formData.smartReminders.streakContinuation" />
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <!-- Difficulty & Growth -->
+      <TabsContent value="growth" class="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center gap-2">
+              <TrendingUp class="w-5 h-5" />
+              Difficulty & Growth Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <Input name="initialValue" label="Initial Value / Starting Point" type="number"
+              placeholder="e.g., 5 pushups" v-model="formData.initialValue" />
+
+            <Input label="Difficulty Increase Rate" name="difficultyRate" type="number" placeholder="e.g., +1"
+              v-model="formData.difficultyRate">
+            <template #suffix>
+              <span class="text-sm text-muted-foreground w-20">per week</span>
+            </template>
+            </Input>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <Label htmlFor="autoGrowth" class="text-base">Auto-Growth</Label>
+                <p class="text-sm text-muted-foreground">Automatically increase difficulty over time</p>
+              </div>
+              <Switch id="autoGrowth" v-model="formData.autoGrowth" />
+            </div>
+
+
+            <div class="pt-4 border-t space-y-4">
+              <Label class="text-base flex items-center gap-2">
+                <IconTarget class="w-5 h-5" />
+                Goal Definition
+              </Label>
+            </div>
+
+
+            <Input name="goalValue" type="number" placeholder="e.g., 100" v-model="formData.goalValue"
+              label="Ultimate Goal" />
+
+            <Select name="goalMetric" v-model="formData.goalMetric" label="Goal Metric">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sessions">Sessions</SelectItem>
+                <SelectItem value="days">Days</SelectItem>
+                <SelectItem value="hours">Hours</SelectItem>
+                <SelectItem value="repetitions">Repetitions</SelectItem>
+                <SelectItem value="pages">Pages</SelectItem>
+                <SelectItem value="miles">Miles</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input name="estimatedDate" type="date" v-model="formData.estimatedDate"
+              label="Estimated Completion Date" />
           </CardContent>
         </Card>
       </TabsContent>
@@ -257,6 +316,14 @@ const showPreview = ref(false)
 
 function updateFormData<K extends keyof FormData>(key: K, value: FormData[K]) {
   formData[key] = value
+}
+
+function addReminderTime() {
+  formData.reminderTimes.push("09:00")
+}
+
+function removeReminderTime(index: number) {
+  formData.reminderTimes.splice(index, 1)
 }
 
 function handleSave(andAddAnother = false) {

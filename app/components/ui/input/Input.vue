@@ -52,8 +52,11 @@ const inputClasses = computed(() => {
   <div class="">
     <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
         class="text-destructive">*</span></Label>
-    <input :id="props.name" v-model="modelValue" :class="inputClasses" :placeholder="props.placeholder"
-      @blur="validateOnBlur ? validate() : null">
+    <div class="flex items-center gap-2">
+      <input :id="props.name" v-model="modelValue" :class="inputClasses" :placeholder="props.placeholder"
+        @blur="validateOnBlur ? validate() : null">
+        <slot name="suffix" />
+    </div>
     <p v-if="showError" class="text-sm text-destructive">{{ customErrorMessage || errorMessage }}</p>
   </div>
 </template>
