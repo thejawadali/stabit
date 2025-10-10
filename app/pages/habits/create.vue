@@ -50,7 +50,8 @@
             <Input label="Habit Name" rules="required" name="name" placeholder="e.g., Daily Reading" validateOnBlur
               v-model="formData.name" />
 
-            <Select label="Category" rules="required" name="category" placeholder="Select a category" validateOnBlur>
+            <Select label="Category" v-model="formData.category" rules="required" name="category"
+              placeholder="Select a category" validateOnBlur>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
@@ -61,7 +62,7 @@
               </SelectContent>
             </Select>
             <Textarea name="description" label="Description / Motivation"
-              placeholder="Why is this habit important to you?" />
+              placeholder="Why is this habit important to you?" v-model="formData.description" />
 
           </CardContent>
         </Card>
@@ -85,12 +86,9 @@
               <SelectContent>
                 <SelectItem value="daily">Daily</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
-
-            <Input v-if="formData.recurrenceType === 'custom'" label="Custom Recurrence Pattern" name="customRecurrence"
-              placeholder="e.g., Every 2 days, Mon-Wed-Fri" v-model="formData.customRecurrence" />
 
             <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="formData.timeOfDay" />
 
@@ -111,7 +109,7 @@
 
               <div class="space-y-2" v-if="formData.notificationsEnabled">
                 <Label>Reminder Times</Label>
-                <div v-for="(time, index) in formData.reminderTimes" :key="index" class="flex items-center gap-2">
+                <div v-for="(_, index) in formData.reminderTimes" :key="index" class="flex items-center gap-2">
                   <Input type="time" v-model="formData.reminderTimes[index]" />
                   <Button v-if="formData.reminderTimes.length > 1" type="button" variant="ghost" size="icon"
                     @click="removeReminderTime(index)">
@@ -150,7 +148,7 @@
         <Card>
           <CardHeader>
             <CardTitle class="flex items-center gap-2">
-              <TrendingUp class="w-5 h-5" />
+              <IconTrendingUp class="w-5 h-5" />
               Difficulty & Growth Settings
             </CardTitle>
           </CardHeader>
@@ -165,13 +163,14 @@
             </template>
             </Input>
 
-            <div class="flex items-center justify-between">
+            <!-- TODO: in phase 2
+             <div class="flex items-center justify-between">
               <div>
-                <Label htmlFor="autoGrowth" class="text-base">Auto-Growth</Label>
+                <Label for="autoGrowth" class="text-base">Auto-Growth</Label>
                 <p class="text-sm text-muted-foreground">Automatically increase difficulty over time</p>
               </div>
               <Switch id="autoGrowth" v-model="formData.autoGrowth" />
-            </div>
+            </div> -->
 
 
             <div class="pt-4 border-t space-y-4">
@@ -210,7 +209,15 @@
       <TabsContent value="custom" class="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Custom Fields</CardTitle>
+            <CardTitle>
+              <div class="flex items-center justify-between">
+                Custom Fields
+                <Button type="button" variant="outline" @click="addCustomField">
+                  <IconPlus class="w-4 h-4 mr-2" />
+                  Add Custom Field
+                </Button>
+              </div>
+            </CardTitle>
             <p class="text-sm text-muted-foreground">
               Add custom fields unique to this habit that you can track with each session
             </p>
@@ -220,9 +227,11 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <IconGripVertical class="w-4 h-4 text-muted-foreground" />
-                  <span class="font-medium">Field {{ index + 1 }}</span>
+                  <span class="font-medium">
+                    {{ field.title || `Field ${index + 1}` }}
+                  </span>
                 </div>
-                <Button type="button" variant="ghost" size="icon" @click="undefined">
+                <Button type="button" variant="ghost" size="icon" @click="deleteCustomField(index)">
                   <IconTrash2 class="w-4 h-4" />
                 </Button>
               </div>
@@ -239,38 +248,23 @@
                     <SelectItem value="text">Text</SelectItem>
                     <SelectItem value="number">Number</SelectItem>
                     <SelectItem value="date">Date</SelectItem>
-                    <SelectItem value="select">Select</SelectItem>
-                    <SelectItem value="boolean">Yes/No</SelectItem>
+                    <SelectItem value="boolean">Checkbox/Switch</SelectItem>
                   </SelectContent>
                 </Select>
 
               </div>
-            </div>
-            <!-- v-if="field.type === 'select'" -->
-            <Input name="options" placeholder="Option 1, Option 2, Option 3" label="Options (comma-separated)" />
+              <TagsInput v-if="field.type === 'select'" v-model="field.options">
+                <TagsInputItem v-for="item in field.options" :key="item" :value="item">
+                  <TagsInputItemText />
+                  <TagsInputItemDelete />
+                </TagsInputItem>
 
-            <div class="flex items-center gap-2">
-              <Switch />
-              <Label class="font-normal">Required field</Label>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <Select>
-                <SelectTrigger class="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="text">Text</SelectItem>
-                  <SelectItem value="number">Number</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="select">Select</SelectItem>
-                  <SelectItem value="boolean">Yes/No</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button type="button" variant="outline" onClick={addCustomField}>
-                <IconPlus class="w-4 h-4 mr-2" />
-                Add Custom Field
-              </Button>
+                <TagsInputInput placeholder="Options..." />
+              </TagsInput>
+              <div class="flex items-center gap-2">
+                <Switch />
+                <Label class="font-normal">Required field</Label>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -281,9 +275,17 @@
       <TabsContent value="rewards" class="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <IconGift class="w-5 h-5" />
-              Rewards & Milestones
+            <CardTitle>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                  <IconGift class="w-5 h-5" />
+                  Rewards & Milestones
+                </span>
+                <Button type="button" variant="outline" @click="addReward">
+                  <IconPlus class="w-4 h-4 mr-2" />
+                  Add Reward
+                </Button>
+              </div>
             </CardTitle>
             <p class="text-sm text-muted-foreground">
               Define rewards for reaching milestones to stay motivated
@@ -294,45 +296,42 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="text-2xl">{{ reward.icon }}</span>
-                  <span class="font-medium">Reward {{ index + 1 }}</span>
+                  <!-- <span class="font-medium">Reward {{ index + 1 }}</span> -->
+                  <span class="font-medium">
+                    {{ reward.name || `Reward ${index + 1}` }}
+                  </span>
                 </div>
-                <Button type="button" variant="ghost" size="icon">
+                <Button type="button" variant="ghost" size="icon" @click="deleteReward(index)">
                   <IconTrash2 class="w-4 h-4" />
                 </Button>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
+                <div class="col-span-2">
+                  <Input name="reward_name" label="Reward Name" placeholder="e.g., Cheat Meal, Movie Night"
+                  v-model="reward.name"/>
+                </div>
                 <div class="space-y-2">
                   <Input type="number" label="Milestone Value" placeholder="e.g., 10" v-model="reward.milestoneValue" />
                   <p class="text-xs text-muted-foreground">After how many {{ formData.goalMetric }}?</p>
                 </div>
-                <div class="space-y-2">
-                  <Select name="icon" label="Icon" v-model="reward.icon">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="icon in icons" :key="icon" :value="icon">
-                        {{ icon }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select name="icon" label="Icon" v-model="reward.icon">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="icon in icons" :key="icon" :value="icon">
+                      {{ icon }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
-              <Input name="reward_name" label="Reward Name" placeholder="e.g., Cheat Meal, Movie Night"
-                v-model="reward.name" />
 
               <div class="space-y-2">
 
                 <Textarea placeholder="Describe your reward..." v-model="reward.description" label="Description" />
               </div>
             </div>
-
-            <Button type="button" variant="outline">
-              <IconPlus class="w-4 h-4 mr-2" />
-              Add Reward
-            </Button>
           </CardContent>
         </Card>
       </TabsContent>
@@ -364,7 +363,7 @@
 type CustomField = {
   id: string
   title: string
-  type: "text" | "number" | "date" | "select" | "boolean"
+  type: "text" | "number" | "select" | "boolean"
   options?: string[]
   required: boolean
 }
@@ -382,7 +381,7 @@ type FormData = {
   category: string
   description: string
   icon: string
-  recurrenceType: "daily" | "weekly" | "custom"
+  recurrenceType: "daily" | "weekly" | "monthly"
   customRecurrence: string
   timeOfDay: string
   startDate: string
@@ -401,14 +400,8 @@ type FormData = {
   }
 }
 
-// withDefaults(defineProps<{
-//   editMode: boolean
-// }>(), {
-//   editMode: false
-// })
-
 const icons = ["🎁", "🎉", "🏆", "⭐", "🎊", "💎", "🎈", "🍕", "🍰", "🎮"]
-const EMOJI_OPTIONS = ["📚", "🏃", "💪", "🎯"]
+const EMOJI_OPTIONS = ["📚", "🏃", "💪", "🎯", "🧘", "💧", "🎨", "🎵", "✍️", "🍎", "🌱", "🔥", "⭐", "🎮", "📱", "💼"]
 const CATEGORIES = ["Health", "Learning", "Productivity", "Fitness"]
 
 const router = useRouter()
@@ -448,6 +441,47 @@ const showPreview = ref(false)
 function updateFormData<K extends keyof FormData>(key: K, value: FormData[K]) {
   formData[key] = value
 }
+
+const addCustomField = () => {
+  // if previous field is not filled, show error
+  const previousField = customFields.value[customFields.value.length - 1]
+  if (previousField && previousField.title === "") {
+    // toast.error("Please fill the previous field first")
+    console.error("Please fill the previous field first")
+
+    return
+  }
+  const newField: CustomField = {
+    id: Date.now().toString(),
+    title: "",
+    type: "text",
+    required: false,
+    options: [],
+  }
+  customFields.value.push(newField)
+}
+
+
+const deleteCustomField = (index: number) => {
+  customFields.value.splice(index, 1)
+}
+
+
+const addReward = () => {
+  const newReward: Reward = {
+    id: Date.now().toString(),
+    milestoneValue: 10,
+    name: "",
+    description: "",
+    icon: "🎁",
+  }
+  rewards.value.push(newReward)
+}
+
+const deleteReward = (index: number) => {
+  rewards.value.splice(index, 1)
+}
+
 
 function addReminderTime() {
   formData.reminderTimes.push("09:00")
