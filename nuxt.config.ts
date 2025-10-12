@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-lucide-icons',
     '@nuxtjs/supabase',
+    'dayjs-nuxt',
   ],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
