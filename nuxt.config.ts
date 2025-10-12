@@ -6,6 +6,7 @@ export default defineNuxtConfig({
       titleTemplate: '%s - Stabit',
       meta: [
         { name: 'description', content: 'Stabit is a platform for building better habits' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/icon.png' },
