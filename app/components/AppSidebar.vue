@@ -40,7 +40,8 @@ import {
   IconUsers,
   IconBookOpen,
   IconBell,
-  IconUser
+  IconUser,
+  IconAward
 } from "#components"
 
 const route = useRoute()
@@ -56,6 +57,7 @@ const navigationItems = [
   { title: "Analytics", url: "/analytics", icon: IconBarChart3 },
   { title: "Calendar", url: "/calendar", icon: IconCalendar },
   { title: "Progress", url: "/progress", icon: IconTrendingUp },
+  { title: "Milestones", url: "/milestones", icon: IconAward },
 ]
 
 const isActive = (path: string) => route.path === path
