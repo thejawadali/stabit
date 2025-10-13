@@ -39,11 +39,16 @@
         <!-- Right Column - 1/3 width -->
         <div className="space-y-6">
           <!-- Calendar Widget -->
-          <CalendarWidget />
+          <Card class="bg-gradient-card shadow-card">
+            <CardHeader class="pb-1" />
+            <CardContent>
+              <CalendarWidget />
+            </CardContent>
+          </Card>
 
           <!-- Progress Snapshot -->
-          <ProgressSnapshot :weekly-completion="85" :monthly-trend="12" :remaining-sessions="15"
-            :total-sessions="247" :streak-text="'You\'re on a 25-day streak! 🔥'" />
+          <ProgressSnapshot :weekly-completion="85" :monthly-trend="12" :remaining-sessions="15" :total-sessions="247"
+            :streak-text="'You\'re on a 25-day streak! 🔥'" />
 
           <!-- Milestones -->
           <MilestonesPanel :milestones="milestones" />
