@@ -2,7 +2,7 @@
   <Card class="bg-gradient-card shadow-card">
     <CardHeader>
       <CardTitle class="text-lg font-semibold text-foreground flex items-center gap-2">
-        <Target class="h-5 w-5 text-primary" />
+        <IconTarget class="h-5 w-5 text-primary" />
         Goal Progress
       </CardTitle>
     </CardHeader>

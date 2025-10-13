@@ -47,21 +47,19 @@
       </ClientOnly>
 
 
-       <!-- Streaks & Goals -->
+      <!-- Streaks & Goals -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnalyticsStreaksPanel />
         <AnalyticsGoalProgressPanel />
       </div>
-      <!-- 
-      
 
-
-
-      {/* Category & Calendar */}
+      <!-- Category & Calendar -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CategoryBreakdown />
-        <CalendarSummary />
-      </div> -->
+        <ClientOnly>
+          <AnalyticsCategoryBreakdown />
+        </ClientOnly>
+        <!-- <CalendarSummary /> -->
+      </div>
     </div>
   </main>
 </template>
