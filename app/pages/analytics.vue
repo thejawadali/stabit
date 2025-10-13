@@ -32,20 +32,19 @@
         </Card>
       </div>
 
-       <!-- Performance Charts -->
+      <!-- Performance Charts -->
       <div className="grid grid-cols-1lg: grid-cols-2 gap-6">
         <ClientOnly>
-          <AnalyticsWeeklyPerformanceChart :weeklyData/>
-        </ClientOnly>
-        <ClientOnly>
+          <AnalyticsWeeklyPerformanceChart :weeklyData />
           <AnalyticsMonthlyTrendChart />
         </ClientOnly>
       </div>
 
-      
-      <!-- Habit Comparison -->
-      <AnalyticsHabitComparisonChart />
 
+      <!-- Habit Comparison -->
+      <ClientOnly>
+        <AnalyticsHabitComparisonChart />
+      </ClientOnly>
       <!-- 
       
 
