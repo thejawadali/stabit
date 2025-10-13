@@ -61,12 +61,9 @@
             </CardTitle>
           </CardHeader>
           <CardContent class="flex flex-col items-center">
-            <!-- <CalendarComponent mode="single" selected={date} onSelect={setDate}
-              class="rounded-md border-0 pointer-events-auto" modifiers={{ completed: completedDates, partial:
-              partialDates, }} modifiersStyles={{ completed: { backgroundColor: "hsl(var(--success) / 0.2)" ,
-              color: "hsl(var(--success))" , fontWeight: "bold" , }, partial: {
-              backgroundColor: "hsl(var(--warning) / 0.2)" , color: "hsl(var(--warning))" , fontWeight: "bold" , },
-              }} /> -->
+            <div class="my-2">
+              <CalendarWidget />
+            </div>
 
             <!-- Legend -->
             <div class="flex items-center justify-center space-x-6 mt-6 flex-wrap gap-3">
