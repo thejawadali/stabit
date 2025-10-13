@@ -58,7 +58,7 @@
         <ClientOnly>
           <AnalyticsCategoryBreakdown />
         </ClientOnly>
-        <!-- <CalendarSummary /> -->
+        <AnalyticsCalendarSummary />
       </div>
     </div>
   </main>

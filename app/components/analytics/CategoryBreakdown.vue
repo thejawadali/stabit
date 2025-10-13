@@ -7,7 +7,7 @@
       </CardTitle>
     </CardHeader>
     <CardContent>
-      <div class="h-40 my-6">
+      <div class="h-44 my-6">
         <Doughnut :data="data" :options="options" />
       </div>
       <div class="grid grid-cols-2 gap-3 mt-4">
