@@ -45,15 +45,17 @@
       <ClientOnly>
         <AnalyticsHabitComparisonChart />
       </ClientOnly>
+
+
+       <!-- Streaks & Goals -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AnalyticsStreaksPanel />
+        <AnalyticsGoalProgressPanel />
+      </div>
       <!-- 
       
 
 
-      {/* Streaks & Goals */}
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StreaksPanel />
-        <GoalProgressPanel />
-      </div>
 
       {/* Category & Calendar */}
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
