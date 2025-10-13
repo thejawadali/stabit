@@ -29,13 +29,17 @@
         :class="{
           'bg-primary text-primary-foreground': dayObj.isCurrentMonth && isToday(dayObj.day),
           'bg-success/10 hover:bg-success/20': dayObj.isCurrentMonth && isCompleted(dayObj.day),
-          'hover:bg-muted': dayObj.isCurrentMonth && !isToday(dayObj.day) && !isCompleted(dayObj.day),
+          'bg-[hsl(var(--warning)/0.2)] hover:bg-[hsl(var(--warning)/0.3)] text-[hsl(var(--warning))] hover:text-[hsl(var(--warning))]': dayObj.isCurrentMonth && isPartiallyCompleted(dayObj.day),
+          'hover:bg-muted': dayObj.isCurrentMonth && !isToday(dayObj.day) && !isCompleted(dayObj.day) && !isPartiallyCompleted(dayObj.day),
           'text-muted-foreground/50 cursor-not-allowed': !dayObj.isCurrentMonth
         }"
         :disabled="!dayObj.isCurrentMonth"
       >
         <template v-if="dayObj.isCurrentMonth && isCompleted(dayObj.day)">
           <IconCheck class="h-4 w-4 text-success" />
+        </template>
+        <template v-else-if="dayObj.isCurrentMonth && isPartiallyCompleted(dayObj.day)">
+          {{ dayObj.day }}
         </template>
         <template v-else>
           {{ dayObj.day }}
@@ -107,6 +111,9 @@ const calendarDays = computed(() => {
 // Mock completed days
 const completedDays = ref([1, 3, 5, 7, 8, 10, 12, 15, 17, 20, 21])
 
+// Mock partially completed days
+const partiallyCompletedDays = ref([2, 4])
+
 const previousMonth = () => {
   currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
 }
@@ -116,6 +123,7 @@ const nextMonth = () => {
 }
 
 const isCompleted = (day: number) => completedDays.value.includes(day)
+const isPartiallyCompleted = (day: number) => partiallyCompletedDays.value.includes(day)
 const isToday = (day: number) => {
   const today = new Date()
   return day === today.getDate() &&
