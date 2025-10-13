@@ -58,6 +58,7 @@ const navigationItems = [
   { title: "Calendar", url: "/calendar", icon: IconCalendar },
   { title: "Progress", url: "/progress", icon: IconTrendingUp },
   { title: "Milestones", url: "/milestones", icon: IconAward },
+  { title: "Settings", url: "/settings", icon: IconSettings },
 ]
 
 const isActive = (path: string) => route.path === path
