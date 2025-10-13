@@ -7,10 +7,10 @@
         </CardTitle>
         <div class="flex space-x-1">
           <Button variant="ghost" size="icon" class="h-8 w-8" @click="previousMonth">
-            <ChevronLeft class="h-4 w-4" />
+            <IconChevronLeft class="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" class="h-8 w-8" @click="nextMonth">
-            <ChevronRight class="h-4 w-4" />
+            <IconChevronRight class="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -34,7 +34,7 @@
           'hover:bg-muted': !isToday(day) && !isCompleted(day)
         }">
           <template v-if="isCompleted(day)">
-            <Check class="h-4 w-4 text-success" />
+            <IconCheck class="h-4 w-4 text-success" />
           </template>
           <template v-else>
             {{ day }}
