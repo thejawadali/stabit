@@ -272,7 +272,7 @@
       <Card>
         <CardHeader>
           <CardTitle class="flex items-center gap-2">
-            <Star class="w-5 h-5 text-warning" />
+            <IconStar class="w-5 h-5 text-warning" />
             Completed Rewards History
           </CardTitle>
         </CardHeader>
