@@ -39,6 +39,7 @@
               <SelectItem value="text">Text</SelectItem>
               <SelectItem value="number">Number</SelectItem>
               <SelectItem value="date">Date</SelectItem>
+              <SelectItem value="select">Select</SelectItem>
               <SelectItem value="boolean">Checkbox/Switch</SelectItem>
             </SelectContent>
           </Select>

@@ -218,7 +218,7 @@ CREATE TABLE habit_streaks (
 -- =====================================================
 
 -- Milestones for habits
-CREATE TABLE milestones (
+CREATE TABLE milestones ( -- you can name it rewards, UI is not sync with this table
     id INT PRIMARY KEY AUTO_INCREMENT,
     habit_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
