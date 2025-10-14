@@ -78,6 +78,14 @@ const {validate} = useForm()
 const { signIn, signInWithProvider } = useAuth()
 const router = useRouter()
 
+
+// In dev mode, prefill login credentials
+if (process.env.NODE_ENV === 'development') {
+  email.value = "ali@ali.com"
+  password.value = "12345678"
+}
+
+
 const handleSubmit = async () => {
   const { valid } = await validate()
   if (!valid) return
