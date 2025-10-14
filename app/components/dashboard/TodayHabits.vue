@@ -15,10 +15,10 @@
           class="flex items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
           <div class="flex items-center space-x-3 flex-1">
             <template v-if="habit.status === 'done'">
-              <CheckCircle2 class="w-5 h-5 text-success" />
+              <IconCheckCircle2 class="w-5 h-5 text-success" />
             </template>
             <template v-else>
-              <Circle class="w-5 h-5 text-muted-foreground" />
+              <IconCircle class="w-5 h-5 text-muted-foreground" />
             </template>
             <div class="flex-1">
               <div class="flex items-center space-x-2">
@@ -28,7 +28,7 @@
                 </span>
               </div>
               <div class="flex items-center space-x-2 mt-1">
-                <Clock class="w-3 h-3 text-muted-foreground" />
+                <IconClock class="w-3 h-3 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">{{ habit.time }}</span>
                 <Badge variant="outline" class="text-xs">{{ habit.category }}</Badge>
               </div>

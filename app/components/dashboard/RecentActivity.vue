@@ -15,7 +15,7 @@
             </div>
           </div>
           <div class="flex items-center space-x-2 text-xs text-muted-foreground">
-            <Clock class="w-3 h-3" />
+            <IconClock class="w-3 h-3" />
             <span>{{ activity.timestamp }}</span>
           </div>
         </div>
