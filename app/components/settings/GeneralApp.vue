@@ -1,5 +1,6 @@
 <template>
-  <div class="space-y-6">
+  <TooltipProvider>
+    <div class="space-y-6">
     <!-- Language Selection -->
     <Card>
       <CardHeader>
@@ -95,14 +96,15 @@
     </Card>
 
     <!-- Backup & Sync -->
-    <Card>
+    <Card class="opacity-50 pointer-events-none">
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">☁️</span>
           Backup & Sync
+          <Badge variant="secondary" class="ml-2">Coming Soon</Badge>
         </CardTitle>
         <CardDescription>
-          Manage cloud backup and synchronization settings
+          Cloud backup and synchronization features will be available soon
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
@@ -114,20 +116,25 @@
                 Automatically sync your data to the cloud
               </p>
             </div>
-            <Switch v-model="generalData.autoSync" />
+            <Switch disabled />
           </div>
           
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Manual Sync</p>
               <p class="text-sm text-muted-foreground">
-                Last synced: {{ generalData.lastSyncTime }}
+                Sync your data manually when needed
               </p>
             </div>
-            <Button variant="outline" size="sm" @click="manualSync">
+            <Button variant="outline" size="sm" disabled>
               Sync Now
             </Button>
           </div>
+        </div>
+        <div class="p-3 bg-muted rounded-lg">
+          <p class="text-sm text-muted-foreground">
+            We're working on bringing you secure cloud backup and sync capabilities. This feature will allow you to access your habits and progress across all your devices.
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -145,7 +152,24 @@
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="space-y-2">
-          <Label for="default-dashboard-view">Default Dashboard View</Label>
+          <Label for="default-dashboard-view" class="flex items-center gap-2">
+            Default Dashboard View
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <button type="button" class="text-muted-foreground hover:text-foreground">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <path d="M12 17h.01"/>
+                  </svg>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Choose which dashboard view to show when you first open the app.</p>
+                <p class="text-xs mt-1">Overview: summary cards | Analytics: charts & insights | Calendar: habit calendar | Progress: detailed progress</p>
+              </TooltipContent>
+            </Tooltip>
+          </Label>
           <Select v-model="generalData.defaultDashboardView">
             <SelectTrigger>
               <SelectValue placeholder="Select default view" />
@@ -171,91 +195,7 @@
       </CardContent>
     </Card>
 
-    <!-- App Notifications -->
-    <Card>
-      <CardHeader>
-        <CardTitle class="flex items-center gap-2">
-          <span class="text-xl">🔔</span>
-          App Notifications
-        </CardTitle>
-        <CardDescription>
-          Control global notification settings
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-medium">Enable All Notifications</p>
-            <p class="text-sm text-muted-foreground">
-              Master toggle for all app notifications
-            </p>
-          </div>
-          <Switch v-model="generalData.notificationsEnabled" />
-        </div>
-        
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-medium">Sound Notifications</p>
-            <p class="text-sm text-muted-foreground">
-              Play sounds for notifications
-            </p>
-          </div>
-          <Switch v-model="generalData.soundNotifications" />
-        </div>
-      </CardContent>
-    </Card>
 
-    <!-- Reset Options -->
-    <Card>
-      <CardHeader>
-        <CardTitle class="flex items-center gap-2">
-          <span class="text-xl">🔄</span>
-          Reset Options
-        </CardTitle>
-        <CardDescription>
-          Reset various app settings and data
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <p class="font-medium">Clear Cache</p>
-              <p class="text-sm text-muted-foreground">
-                Clear temporary app data and cache
-              </p>
-            </div>
-            <Button variant="outline" size="sm" @click="clearCache">
-              Clear Cache
-            </Button>
-          </div>
-          
-          <div class="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <p class="font-medium">Reset UI Preferences</p>
-              <p class="text-sm text-muted-foreground">
-                Reset all UI settings to defaults
-              </p>
-            </div>
-            <Button variant="outline" size="sm" @click="resetUIPreferences">
-              Reset UI
-            </Button>
-          </div>
-          
-          <div class="flex items-center justify-between p-3 border rounded-lg border-destructive">
-            <div>
-              <p class="font-medium text-destructive">Restore Default Settings</p>
-              <p class="text-sm text-muted-foreground">
-                Reset all settings to factory defaults
-              </p>
-            </div>
-            <Button variant="destructive" size="sm" @click="restoreDefaults">
-              Restore Defaults
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
 
     <!-- Save Button -->
     <div class="flex justify-end">
@@ -264,7 +204,8 @@
         {{ saving ? 'Saving...' : 'Save Changes' }}
       </Button>
     </div>
-  </div>
+    </div>
+  </TooltipProvider>
 </template>
 
 <script setup lang="ts">
@@ -276,8 +217,6 @@ type GeneralData = {
   lastSyncTime: string
   defaultDashboardView: string
   showWelcomeMessage: boolean
-  notificationsEnabled: boolean
-  soundNotifications: boolean
 }
 
 const generalData = reactive<GeneralData>({
@@ -286,9 +225,7 @@ const generalData = reactive<GeneralData>({
   autoSync: true,
   lastSyncTime: '2 hours ago',
   defaultDashboardView: 'overview',
-  showWelcomeMessage: true,
-  notificationsEnabled: true,
-  soundNotifications: true
+  showWelcomeMessage: true
 })
 
 const saving = ref(false)
@@ -321,23 +258,6 @@ function manualSync() {
   // toast.success('Data synced successfully!')
 }
 
-function clearCache() {
-  // Simulate cache clearing
-  console.log('Clearing cache...')
-  // toast.success('Cache cleared successfully!')
-}
-
-function resetUIPreferences() {
-  // Simulate UI reset
-  console.log('Resetting UI preferences...')
-  // toast.success('UI preferences reset successfully!')
-}
-
-function restoreDefaults() {
-  // Simulate restore defaults
-  console.log('Restoring default settings...')
-  // toast.success('Settings restored to defaults!')
-}
 </script>
 
 <style scoped></style>

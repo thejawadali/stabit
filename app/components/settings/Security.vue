@@ -48,6 +48,7 @@
     </Card>
 
     <!-- Two-Factor Authentication -->
+    <!-- 
     <Card>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
@@ -92,8 +93,10 @@
         </div>
       </CardContent>
     </Card>
+    -->
 
     <!-- Privacy Controls -->
+    <!-- 
     <Card>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
@@ -138,6 +141,7 @@
         </div>
       </CardContent>
     </Card>
+    -->
 
     <!-- Account Activity -->
     <Card>
@@ -187,45 +191,6 @@
       </CardContent>
     </Card>
 
-    <!-- Data Management -->
-    <Card>
-      <CardHeader>
-        <CardTitle class="flex items-center gap-2">
-          <span class="text-xl">📋</span>
-          Data Management
-        </CardTitle>
-        <CardDescription>
-          Manage your personal data and account information
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <p class="font-medium">Download My Data</p>
-              <p class="text-sm text-muted-foreground">
-                Get a copy of all your data
-              </p>
-            </div>
-            <Button variant="outline" size="sm" @click="downloadData">
-              Download
-            </Button>
-          </div>
-          
-          <div class="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <p class="font-medium">Data Processing Information</p>
-              <p class="text-sm text-muted-foreground">
-                Learn how we process your data
-              </p>
-            </div>
-            <Button variant="outline" size="sm" @click="viewDataProcessing">
-              View Info
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
 
     <!-- Delete Account -->
     <Card class="border-destructive">
@@ -345,25 +310,25 @@ function changePassword() {
   }, 2000)
 }
 
-function toggle2FA(enabled: boolean) {
-  if (enabled) {
-    // toast.success('Two-factor authentication enabled')
-  } else {
-    // toast.success('Two-factor authentication disabled')
-  }
-}
+// function toggle2FA(enabled: boolean) {
+//   if (enabled) {
+//     // toast.success('Two-factor authentication enabled')
+//   } else {
+//     // toast.success('Two-factor authentication disabled')
+//   }
+// }
 
-function showRecoveryCodes() {
-  // Simulate showing recovery codes
-  console.log('Showing recovery codes...')
-  // toast.success('Recovery codes displayed')
-}
+// function showRecoveryCodes() {
+//   // Simulate showing recovery codes
+//   console.log('Showing recovery codes...')
+//   // toast.success('Recovery codes displayed')
+// }
 
-function setupAuthenticator() {
-  // Simulate authenticator setup
-  console.log('Setting up authenticator...')
-  // toast.success('Authenticator setup initiated')
-}
+// function setupAuthenticator() {
+//   // Simulate authenticator setup
+//   console.log('Setting up authenticator...')
+//   // toast.success('Authenticator setup initiated')
+// }
 
 function viewAllActivity() {
   // Simulate viewing activity
@@ -371,17 +336,6 @@ function viewAllActivity() {
   // toast.success('Activity log opened')
 }
 
-function downloadData() {
-  // Simulate data download
-  console.log('Downloading data...')
-  // toast.success('Data download initiated')
-}
-
-function viewDataProcessing() {
-  // Simulate viewing data processing info
-  console.log('Viewing data processing information...')
-  // toast.success('Data processing info opened')
-}
 
 function deleteAccount() {
   if (deleteConfirmation.value !== 'DELETE') {
