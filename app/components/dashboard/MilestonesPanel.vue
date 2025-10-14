@@ -2,7 +2,7 @@
   <Card>
     <CardHeader>
       <div class="flex items-center space-x-2">
-        <Trophy class="w-5 h-5 text-warning" />
+        <IconTrophy class="w-5 h-5 text-warning" />
         <CardTitle class="text-lg">Milestones & Rewards</CardTitle>
       </div>
     </CardHeader>
