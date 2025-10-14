@@ -47,7 +47,11 @@ export default defineNuxtConfig({
     namePrefix: 'Icon'
   },
   supabase: {
-    redirect: false,
+    redirectOptions: {
+      login: '/login',
+      callback: '/auth/callback',
+      exclude: ['/', '/signup', '/auth/callback']
+    }
   },
   components: [
     {

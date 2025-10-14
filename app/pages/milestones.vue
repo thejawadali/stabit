@@ -259,7 +259,7 @@
             </TableBody>
           </Table>
           <div v-if="filteredMilestones.length === 0" class="text-center py-12">
-            <Trophy class="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-3" />
+            <IconTrophy class="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-3" />
             <p class="text-muted-foreground">No milestones found</p>
             <p class="text-sm text-muted-foreground mt-1">
               Try adjusting your filters or create a new milestone

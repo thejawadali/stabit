@@ -75,7 +75,7 @@
               <div v-for="(milestone, index) in milestones" :key="index"
                 class="flex items-start space-x-3 p-3 rounded-lg bg-muted/30">
                 <div class="mt-1">
-                  <CheckCircle2 v-if="milestone.completed" class="h-5 w-5 text-success" />
+                  <IconCheckCircle2 v-if="milestone.completed" class="h-5 w-5 text-success" />
                   <div v-else class="h-5 w-5 rounded-full border-2 border-muted" />
                 </div>
                 <div class="flex-1">

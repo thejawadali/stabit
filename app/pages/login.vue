@@ -17,8 +17,8 @@
           <!-- email -->
           <Input v-model="email" rules="required|email" validate-on-blur custom-error-message="Enter a valid email" name="email" label="Email" placeholder="Enter your email" />
             <!-- password -->
-          <Input v-model="password" rules="required|min:8|max:16" validate-on-blur custom-error-message="Enter a password" name="password" label="Password" type="password" placeholder="Create a password" />
-          <Button variant="hero" class="w-full" type="submit">
+          <Input v-model="password" rules="required|min:8|max:16" validate-on-blur custom-error-message="Enter a password" name="password" label="Password" type="password" placeholder="Enter your password" />
+          <Button variant="hero" class="w-full" type="submit" :is-loading>
             Sign In
           </Button>
         </form>
@@ -39,11 +39,11 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <Button variant="outline" class="w-full">
+          <Button variant="outline" class="w-full" @click="handleOAuthSignin('google')" :is-loading>
             <IconGoogle class="mr-2" />
             Google
           </Button>
-          <Button variant="outline" class="w-full">
+          <Button variant="outline" class="w-full" @click="handleOAuthSignin('github')" :is-loading>
             <IconGithub class="mr-2" />
             GitHub
           </Button>
@@ -63,7 +63,7 @@
 <script setup lang="ts">
 
 definePageMeta({
-  layout: false,
+  layout: false
 })
 
 useHead({
@@ -72,15 +72,54 @@ useHead({
 
 const email = ref("")
 const password = ref("")
+const isLoading = ref(false)
 
-// eslint-disable-next-line no-undef
 const {validate} = useForm()
+const { signIn, signInWithProvider } = useAuth()
+const router = useRouter()
+
+
+// In dev mode, prefill login credentials
+if (process.env.NODE_ENV === 'development') {
+  email.value = "ali@ali.com"
+  password.value = "12345678"
+}
+
 
 const handleSubmit = async () => {
   const { valid } = await validate()
   if (!valid) return
-  console.log(email.value, password.value)
+  
+  isLoading.value = true
+  
+  try {
+    const { error } = await signIn(email.value, password.value)
+    if (error) {
+      const errorMsg = (error as any).message
+      console.log(errorMsg || 'An error occurred during signin')
+    } else {
+      // Redirect to dashboard on successful login
+      await router.push('/dashboard')
+    }
+  } catch (error) {
+    console.log("An unexpected error occurred. Please try again.")
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleOAuthSignin = async (provider: 'google' | 'github') => {
+  isLoading.value = true
+  try {
+    const { error } = await signInWithProvider(provider)
+    if (error) {
+      const errorMsg = (error as any).message
+      console.log(errorMsg || 'An error occurred during signin')
+    }
+  } catch (error) {
+    console.log("An unexpected error occurred. Please try again.")
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
-
-<style scoped></style>

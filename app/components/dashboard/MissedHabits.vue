@@ -3,7 +3,7 @@
     <Card class="border-warning/50 bg-warning/5">
       <CardHeader>
         <div class="flex items-center space-x-2">
-          <AlertCircle class="w-5 h-5 text-warning" />
+          <IconAlertCircle class="w-5 h-5 text-warning" />
           <CardTitle class="text-lg">Missed & Overdue</CardTitle>
           <Badge variant="outline" class="ml-auto">{{ habits.length }}</Badge>
         </div>
