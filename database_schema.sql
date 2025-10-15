@@ -1,78 +1,56 @@
 -- =====================================================
--- Stabit Habit Tracking App - PostgreSQL Database Schema
+-- Stabit Habit Tracking App - MySQL Database Schema
 -- =====================================================
 -- This schema supports a comprehensive habit tracking application
--- with user management, habit creation, progress tracking, 
+-- with user management, habit creation, progress tracking,
 -- analytics, milestones, and settings.
---
--- NOTE: This schema is designed to work with Supabase Authentication.
--- User authentication is handled by Supabase's auth.users table.
--- All user_id references in this schema point to auth.users.id (UUID).
 
 -- =====================================================
--- 1. USER PROFILES (Supabase Auth Integration)
+-- 1. USERS & USER PREFERENCES & SETTINGS
 -- =====================================================
 
--- Create custom types for PostgreSQL
-CREATE TYPE theme_type AS ENUM ('light', 'dark', 'system');
-CREATE TYPE gender_type AS ENUM ('male', 'female', 'other');
-CREATE TYPE time_units_type AS ENUM ('minutes', 'hours');
-CREATE TYPE count_units_type AS ENUM ('repetitions', 'sessions', 'times', 'items');
-CREATE TYPE tracking_type AS ENUM ('duration', 'count', 'both');
-CREATE TYPE goal_frequency_type AS ENUM ('daily', 'weekly', 'monthly');
-CREATE TYPE dashboard_view_type AS ENUM ('overview', 'analytics', 'calendar', 'progress');
-
--- User profiles table - Complete user information and preferences (uses auth.users.id as PK)
+-- Users table - Core user information
 CREATE TABLE user_profiles (
-    user_id UUID PRIMARY KEY,  -- References auth.users.id from Supabase (also serves as PK)
-    avatar_url VARCHAR(500),  -- Allow NULL for missing avatar
+    user_id UUID PRIMARY KEY,
+    avatar_url VARCHAR(500) NULL, -- Allow NULL for missing avatar
     timezone VARCHAR(50) DEFAULT 'UTC',
     language VARCHAR(10) DEFAULT 'en',
     date_format VARCHAR(20) DEFAULT 'MM/DD/YYYY',
-    theme theme_type DEFAULT 'system',
-    age INTEGER,  -- Allow NULL for users who may not provide their age
-    gender gender_type DEFAULT 'male',
-    height DECIMAL(5, 2),  -- Store height in meters (e.g., 1.75), or change to INTEGER if in cm
+    theme ENUM('light', 'dark', 'system') DEFAULT 'system',
+    age INT NULL, -- Allow NULL for users who may not provide their age
+    gender ENUM('male', 'female', 'other') DEFAULT 'male',
+    height DECIMAL(5, 2) NULL, -- Store height in meters (e.g., 1.75), or change to INT if in cm
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP NULL,
     is_active BOOLEAN DEFAULT TRUE,
     
-    -- User preferences and settings
-    personal_goals TEXT, -- Allow NULL for missing personal goals
-    preferred_time_units time_units_type DEFAULT 'minutes',
-    preferred_count_units count_units_type DEFAULT 'repetitions',
+    personal_goals TEXT NULL, -- Allow NULL for missing personal goals
+    preferred_time_units ENUM('minutes', 'hours') DEFAULT 'minutes',
+    preferred_count_units ENUM(
+        'repetitions',
+        'sessions',
+        'times',
+        'items'
+    ) DEFAULT 'repetitions',
     default_reminder_time TIME DEFAULT '09:00:00',
-    default_tracking_type tracking_type DEFAULT 'duration',
-    default_goal_frequency goal_frequency_type DEFAULT 'daily',
+    default_tracking_type ENUM('duration', 'count', 'both') DEFAULT 'duration',
+    default_goal_frequency ENUM('daily', 'weekly', 'monthly') DEFAULT 'daily',
     auto_sync BOOLEAN DEFAULT TRUE,
-    last_sync_time TIMESTAMP,
-    default_dashboard_view dashboard_view_type DEFAULT 'overview',
+    last_sync_time TIMESTAMP NULL,
+    default_dashboard_view ENUM(
+        'overview',
+        'analytics',
+        'calendar',
+        'progress'
+    ) DEFAULT 'overview',
     show_welcome_message BOOLEAN DEFAULT TRUE,
     notifications_enabled BOOLEAN DEFAULT TRUE,
     sound_notifications BOOLEAN DEFAULT TRUE,
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-
--- Create indexes
-CREATE INDEX idx_user_profiles_created_at ON user_profiles (created_at);
-CREATE INDEX idx_user_profiles_is_active ON user_profiles (is_active);
-
--- Create trigger to update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
-CREATE TRIGGER update_user_profiles_updated_at 
-    BEFORE UPDATE ON user_profiles 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
-
-
-
 
 -- =====================================================
 -- 3. HABITS & CATEGORIES
@@ -80,122 +58,116 @@ CREATE TRIGGER update_user_profiles_updated_at
 
 -- Habit categories
 CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     color VARCHAR(7) DEFAULT '#3B82F6', -- Hex color
     icon VARCHAR(10) DEFAULT '🎯',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_category_name UNIQUE (name)
+    UNIQUE KEY unique_category_name (name)
 );
-
--- Create additional custom types for habits
-CREATE TYPE recurrence_type AS ENUM ('daily', 'weekly', 'monthly', 'custom');
-CREATE TYPE habit_status_type AS ENUM ('active', 'inactive', 'completed', 'paused');
 
 -- Main habits table
 CREATE TABLE habits (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
-    category_id INTEGER NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    category_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     icon VARCHAR(10) DEFAULT '🎯',
-    recurrence_type recurrence_type NOT NULL,
+    recurrence_type ENUM(
+        'daily',
+        'weekly',
+        'monthly',
+        'custom'
+    ) NOT NULL,
     custom_recurrence VARCHAR(100),
     time_of_day TIME,
     start_date DATE NOT NULL,
-    end_date DATE,
+    end_date DATE NULL,
     initial_value DECIMAL(10, 2) DEFAULT 0,
     difficulty_rate DECIMAL(5, 2) DEFAULT 1.0,
     auto_growth BOOLEAN DEFAULT FALSE,
     goal_value DECIMAL(10, 2) DEFAULT 0,
     goal_metric VARCHAR(50) DEFAULT 'sessions',
-    estimated_completion_date DATE,
-    status habit_status_type DEFAULT 'active',
+    estimated_completion_date DATE NULL,
+    status ENUM(
+        'active',
+        'inactive',
+        'completed',
+        'paused'
+    ) DEFAULT 'active',
     is_archived BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories (id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories (id),
+    INDEX idx_user_habits (user_id, status),
+    INDEX idx_category_habits (category_id),
+    INDEX idx_created_at (created_at)
 );
-
--- Create indexes
-CREATE INDEX idx_user_habits ON habits (user_id, status);
-CREATE INDEX idx_category_habits ON habits (category_id);
-CREATE INDEX idx_habits_created_at ON habits (created_at);
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_habits_updated_at 
-    BEFORE UPDATE ON habits 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
 -- 4. HABIT CUSTOM FIELDS
 -- =====================================================
 
--- Create custom type for field types
-CREATE TYPE field_type AS ENUM ('text', 'number', 'select', 'boolean');
-
 -- Custom fields for habits (e.g., "Pages Read", "Weather", etc.)
 CREATE TABLE habit_custom_fields (
-    id SERIAL PRIMARY KEY,
-    habit_id INTEGER NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    habit_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    field_type field_type NOT NULL,
-    options JSONB, -- For select fields: ["Option1", "Option2"]
+    field_type ENUM(
+        'text',
+        'number',
+        'select',
+        'boolean'
+    ) NOT NULL,
+    options JSON, -- For select fields: ["Option1", "Option2"]
     is_required BOOLEAN DEFAULT FALSE,
-    display_order INTEGER DEFAULT 0,
+    display_order INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE
+    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE,
+    INDEX idx_habit_fields (habit_id, display_order)
 );
-
--- Create index
-CREATE INDEX idx_habit_fields ON habit_custom_fields (habit_id, display_order);
 
 -- =====================================================
 -- 5. HABIT LOGS & COMPLETIONS
 -- =====================================================
 
--- Create custom type for completion status
-CREATE TYPE completion_status_type AS ENUM ('completed', 'partial', 'missed', 'skipped');
-
 -- Daily habit completions/logs
 CREATE TABLE habit_logs (
-    id SERIAL PRIMARY KEY,
-    habit_id INTEGER NOT NULL,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    habit_id INT NOT NULL,
+    user_id INT NOT NULL,
     log_date DATE NOT NULL,
-    completion_status completion_status_type NOT NULL,
+    completion_status ENUM(
+        'completed',
+        'partial',
+        'missed',
+        'skipped'
+    ) NOT NULL,
     value DECIMAL(10, 2) DEFAULT 0, -- The actual value achieved
     notes TEXT,
-    completion_time TIMESTAMP,
+    completion_time TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE,
-    CONSTRAINT unique_habit_date UNIQUE (habit_id, log_date)
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    UNIQUE KEY unique_habit_date (habit_id, log_date),
+    INDEX idx_user_date (user_id, log_date),
+    INDEX idx_habit_date (habit_id, log_date)
 );
-
--- Create indexes
-CREATE INDEX idx_user_date ON habit_logs (user_id, log_date);
-CREATE INDEX idx_habit_date ON habit_logs (habit_id, log_date);
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_habit_logs_updated_at 
-    BEFORE UPDATE ON habit_logs 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
 
 -- Custom field values for each log entry
 CREATE TABLE habit_log_custom_values (
-    id SERIAL PRIMARY KEY,
-    log_id INTEGER NOT NULL,
-    custom_field_id INTEGER NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    log_id INT NOT NULL,
+    custom_field_id INT NOT NULL,
     value TEXT, -- Store as text, parse based on field type
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (log_id) REFERENCES habit_logs (id) ON DELETE CASCADE,
     FOREIGN KEY (custom_field_id) REFERENCES habit_custom_fields (id) ON DELETE CASCADE,
-    CONSTRAINT unique_log_field UNIQUE (log_id, custom_field_id)
+    UNIQUE KEY unique_log_field (log_id, custom_field_id)
 );
 
 -- =====================================================
@@ -204,37 +176,28 @@ CREATE TABLE habit_log_custom_values (
 
 -- Current streak information for each habit
 CREATE TABLE habit_streaks (
-    id SERIAL PRIMARY KEY,
-    habit_id INTEGER NOT NULL,
-    current_streak INTEGER DEFAULT 0,
-    longest_streak INTEGER DEFAULT 0,
-    last_completion_date DATE,
-    streak_start_date DATE,
-    total_completions INTEGER DEFAULT 0,
-    total_sessions INTEGER DEFAULT 0,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    habit_id INT NOT NULL,
+    current_streak INT DEFAULT 0,
+    longest_streak INT DEFAULT 0,
+    last_completion_date DATE NULL,
+    streak_start_date DATE NULL,
+    total_completions INT DEFAULT 0,
+    total_sessions INT DEFAULT 0,
     completion_rate DECIMAL(5, 2) DEFAULT 0.00,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE,
-    CONSTRAINT unique_habit_streak UNIQUE (habit_id)
+    UNIQUE KEY unique_habit_streak (habit_id)
 );
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_habit_streaks_updated_at 
-    BEFORE UPDATE ON habit_streaks 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
 -- 7. MILESTONES & REWARDS
 -- =====================================================
 
--- Create custom type for milestone status
-CREATE TYPE milestone_status_type AS ENUM ('locked', 'in_progress', 'achieved');
-
 -- Milestones for habits
 CREATE TABLE milestones ( -- you can name it rewards, UI is not sync with this table
-    id SERIAL PRIMARY KEY,
-    habit_id INTEGER NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    habit_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     target_value DECIMAL(10, 2) NOT NULL,
@@ -242,23 +205,19 @@ CREATE TABLE milestones ( -- you can name it rewards, UI is not sync with this t
     reward_name VARCHAR(255),
     reward_description TEXT,
     reward_icon VARCHAR(10) DEFAULT '🎉',
-    status milestone_status_type DEFAULT 'locked',
+    status ENUM(
+        'locked',
+        'in_progress',
+        'achieved'
+    ) DEFAULT 'locked',
     current_progress DECIMAL(10, 2) DEFAULT 0,
-    achieved_date DATE,
+    achieved_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE,
+    INDEX idx_habit_milestones (habit_id, status),
+    INDEX idx_status (status)
 );
-
--- Create indexes
-CREATE INDEX idx_habit_milestones ON milestones (habit_id, status);
-CREATE INDEX idx_milestones_status ON milestones (status);
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_milestones_updated_at 
-    BEFORE UPDATE ON milestones 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
 -- 8. NOTIFICATIONS & REMINDERS
@@ -266,43 +225,39 @@ CREATE TRIGGER update_milestones_updated_at
 
 -- Notification settings for habits
 CREATE TABLE habit_notifications (
-    id SERIAL PRIMARY KEY,
-    habit_id INTEGER NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    habit_id INT NOT NULL,
     is_enabled BOOLEAN DEFAULT TRUE,
-    reminder_times JSONB, -- Array of time strings: ["09:00", "18:00"]
-    smart_reminders JSONB, -- {"missed_yesterday": true, "streak_continuation": false}
+    reminder_times JSON, -- Array of time strings: ["09:00", "18:00"]
+    smart_reminders JSON, -- {"missed_yesterday": true, "streak_continuation": false}
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE CASCADE,
-    CONSTRAINT unique_habit_notifications UNIQUE (habit_id)
+    UNIQUE KEY unique_habit_notifications (habit_id)
 );
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_habit_notifications_updated_at 
-    BEFORE UPDATE ON habit_notifications 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Create custom type for notification types
-CREATE TYPE notification_type AS ENUM ('reminder', 'streak_break', 'milestone_achieved', 'encouragement', 'system');
 
 -- Notification history/log
 CREATE TABLE notifications (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
-    habit_id INTEGER,
-    type notification_type NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    habit_id INT NULL,
+    type ENUM(
+        'reminder',
+        'streak_break',
+        'milestone_achieved',
+        'encouragement',
+        'system'
+    ) NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    read_at TIMESTAMP,
-    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE SET NULL
+    read_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE SET NULL,
+    INDEX idx_user_notifications (user_id, is_read),
+    INDEX idx_sent_at (sent_at)
 );
-
--- Create indexes
-CREATE INDEX idx_user_notifications ON notifications (user_id, is_read);
-CREATE INDEX idx_notifications_sent_at ON notifications (sent_at);
 
 -- =====================================================
 -- 9. ANALYTICS & STATISTICS
@@ -310,114 +265,116 @@ CREATE INDEX idx_notifications_sent_at ON notifications (sent_at);
 
 -- Daily statistics for analytics
 CREATE TABLE daily_statistics (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     stat_date DATE NOT NULL,
-    total_habits INTEGER DEFAULT 0,
-    completed_habits INTEGER DEFAULT 0,
+    total_habits INT DEFAULT 0,
+    completed_habits INT DEFAULT 0,
     completion_rate DECIMAL(5, 2) DEFAULT 0.00,
-    total_sessions INTEGER DEFAULT 0,
+    total_sessions INT DEFAULT 0,
     total_duration DECIMAL(10, 2) DEFAULT 0.00, -- in minutes
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_user_date UNIQUE (user_id, stat_date)
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_date (user_id, stat_date),
+    INDEX idx_user_date (user_id, stat_date)
 );
-
--- Create index
-CREATE INDEX idx_daily_stats_user_date ON daily_statistics (user_id, stat_date);
 
 -- Weekly statistics
 CREATE TABLE weekly_statistics (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     week_start_date DATE NOT NULL,
-    total_habits INTEGER DEFAULT 0,
-    completed_habits INTEGER DEFAULT 0,
+    total_habits INT DEFAULT 0,
+    completed_habits INT DEFAULT 0,
     completion_rate DECIMAL(5, 2) DEFAULT 0.00,
-    total_sessions INTEGER DEFAULT 0,
+    total_sessions INT DEFAULT 0,
     total_duration DECIMAL(10, 2) DEFAULT 0.00,
-    longest_streak INTEGER DEFAULT 0,
+    longest_streak INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_user_week UNIQUE (user_id, week_start_date)
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_week (user_id, week_start_date),
+    INDEX idx_user_week (user_id, week_start_date)
 );
-
--- Create index
-CREATE INDEX idx_weekly_stats_user_week ON weekly_statistics (user_id, week_start_date);
 
 -- Monthly statistics
 CREATE TABLE monthly_statistics (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     month_year VARCHAR(7) NOT NULL, -- Format: "2024-01"
-    total_habits INTEGER DEFAULT 0,
-    completed_habits INTEGER DEFAULT 0,
+    total_habits INT DEFAULT 0,
+    completed_habits INT DEFAULT 0,
     completion_rate DECIMAL(5, 2) DEFAULT 0.00,
-    total_sessions INTEGER DEFAULT 0,
+    total_sessions INT DEFAULT 0,
     total_duration DECIMAL(10, 2) DEFAULT 0.00,
-    longest_streak INTEGER DEFAULT 0,
-    new_habits_created INTEGER DEFAULT 0,
+    longest_streak INT DEFAULT 0,
+    new_habits_created INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_user_month UNIQUE (user_id, month_year)
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_month (user_id, month_year),
+    INDEX idx_user_month (user_id, month_year)
 );
-
--- Create index
-CREATE INDEX idx_monthly_stats_user_month ON monthly_statistics (user_id, month_year);
 
 -- =====================================================
 -- 10. ACHIEVEMENTS & BADGES
 -- =====================================================
 
--- Create custom type for achievement categories
-CREATE TYPE achievement_category_type AS ENUM ('streak', 'completion', 'consistency', 'milestone', 'special');
-
 -- Achievement definitions
 CREATE TABLE achievements (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     icon VARCHAR(10) DEFAULT '🏆',
-    category achievement_category_type NOT NULL,
-    criteria JSONB NOT NULL, -- {"type": "streak", "value": 30, "habit_type": "any"}
+    category ENUM(
+        'streak',
+        'completion',
+        'consistency',
+        'milestone',
+        'special'
+    ) NOT NULL,
+    criteria JSON NOT NULL, -- {"type": "streak", "value": 30, "habit_type": "any"}
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- User achievements
 CREATE TABLE user_achievements (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
-    achievement_id INTEGER NOT NULL,
-    habit_id INTEGER, -- NULL for general achievements
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    achievement_id INT NOT NULL,
+    habit_id INT NULL, -- NULL for general achievements
     unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (achievement_id) REFERENCES achievements (id) ON DELETE CASCADE,
     FOREIGN KEY (habit_id) REFERENCES habits (id) ON DELETE SET NULL,
-    CONSTRAINT unique_user_achievement UNIQUE (user_id, achievement_id, habit_id)
+    UNIQUE KEY unique_user_achievement (
+        user_id,
+        achievement_id,
+        habit_id
+    ),
+    INDEX idx_user_achievements (user_id, unlocked_at)
 );
-
--- Create index
-CREATE INDEX idx_user_achievements ON user_achievements (user_id, unlocked_at);
 
 -- =====================================================
 -- 11. DATA EXPORT/IMPORT
 -- =====================================================
 
--- Create custom types for export
-CREATE TYPE export_type AS ENUM ('csv', 'json', 'pdf');
-CREATE TYPE export_status_type AS ENUM ('pending', 'completed', 'failed');
-
 -- Export history
 CREATE TABLE data_exports (
-    id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL,  -- References auth.users.id from Supabase
-    export_type export_type NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    export_type ENUM('csv', 'json', 'pdf') NOT NULL,
     file_path VARCHAR(500),
-    file_size INTEGER,
-    status export_status_type DEFAULT 'pending',
+    file_size INT,
+    status ENUM(
+        'pending',
+        'completed',
+        'failed'
+    ) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    completed_at TIMESTAMP
+    completed_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_user_exports (user_id, created_at)
 );
-
--- Create index
-CREATE INDEX idx_user_exports ON data_exports (user_id, created_at);
 
 -- =====================================================
 -- 12. SYSTEM & AUDIT
@@ -425,36 +382,29 @@ CREATE INDEX idx_user_exports ON data_exports (user_id, created_at);
 
 -- System settings
 CREATE TABLE system_settings (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
     setting_value TEXT,
     description TEXT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER update_system_settings_updated_at 
-    BEFORE UPDATE ON system_settings 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
 
 -- Audit log for important actions
 CREATE TABLE audit_logs (
-    id SERIAL PRIMARY KEY,
-    user_id UUID,  -- References auth.users.id from Supabase
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NULL,
     action VARCHAR(100) NOT NULL,
     entity_type VARCHAR(50) NOT NULL,
-    entity_id INTEGER,
-    old_values JSONB,
-    new_values JSONB,
+    entity_id INT NULL,
+    old_values JSON,
+    new_values JSON,
     ip_address VARCHAR(45),
     user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    INDEX idx_user_audit (user_id, created_at),
+    INDEX idx_action (action, created_at)
 );
-
--- Create indexes
-CREATE INDEX idx_user_audit ON audit_logs (user_id, created_at);
-CREATE INDEX idx_audit_action ON audit_logs (action, created_at);
 
 -- =====================================================
 -- 13. INITIAL DATA & INDEXES
@@ -650,7 +600,7 @@ WHERE
 -- View for user dashboard statistics
 CREATE VIEW user_dashboard_stats AS
 SELECT
-    up.user_id,
+    u.id as user_id,
     COUNT(DISTINCT h.id) as total_habits,
     COUNT(
         DISTINCT CASE
@@ -660,106 +610,116 @@ SELECT
     COUNT(
         DISTINCT CASE
             WHEN hl.completion_status = 'completed'
-            AND hl.log_date = CURRENT_DATE THEN hl.habit_id
+            AND hl.log_date = CURDATE() THEN hl.habit_id
         END
     ) as completed_today,
     AVG(hs.completion_rate) as avg_completion_rate,
     MAX(hs.longest_streak) as best_streak
 FROM
-    user_profiles up
-    LEFT JOIN habits h ON up.user_id = h.user_id
+    users u
+    LEFT JOIN habits h ON u.id = h.user_id
     AND h.is_archived = FALSE
     LEFT JOIN habit_streaks hs ON h.id = hs.habit_id
     LEFT JOIN habit_logs hl ON h.id = hl.habit_id
 GROUP BY
-    up.user_id;
+    u.id;
 
 -- =====================================================
--- 15. STORED PROCEDURES (PostgreSQL Functions)
+-- 15. STORED PROCEDURES
 -- =====================================================
 
--- Function to update habit streak when a log is created/updated
-CREATE OR REPLACE FUNCTION update_habit_streak(p_habit_id INTEGER)
-RETURNS VOID AS $$
-DECLARE
-    v_current_streak INTEGER := 0;
-    v_longest_streak INTEGER := 0;
-    v_last_date DATE;
-    v_check_date DATE;
-    v_total_completions INTEGER := 0;
-    v_total_sessions INTEGER := 0;
-    v_completion_rate DECIMAL(5,2) := 0.00;
+DELIMITER /
+/
+
+-- Procedure to update habit streak when a log is created/updated
+CREATE PROCEDURE UpdateHabitStreak(IN habit_id INT)
 BEGIN
+    DECLARE current_streak INT DEFAULT 0;
+    DECLARE longest_streak INT DEFAULT 0;
+    DECLARE last_date DATE;
+    DECLARE check_date DATE;
+    DECLARE total_completions INT DEFAULT 0;
+    DECLARE total_sessions INT DEFAULT 0;
+    DECLARE completion_rate DECIMAL(5,2) DEFAULT 0.00;
+    
     -- Get current streak data
     SELECT current_streak, longest_streak, last_completion_date, total_completions, total_sessions
-    INTO v_current_streak, v_longest_streak, v_last_date, v_total_completions, v_total_sessions
+    INTO current_streak, longest_streak, last_date, total_completions, total_sessions
     FROM habit_streaks 
-    WHERE habit_id = p_habit_id;
+    WHERE habit_id = habit_id;
     
     -- Calculate new streak
-    v_check_date := CURRENT_DATE;
-    v_current_streak := 0;
+    SET check_date = CURDATE();
+    SET current_streak = 0;
     
     -- Count consecutive completed days backwards from today
     WHILE EXISTS (
         SELECT 1 FROM habit_logs 
-        WHERE habit_id = p_habit_id 
-        AND log_date = v_check_date 
+        WHERE habit_id = habit_id 
+        AND log_date = check_date 
         AND completion_status IN ('completed', 'partial')
-    ) LOOP
-        v_current_streak := v_current_streak + 1;
-        v_check_date := v_check_date - INTERVAL '1 day';
-    END LOOP;
+    ) DO
+        SET current_streak = current_streak + 1;
+        SET check_date = DATE_SUB(check_date, INTERVAL 1 DAY);
+    END WHILE;
     
     -- Update longest streak if current is higher
-    IF v_current_streak > v_longest_streak THEN
-        v_longest_streak := v_current_streak;
+    IF current_streak > longest_streak THEN
+        SET longest_streak = current_streak;
     END IF;
     
     -- Calculate completion rate (last 30 days)
     SELECT 
-        COUNT(CASE WHEN completion_status IN ('completed', 'partial') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)
-    INTO v_completion_rate
+        COUNT(CASE WHEN completion_status IN ('completed', 'partial') THEN 1 END) * 100.0 / COUNT(*)
+    INTO completion_rate
     FROM habit_logs 
-    WHERE habit_id = p_habit_id 
-    AND log_date >= CURRENT_DATE - INTERVAL '30 days';
+    WHERE habit_id = habit_id 
+    AND log_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
     
     -- Update or insert streak record
     INSERT INTO habit_streaks (habit_id, current_streak, longest_streak, last_completion_date, total_completions, total_sessions, completion_rate)
-    VALUES (p_habit_id, v_current_streak, v_longest_streak, v_last_date, v_total_completions, v_total_sessions, v_completion_rate)
-    ON CONFLICT (habit_id) DO UPDATE SET
-        current_streak = EXCLUDED.current_streak,
-        longest_streak = EXCLUDED.longest_streak,
-        last_completion_date = EXCLUDED.last_completion_date,
-        total_completions = EXCLUDED.total_completions,
-        total_sessions = EXCLUDED.total_sessions,
-        completion_rate = EXCLUDED.completion_rate,
+    VALUES (habit_id, current_streak, longest_streak, last_date, total_completions, total_sessions, completion_rate)
+    ON DUPLICATE KEY UPDATE
+        current_streak = VALUES(current_streak),
+        longest_streak = VALUES(longest_streak),
+        last_completion_date = VALUES(last_completion_date),
+        total_completions = VALUES(total_completions),
+        total_sessions = VALUES(total_sessions),
+        completion_rate = VALUES(completion_rate),
         updated_at = CURRENT_TIMESTAMP;
-END;
-$$ LANGUAGE plpgsql;
+END
+/
+/
+
+DELIMITER;
 
 -- =====================================================
 -- 16. TRIGGERS
 -- =====================================================
 
--- Trigger to update streak when habit log is inserted
-CREATE OR REPLACE FUNCTION trigger_update_habit_streak()
-RETURNS TRIGGER AS $$
-BEGIN
-    PERFORM update_habit_streak(NEW.habit_id);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Trigger to update streak when habit log is inserted/updated
+DELIMITER /
+/
 
 CREATE TRIGGER after_habit_log_insert
-    AFTER INSERT ON habit_logs
-    FOR EACH ROW
-    EXECUTE FUNCTION trigger_update_habit_streak();
+AFTER INSERT ON habit_logs
+FOR EACH ROW
+BEGIN
+    CALL UpdateHabitStreak(NEW.habit_id);
+END
+/
+/
 
 CREATE TRIGGER after_habit_log_update
-    AFTER UPDATE ON habit_logs
-    FOR EACH ROW
-    EXECUTE FUNCTION trigger_update_habit_streak();
+AFTER UPDATE ON habit_logs
+FOR EACH ROW
+BEGIN
+    CALL UpdateHabitStreak(NEW.habit_id);
+END
+/
+/
+
+DELIMITER;
 
 -- =====================================================
 -- SCHEMA COMPLETE
