@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     'nuxt-lucide-icons',
     '@nuxtjs/supabase',
     'dayjs-nuxt',
+    '@prisma/nuxt',
   ],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
