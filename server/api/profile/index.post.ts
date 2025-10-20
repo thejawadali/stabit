@@ -19,13 +19,19 @@ export default defineEventHandler(async (event) => {
   const data = await readBody(event)
 
   try {
-    const created = await prisma.userProfile.create({ data })
+    const created = await prisma.userProfile.create({
+      data: {
+        userId: user?.sub,
+        ...data
+      }
+    })
     return created
   } catch (error: any) {
     // Prisma P2002: Unique constraint failed (userId already exists)
     if (error?.code === 'P2002') {
       throw createError({ statusCode: 409, statusMessage: 'UserProfile already exists' })
     }
+    console.log(error)
     throw createError({ statusCode: 500, statusMessage: 'Failed to create UserProfile' })
   }
 })

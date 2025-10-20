@@ -57,7 +57,7 @@ v-if="notificationCount > 0"
           <IconBarChart3 class="mr-2 h-4 w-4" />Analytics
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem @click="signOut()">
           <IconLogOut class="mr-2 h-4 w-4" />Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -68,6 +68,7 @@ v-if="notificationCount > 0"
 <script setup lang="ts">
 import { IconCalendar, IconBarChart3, IconTrendingUp } from "#components"
 
+const { signOut } = useAuth()
 
 const notificationCount = ref(3)
 
