@@ -6,3 +6,74 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model UserProfile {
+  userId               String        @id @default(uuid())
+  avatarUrl            String?       @default("") @db.VarChar(500)
+  timezone             String        @default("UTC") @db.VarChar(50)
+  language             String        @default("en") @db.VarChar(10)
+  dateFormat           String        @default("MM/DD/YYYY") @db.VarChar(20)
+  theme                Theme         @default(system)
+  age                  Int?          @db.Int
+  gender               Gender        @default(male)
+  height               Decimal?      @db.Decimal(5, 2)
+  isActive             Boolean       @default(true)
+  personalGoals        String?       @default("") @db.Text
+  preferredTimeUnits   TimeUnit      @default(minutes)
+  preferredCountUnits  CountUnit     @default(repetitions)
+  defaultReminderTime  DateTime?     @db.Timestamp
+  defaultTrackingType  TrackingType  @default(duration)
+  defaultGoalFrequency GoalFrequency @default(daily)
+  autoSync             Boolean       @default(true)
+  lastSyncTime         DateTime?     @db.Timestamp
+  defaultDashboardView DashboardView @default(overview)
+  showWelcomeMessage   Boolean       @default(true)
+  notificationsEnabled Boolean       @default(false)
+  soundNotifications   Boolean       @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Theme {
+  light
+  dark
+  system
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum TimeUnit {
+  minutes
+  hours
+}
+
+enum CountUnit {
+  repetitions
+  sessions
+  times
+  items
+}
+
+enum TrackingType {
+  duration
+  count
+  both
+}
+
+enum GoalFrequency {
+  daily
+  weekly
+  monthly
+}
+
+enum DashboardView {
+  overview
+  analytics
+  calendar
+  progress
+}

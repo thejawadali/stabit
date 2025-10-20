@@ -104,7 +104,7 @@ const calendarDays = computed(() => {
     })
   }
   
-  console.log(`Calendar days for ${month + 1}/${year}:`, days)
+  // console.log(`Calendar days for ${month + 1}/${year}:`, days)
   return days
 })
 

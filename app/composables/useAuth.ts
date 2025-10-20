@@ -18,6 +18,12 @@ export const useAuth = () => {
 
       if (error) throw error
 
+      await $fetch('/api/profile', {
+        method: 'POST',
+        body: {
+        },
+      })
+
       return { data, error: null }
     } catch (error) {
       return { data: null, error }
@@ -51,6 +57,12 @@ export const useAuth = () => {
       })
 
       if (error) throw error
+
+      await $fetch('/api/profile', {
+        method: 'POST',
+        body: {
+        },
+      })
 
       return { data, error: null }
     } catch (error) {
