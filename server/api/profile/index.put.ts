@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
 
     const data = await readBody(event)
 
+    delete data.email
+
 
     // Filter out any fields that aren't allowed
     const updateData = Object.keys(data)
