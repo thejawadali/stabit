@@ -53,9 +53,11 @@ const inputClasses = computed(() => {
 </script>
 
 <template>
-  <div class="">
-    <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
+  <div class="space-y-1">
+    <slot name="field-label">
+      <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
         class="text-destructive">*</span></Label>
+    </slot>
     <div class="flex items-center gap-x-2">
       <input :id="props.name" v-model="modelValue" :class="inputClasses" :placeholder="props.placeholder" v-bind="$attrs"
         @blur="validateOnBlur ? validate() : null">

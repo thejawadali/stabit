@@ -55,9 +55,11 @@ const handleBlur = () => {
 </script>
 
 <template>
-  <div class="">
-    <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
-        class="text-destructive">*</span></Label>
+  <div class="space-y-1">
+    <slot name="field-label">
+      <Label :for="props.name">{{ props.label }} <span v-if="rules.includes('required')"
+          class="text-destructive">*</span></Label>
+    </slot>
     <SelectRoot :id="props.name" v-bind="forwarded" @blur="handleBlur">
       <slot />
     </SelectRoot>
