@@ -9,19 +9,21 @@ datasource db {
 
 model UserProfile {
   userId               String        @id @default(uuid())
-  avatarUrl            String?       @default("") @db.VarChar(500)
+  name                 String        @default("") @db.VarChar(255)
+  email                String        @default("") @db.VarChar(255)
+  avatarUrl            String        @default("") @db.VarChar(500)
   timezone             String        @default("UTC") @db.VarChar(50)
   language             String        @default("en") @db.VarChar(10)
   dateFormat           String        @default("MM/DD/YYYY") @db.VarChar(20)
   theme                Theme         @default(system)
-  age                  Int?          @db.Int
+  age                  Int           @db.Int @default(0)
   gender               Gender        @default(male)
-  height               Decimal?      @db.Decimal(5, 2)
+  height               Int           @db.Int @default(0)
   isActive             Boolean       @default(true)
-  personalGoals        String?       @default("") @db.Text
+  personalGoals        String        @default("") @db.Text
   preferredTimeUnits   TimeUnit      @default(minutes)
   preferredCountUnits  CountUnit     @default(repetitions)
-  defaultReminderTime  DateTime?     @db.Timestamp
+  defaultReminderTime  String?       @db.VarChar(20)
   defaultTrackingType  TrackingType  @default(duration)
   defaultGoalFrequency GoalFrequency @default(daily)
   autoSync             Boolean       @default(true)
