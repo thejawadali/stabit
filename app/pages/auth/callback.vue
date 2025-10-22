@@ -68,7 +68,18 @@ onMounted(async () => {
     }
 
     if (data.session) {
-      // User is authenticated, redirect to dashboard
+      // User is authenticated, update profile and redirect to dashboard
+      try {
+        await $fetch('/api/profile', {
+          method: 'POST',
+          body: {
+            avatarUrl: data.session.user?.user_metadata?.avatar_url,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+        })
+      } catch (profileError) {
+        console.error('Failed to update profile:', profileError)
+      }
       await router.push('/dashboard')
     } else {
       // OAuth flow but no session yet - keep checking until session is available

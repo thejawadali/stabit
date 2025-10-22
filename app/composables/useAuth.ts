@@ -64,13 +64,6 @@ export const useAuth = () => {
 
       if (error) throw error
 
-      await $fetch('/api/profile', {
-        method: 'POST',
-        body: {
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
-      })
-
       return { data, error: null }
     } catch (error) {
       return { data: null, error }
