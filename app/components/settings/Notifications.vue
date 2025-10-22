@@ -1,15 +1,25 @@
 <template>
   <div class="space-y-6">
     <!-- Notification Types -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
-        <CardTitle class="flex items-center gap-2">
-          <span class="text-xl">🔔</span>
-          Notification Types
+        <CardTitle class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🔔</span>
+            <div>
+              <div>Notifications</div>
+              <CardDescription class="mt-0">
+                Enable or disable the entire notification system
+              </CardDescription>
+            </div>
+          </div>
         </CardTitle>
-        <CardDescription>
-          Enable or disable different categories of notifications
-        </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="space-y-3">
@@ -57,7 +67,13 @@
     </Card>
 
     <!-- Reminder Preferences -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">⏰</span>
@@ -107,7 +123,13 @@
     </Card>
 
     <!-- Frequency Control -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">📅</span>
@@ -181,7 +203,13 @@
     </Card>
 
     <!-- Delivery Channels -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">📱</span>
@@ -227,7 +255,13 @@
     </Card>
 
     <!-- Quiet Hours -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">🌙</span>
@@ -285,7 +319,13 @@
     </Card>
 
     <!-- Snooze Option -->
-    <Card>
+    <Card class="relative">
+      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+        <div class="text-center">
+          <div class="text-2xl mb-2">🔕</div>
+          <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
+        </div>
+      </div>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
           <span class="text-xl">😴</span>
@@ -330,18 +370,13 @@
         </div>
       </CardContent>
     </Card>
-
-    <!-- Save Button -->
-    <div class="flex justify-end">
-      <Button @click="saveNotificationSettings" :disabled="saving">
-        <IconSave class="w-4 h-4 mr-2" />
-        {{ saving ? 'Saving...' : 'Save Changes' }}
-      </Button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+defineProps<{
+  enabled: boolean
+}>()
 
 type NotificationData = {
   types: {

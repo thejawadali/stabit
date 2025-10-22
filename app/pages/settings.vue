@@ -10,12 +10,12 @@
     </div>
 
     <Tabs defaultValue="profile" class="space-y-6 w-full">
-      <TabsList class="grid w-full grid-cols-4">
+      <TabsList class="grid w-full grid-cols-3">
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        <TabsTrigger value="security">Security</TabsTrigger>
       </TabsList>
+      <!-- <TabsTrigger value="security">Security</TabsTrigger> -->
 
       <!-- User Profile Settings -->
       <TabsContent value="profile" class="space-y-4">
@@ -29,13 +29,13 @@
 
       <!-- Notifications Settings -->
       <TabsContent value="notifications" class="space-y-4">
-        <SettingsNotifications />
+        <SettingsNotifications :enabled="userData.notificationsEnabled" />
       </TabsContent>
 
       <!-- Security & Account Management -->
-      <TabsContent value="security" class="space-y-4">
+      <!-- <TabsContent value="security" class="space-y-4">
         <SettingsSecurity />
-      </TabsContent>
+      </TabsContent> -->
     </Tabs>
 
     <!-- Save Button -->
