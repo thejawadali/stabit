@@ -16,9 +16,9 @@ model UserProfile {
   language             String        @default("en") @db.VarChar(10)
   dateFormat           String        @default("MM/DD/YYYY") @db.VarChar(20)
   theme                Theme         @default(system)
-  age                  Int           @db.Int @default(0)
+  age                  Int           @default(0) @db.Int
   gender               Gender        @default(male)
-  height               Int           @db.Int @default(0)
+  height               Int           @default(0) @db.Int
   isActive             Boolean       @default(true)
   personalGoals        String        @default("") @db.Text
   preferredTimeUnits   TimeUnit      @default(minutes)

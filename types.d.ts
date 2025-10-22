@@ -1,3 +1,5 @@
+import type { CountUnit, GoalFrequency, Theme, TimeUnit, TrackingType, UserProfile } from "@prisma/client"
+
 interface Habit {
   id: string;
   name: string;
@@ -27,3 +29,8 @@ interface Milestone {
   progress: number;
   daysRemaining: number;
 }
+
+
+// type UserProfileType = Omit<UserProfile, 'userId'|'createdAt'|'updatedAt'|'timezone'|'isActive'>;
+
+type ProfileInfoType = Pick<UserProfile, 'name'|'email'|'avatarUrl'|'age'|'height'|'gender'|'personalGoals'|'preferredTimeUnits'|'preferredCountUnits'|'defaultReminderTime'|'defaultTrackingType'|'defaultGoalFrequency'|'theme'>;
