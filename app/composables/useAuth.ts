@@ -21,6 +21,7 @@ export const useAuth = () => {
       await $fetch('/api/profile', {
         method: 'POST',
         body: {
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       })
 
@@ -39,7 +40,12 @@ export const useAuth = () => {
       })
 
       if (error) throw error
-
+      await $fetch('/api/timezone', {
+        method: 'PUT',
+        body: {
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      })
       return { data, error: null }
     } catch (error: any) {
       return { data: null, error }
@@ -61,6 +67,7 @@ export const useAuth = () => {
       await $fetch('/api/profile', {
         method: 'POST',
         body: {
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       })
 
