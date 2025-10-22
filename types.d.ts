@@ -35,4 +35,4 @@ interface Milestone {
 
 type ProfileInfoType = Pick<UserProfile, 'name'|'email'|'avatarUrl'|'age'|'height'|'gender'|'personalGoals'|'preferredTimeUnits'|'preferredCountUnits'|'defaultReminderTime'|'defaultTrackingType'|'defaultGoalFrequency'|'theme'>;
 
-type GeneralSettingsType = Pick<UserProfile, 'language'|'dateFormat'|'autoSync'|'lastSyncTime'|'defaultDashboardView'|'showWelcomeMessage'>;
+type GeneralSettingsType = Pick<UserProfile, 'language'|'dateFormat'|'autoSync'|'lastSyncTime'|'defaultDashboardView'|'showWelcomeMessage'|'notificationsEnabled'>;

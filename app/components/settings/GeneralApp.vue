@@ -137,6 +137,30 @@
         </CardContent>
       </Card>
 
+      <!-- App Preferences -->
+      <Card>
+        <CardHeader>
+          <CardTitle class="flex items-center gap-2">
+            <span class="text-xl">⚙️</span>
+            App Preferences
+          </CardTitle>
+          <CardDescription>
+            Configure general app behavior and notifications
+          </CardDescription>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-medium">Enable Notifications</p>
+              <p class="text-sm text-muted-foreground">
+                Receive reminders and updates about your habits
+              </p>
+            </div>
+            <Switch v-model="generalData.notificationsEnabled" />
+          </div>
+        </CardContent>
+      </Card>
+
       <!-- Dashboard Preferences -->
       <Card>
         <CardHeader>

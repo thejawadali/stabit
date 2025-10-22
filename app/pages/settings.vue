@@ -29,7 +29,7 @@
 
       <!-- Notifications Settings -->
       <TabsContent value="notifications" class="space-y-4">
-        <SettingsNotifications :enabled="userData.notificationsEnabled" />
+        <SettingsNotifications :enabled="generalSettings.notificationsEnabled" />
       </TabsContent>
 
       <!-- Security & Account Management -->
@@ -72,11 +72,6 @@ const profileInfo = reactive<ProfileInfoType>({
 })
 
 
-const userData = reactive<Partial<any>>({
-  notificationsEnabled: profile.value?.notificationsEnabled || false,
-  soundNotifications: profile.value?.soundNotifications || false,
-})
-
 const generalSettings = reactive<GeneralSettingsType>({
   language: profile.value?.language as string,
   dateFormat: profile.value?.dateFormat as string,
@@ -84,6 +79,7 @@ const generalSettings = reactive<GeneralSettingsType>({
   lastSyncTime: profile.value?.lastSyncTime ? new Date(profile.value.lastSyncTime) : null,
   defaultDashboardView: profile.value?.defaultDashboardView as DashboardView,
   showWelcomeMessage: profile.value?.showWelcomeMessage || true,
+  notificationsEnabled: profile.value?.notificationsEnabled || false,
 })
 
 
@@ -93,7 +89,7 @@ const updateProfile = async () => {
     method: 'PUT',
     body: {
       ...profileInfo,
-      ...userData
+      ...generalSettings
     },
   })
   if (error) {
