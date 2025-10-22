@@ -24,7 +24,7 @@
 
       <!-- General App Settings -->
       <TabsContent value="general" class="space-y-4">
-        <SettingsGeneralApp />
+        <SettingsGeneralApp v-model:generalData="generalSettings"/>
       </TabsContent>
 
       <!-- Notifications Settings -->
@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import type { CountUnit, DashboardView, Gender, GoalFrequency, Theme, TimeUnit, TrackingType } from "@prisma/client"
-import type { ProfileInfoType } from "~~/types"
+import type { GeneralSettingsType, ProfileInfoType } from "~~/types"
 
 const saving = ref(false)
 const { data: profile } = await useFetch('/api/profile')
@@ -73,27 +73,17 @@ const profileInfo = reactive<ProfileInfoType>({
 
 
 const userData = reactive<Partial<any>>({
-  name: profile.value?.name || '',
-  email: profile.value?.email || '',
-  avatarUrl: profile.value?.avatarUrl || '',
-  age: profile.value?.age || 0,
-  height: profile.value?.height || 0,
-  gender: profile.value?.gender as Gender,
-  personalGoals: profile.value?.personalGoals as string,
-  preferredTimeUnits: profile.value?.preferredTimeUnits as TimeUnit,
-  preferredCountUnits: profile.value?.preferredCountUnits as CountUnit,
-  defaultReminderTime: profile.value?.defaultReminderTime,
-  defaultTrackingType: profile.value?.defaultTrackingType as TrackingType,
-  defaultGoalFrequency: profile.value?.defaultGoalFrequency as GoalFrequency,
-  theme: profile.value?.theme as Theme,
+  notificationsEnabled: profile.value?.notificationsEnabled || false,
+  soundNotifications: profile.value?.soundNotifications || false,
+})
+
+const generalSettings = reactive<GeneralSettingsType>({
   language: profile.value?.language as string,
   dateFormat: profile.value?.dateFormat as string,
   autoSync: profile.value?.autoSync || true,
   lastSyncTime: profile.value?.lastSyncTime ? new Date(profile.value.lastSyncTime) : null,
   defaultDashboardView: profile.value?.defaultDashboardView as DashboardView,
   showWelcomeMessage: profile.value?.showWelcomeMessage || true,
-  notificationsEnabled: profile.value?.notificationsEnabled || false,
-  soundNotifications: profile.value?.soundNotifications || false,
 })
 
 
@@ -102,6 +92,7 @@ const updateProfile = async () => {
   const { data, error } = await useFetch('/api/profile', {
     method: 'PUT',
     body: {
+      ...profileInfo,
       ...userData
     },
   })
