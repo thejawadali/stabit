@@ -276,6 +276,7 @@ type FormData = {
 
 // Props
 interface Props {
+  categories: {id: string, name: string, icon: string}[]
   habitId?: string
   isEditMode?: boolean
   initialData?: FormData
@@ -299,7 +300,6 @@ const emit = defineEmits<{
   update: []
 }>()
 
-const categories = ["Health", "Learning", "Productivity", "Fitness"]
 const showPreview = ref(false)
 const router = useRouter()
 

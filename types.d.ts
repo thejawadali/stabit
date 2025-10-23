@@ -1,17 +1,5 @@
-import type { CountUnit, GoalFrequency, Theme, TimeUnit, TrackingType, UserProfile } from "@prisma/client"
+import type { CountUnit, GoalFrequency, Theme, TimeUnit, TrackingType, UserProfile, Category, Habit } from "@prisma/client"
 
-interface Habit {
-  id: string;
-  name: string;
-  icon: string;
-  time?: string;
-  status?: "done" | "pending";
-  category?: string;
-  progress?: number;
-  streak?: number;
-  trend?: number[];
-  missedDate?: string;
-}
 
 interface Activity {
   id: string;
@@ -45,3 +33,5 @@ type NotificationSettingsType = Pick<UserProfile, 'enableReminders'|'enableMiles
 type Category = Pick<Category, 'name'|'description'|'color'|'icon'|'isActive'|'userId'|'habits'> & {
   id: string;
 }
+
+type Habit = Omit<Habit>

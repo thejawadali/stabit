@@ -29,8 +29,8 @@
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="cat in categories" :key="cat" :value="cat">
-            {{ cat }}
+          <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
+            {{ cat.icon }} {{ cat.name }}
           </SelectItem>
         </SelectContent>
       </Select>
@@ -52,7 +52,7 @@ const description = defineModel<string>('description')
 const showEmojiPicker = ref(false)
 
 defineProps<{
-  categories: string[]
+  categories: {id: string, name: string, icon: string}[]
 }>()
 
 
