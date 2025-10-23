@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { serverSupabaseUser } from '#supabase/server'
+import { seedDefaultCategories } from '../../utils/seedCategories'
 
 
 export default defineEventHandler(async (event) => {
@@ -27,6 +28,16 @@ export default defineEventHandler(async (event) => {
         ...data
       }
     })
+
+    // Seed default categories for new user
+    if (user?.sub) {
+      try {
+        await seedDefaultCategories(prisma, user.sub)
+      } catch (seedError) {
+        console.error('Failed to seed default categories:', seedError)
+      }
+    }
+
     return created
   } catch (error: any) {
     // Prisma P2002: Unique constraint failed (userId already exists)
