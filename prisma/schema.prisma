@@ -23,15 +23,40 @@ model UserProfile {
   personalGoals        String        @default("") @db.Text
   preferredTimeUnits   TimeUnit      @default(minutes)
   preferredCountUnits  CountUnit     @default(repetitions)
-  defaultReminderTime  String?       @db.VarChar(20)
   defaultTrackingType  TrackingType  @default(duration)
   defaultGoalFrequency GoalFrequency @default(daily)
   autoSync             Boolean       @default(true)
   lastSyncTime         DateTime?     @db.Timestamp
   defaultDashboardView DashboardView @default(overview)
   showWelcomeMessage   Boolean       @default(true)
+  
   notificationsEnabled Boolean       @default(false)
-  soundNotifications   Boolean       @default(false)
+
+  // Notification Types
+  enableReminders      Boolean       @default(true)
+  enableMilestones     Boolean       @default(true)
+  enableStreaks        Boolean       @default(true)
+  
+  // Reminder Settings
+  defaultReminderTime  String?       @db.VarChar(20) @default("23:00 PM")
+  reminderTone         ReminderTone  @default(gentle)
+  smartReminders       Boolean       @default(true)
+  
+  // Delivery Channels
+  inAppNotifications   Boolean       @default(true)
+  emailNotifications   Boolean       @default(true)
+  pushNotifications    Boolean       @default(true)
+  
+  // Quiet Hours
+  quietHoursEnabled    Boolean       @default(false)
+  quietHoursStart      String?       @db.VarChar(10)
+  quietHoursEnd        String?       @db.VarChar(10)
+  quietHoursDays       Json?         // Array of day strings: ["monday", "tuesday", ...]
+  
+  // Snooze Settings
+  snoozeDuration       SnoozeDuration @default(oneHour)
+  isSnoozed            Boolean       @default(false)
+  snoozeUntil          DateTime?     @db.Timestamp
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,4 +103,21 @@ enum DashboardView {
   analytics
   calendar
   progress
+}
+
+enum ReminderTone {
+  gentle
+  motivational
+  energetic
+  calm
+  custom
+}
+
+enum SnoozeDuration {
+  fifteenMinutes
+  oneHour
+  twoHours
+  fourHours
+  eightHours
+  twentyFourHours
 }

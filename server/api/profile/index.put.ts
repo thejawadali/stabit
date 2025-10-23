@@ -30,11 +30,16 @@ export default defineEventHandler(async (event) => {
       }, {} as any)
 
     // Handle date conversion for DateTime fields
-    if (updateData.defaultReminderTime) {
-      updateData.defaultReminderTime = new Date(updateData.defaultReminderTime)
-    }
     if (updateData.lastSyncTime) {
       updateData.lastSyncTime = new Date(updateData.lastSyncTime)
+    }
+    // if (updateData.snoozeUntil) {
+    //   updateData.snoozeUntil = new Date(updateData.snoozeUntil)
+    // }
+
+    // Handle JSON serialization for quietHoursDays
+    if (updateData.quietHoursDays) {
+      updateData.quietHoursDays = JSON.stringify(updateData.quietHoursDays)
     }
 
     // Update the profile

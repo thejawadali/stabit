@@ -14,8 +14,8 @@
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        <!-- <TabsTrigger value="security">Security</TabsTrigger> -->
       </TabsList>
-      <!-- <TabsTrigger value="security">Security</TabsTrigger> -->
 
       <!-- User Profile Settings -->
       <TabsContent value="profile" class="space-y-4">
@@ -24,12 +24,13 @@
 
       <!-- General App Settings -->
       <TabsContent value="general" class="space-y-4">
-        <SettingsGeneralApp v-model:generalData="generalSettings"/>
+        <SettingsGeneralApp v-model:generalData="generalSettings" />
       </TabsContent>
 
       <!-- Notifications Settings -->
       <TabsContent value="notifications" class="space-y-4">
-        <SettingsNotifications :enabled="generalSettings.notificationsEnabled" />
+        <SettingsNotifications :enabled="generalSettings.notificationsEnabled"
+          v-model:notificationSettings="notificationSettings" />
       </TabsContent>
 
       <!-- Security & Account Management -->
@@ -49,8 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import type { CountUnit, DashboardView, Gender, GoalFrequency, Theme, TimeUnit, TrackingType } from "@prisma/client"
-import type { GeneralSettingsType, ProfileInfoType } from "~~/types"
+import type { CountUnit, DashboardView, Gender, GoalFrequency, ReminderTone, SnoozeDuration, Theme, TimeUnit, TrackingType } from "@prisma/client"
+import type { GeneralSettingsType, NotificationSettingsType, ProfileInfoType } from "~~/types"
 
 const saving = ref(false)
 const { data: profile } = await useFetch('/api/profile')
@@ -83,19 +84,41 @@ const generalSettings = reactive<GeneralSettingsType>({
 })
 
 
+const notificationSettings = reactive<NotificationSettingsType>({
+  enableReminders: profile.value?.enableReminders || false,
+  enableMilestones: profile.value?.enableMilestones || false,
+  enableStreaks: profile.value?.enableStreaks || false,
+  defaultReminderTime: profile.value?.defaultReminderTime || null,
+  reminderTone: profile.value?.reminderTone as ReminderTone,
+  smartReminders: profile.value?.smartReminders || false,
+  inAppNotifications: profile.value?.inAppNotifications || false,
+  emailNotifications: profile.value?.emailNotifications || false,
+  pushNotifications: profile.value?.pushNotifications || false,
+  quietHoursEnabled: profile.value?.quietHoursEnabled || false,
+  quietHoursStart: profile.value?.quietHoursStart || null,
+  quietHoursEnd: profile.value?.quietHoursEnd || null,
+  quietHoursDays: profile.value?.quietHoursDays ? JSON.parse(profile.value.quietHoursDays as string) : [],
+  snoozeDuration: profile.value?.snoozeDuration as SnoozeDuration,
+  isSnoozed: profile.value?.isSnoozed || false,
+  snoozeUntil: profile.value?.snoozeUntil ? new Date(profile.value.snoozeUntil) : null,
+})
+
+
 const updateProfile = async () => {
   saving.value = true
-  const { data, error } = await useFetch('/api/profile', {
-    method: 'PUT',
-    body: {
-      ...profileInfo,
-      ...generalSettings
-    },
-  })
-  if (error) {
+  try {
+    await $fetch('/api/profile', {
+      method: 'PUT',
+      body: {
+        ...profileInfo,
+        ...generalSettings,
+        ...notificationSettings
+      },
+    })
+  } catch (error) {
     console.error(error)
   }
-  
+
   saving.value = false
 }
 

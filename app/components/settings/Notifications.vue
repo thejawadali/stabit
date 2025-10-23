@@ -2,7 +2,8 @@
   <div class="space-y-6">
     <!-- Notification Types -->
     <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -30,9 +31,9 @@
                 Get reminded to complete your habits
               </p>
             </div>
-            <Switch v-model="notificationData.types.reminders" />
+            <Switch v-model="notificationData.enableReminders" />
           </div>
-          
+
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Milestone Achievements</p>
@@ -40,9 +41,9 @@
                 Celebrate when you reach important milestones
               </p>
             </div>
-            <Switch v-model="notificationData.types.milestones" />
+            <Switch v-model="notificationData.enableMilestones" />
           </div>
-          
+
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Streak Updates</p>
@@ -50,25 +51,26 @@
                 Stay motivated with streak progress updates
               </p>
             </div>
-            <Switch v-model="notificationData.types.streaks" />
+            <Switch v-model="notificationData.enableStreaks" />
           </div>
-          
-          <div class="flex items-center justify-between">
+
+          <!-- <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">System Updates</p>
               <p class="text-sm text-muted-foreground">
                 Receive app updates and maintenance notifications
               </p>
             </div>
-            <Switch v-model="notificationData.types.system" />
-          </div>
+            <Switch v-model="notificationData" />
+          </div> -->
         </div>
       </CardContent>
     </Card>
 
     <!-- Reminder Preferences -->
     <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -85,31 +87,24 @@
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <Label for="default-reminder-time">Default Reminder Time</Label>
-            <Input
-              id="default-reminder-time"
-              v-model="notificationData.defaultReminderTime"
-              type="time"
-            />
-          </div>
-          <div class="space-y-2">
-            <Label for="reminder-tone">Reminder Tone</Label>
-            <Select v-model="notificationData.reminderTone">
-              <SelectTrigger>
-                <SelectValue placeholder="Select tone" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gentle">Gentle</SelectItem>
-                <SelectItem value="motivational">Motivational</SelectItem>
-                <SelectItem value="energetic">Energetic</SelectItem>
-                <SelectItem value="calm">Calm</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <!-- Default Reminder Time -->
+          <Input id="default-reminder-time" label="Default Reminder Time"
+            v-model="notificationData.defaultReminderTime!" type="time" />
+
+          <!-- Reminder Tone -->
+          <Select id="reminder-tone" label="Reminder Tone" v-model="notificationData.reminderTone">
+            <SelectTrigger>
+              <SelectValue placeholder="Select tone" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gentle">Gentle</SelectItem>
+              <SelectItem value="motivational">Motivational</SelectItem>
+              <SelectItem value="energetic">Energetic</SelectItem>
+              <SelectItem value="calm">Calm</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        
+
         <div class="flex items-center justify-between">
           <div>
             <p class="font-medium">Smart Reminders</p>
@@ -123,8 +118,9 @@
     </Card>
 
     <!-- Frequency Control -->
-    <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+    <Card class="relative" v-if="false">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -142,7 +138,7 @@
       <CardContent class="space-y-4">
         <div class="space-y-2">
           <Label for="notification-frequency">Notification Frequency</Label>
-          <Select v-model="notificationData.frequency">
+          <Select>
             <SelectTrigger>
               <SelectValue placeholder="Select frequency" />
             </SelectTrigger>
@@ -154,8 +150,8 @@
             </SelectContent>
           </Select>
         </div>
-        
-        <div v-if="notificationData.frequency === 'custom'" class="space-y-3">
+
+        <!-- <div v-if="notificationData.frequency === 'custom'" class="space-y-3">
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Monday</p>
@@ -198,13 +194,14 @@
             </div>
             <Switch v-model="notificationData.customSchedule.sunday" />
           </div>
-        </div>
+        </div> -->
       </CardContent>
     </Card>
 
     <!-- Delivery Channels -->
-    <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+    <Card class="relative" v-if="false">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -228,9 +225,9 @@
                 Show notifications within the app
               </p>
             </div>
-            <Switch v-model="notificationData.channels.inApp" />
+            <Switch v-model="notificationData.inAppNotifications" />
           </div>
-          
+
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Email Notifications</p>
@@ -238,9 +235,9 @@
                 Send notifications to your email
               </p>
             </div>
-            <Switch v-model="notificationData.channels.email" />
+            <Switch v-model="notificationData.emailNotifications" />
           </div>
-          
+
           <div class="flex items-center justify-between">
             <div>
               <p class="font-medium">Push Notifications</p>
@@ -248,7 +245,7 @@
                 Send push notifications to your device
               </p>
             </div>
-            <Switch v-model="notificationData.channels.push" />
+            <Switch v-model="notificationData.pushNotifications" />
           </div>
         </div>
       </CardContent>
@@ -256,7 +253,8 @@
 
     <!-- Quiet Hours -->
     <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -279,38 +277,22 @@
               Automatically mute notifications during specified hours
             </p>
           </div>
-          <Switch v-model="notificationData.quietHours.enabled" />
+          <Switch v-model="notificationData.quietHoursEnabled" />
         </div>
-        
-        <div v-if="notificationData.quietHours.enabled" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <Label for="quiet-start">Start Time</Label>
-            <Input
-              id="quiet-start"
-              v-model="notificationData.quietHours.startTime"
-              type="time"
-            />
-          </div>
-          <div class="space-y-2">
-            <Label for="quiet-end">End Time</Label>
-            <Input
-              id="quiet-end"
-              v-model="notificationData.quietHours.endTime"
-              type="time"
-            />
-          </div>
+
+        <div v-if="notificationData.quietHoursEnabled" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Start Time -->
+          <Input label="Start Time" id="quiet-start" v-model="notificationData.quietHoursStart!" type="time" />
+          <!-- End Time -->
+          <Input id="quiet-end" label="End Time" v-model="notificationData.quietHoursEnd!" type="time" />
         </div>
-        
-        <div v-if="notificationData.quietHours.enabled" class="space-y-2">
+
+        <div v-if="notificationData.quietHoursEnabled" class="space-y-1">
           <Label for="quiet-days">Quiet Days</Label>
           <div class="flex flex-wrap gap-2">
-            <Button
-              v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
-              :key="day"
-              :variant="notificationData.quietHours.days.includes(day.toLowerCase()) ? 'default' : 'outline'"
-              size="sm"
-              @click="toggleQuietDay(day.toLowerCase())"
-            >
+            <Button v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" :key="day"
+              :variant="notificationData.quietHoursDays.includes(day.toLowerCase()) ? 'default' : 'outline'" size="sm"
+              @click="toggleQuietDay(day.toLowerCase())">
               {{ day }}
             </Button>
           </div>
@@ -320,7 +302,8 @@
 
     <!-- Snooze Option -->
     <Card class="relative">
-      <div v-if="!enabled" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+      <div v-if="!enabled"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
         <div class="text-center">
           <div class="text-2xl mb-2">🔕</div>
           <p class="text-sm text-muted-foreground">Enable notifications to configure settings</p>
@@ -336,23 +319,21 @@
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
-        <div class="space-y-2">
-          <Label for="snooze-duration">Snooze Duration</Label>
-          <Select v-model="notificationData.snoozeDuration">
-            <SelectTrigger>
-              <SelectValue placeholder="Select duration" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="15min">15 minutes</SelectItem>
-              <SelectItem value="1hour">1 hour</SelectItem>
-              <SelectItem value="2hours">2 hours</SelectItem>
-              <SelectItem value="4hours">4 hours</SelectItem>
-              <SelectItem value="8hours">8 hours</SelectItem>
-              <SelectItem value="24hours">24 hours</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
+        <!-- Snooze Duration -->
+        <Select id="snooze-duration" label="Snooze Duration" v-model="notificationData.snoozeDuration">
+          <SelectTrigger>
+            <SelectValue placeholder="Select duration" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="15min">15 minutes</SelectItem>
+            <SelectItem value="1hour">1 hour</SelectItem>
+            <SelectItem value="2hours">2 hours</SelectItem>
+            <SelectItem value="4hours">4 hours</SelectItem>
+            <SelectItem value="8hours">8 hours</SelectItem>
+            <SelectItem value="24hours">24 hours</SelectItem>
+          </SelectContent>
+        </Select>
+
         <div class="flex items-center justify-between">
           <div>
             <p class="font-medium">Currently Snoozed</p>
@@ -360,11 +341,7 @@
               {{ notificationData.isSnoozed ? 'Notifications are snoozed' : 'Notifications are active' }}
             </p>
           </div>
-          <Button 
-            :variant="notificationData.isSnoozed ? 'default' : 'outline'"
-            size="sm"
-            @click="toggleSnooze"
-          >
+          <Button :variant="notificationData.isSnoozed ? 'default' : 'outline'" size="sm" @click="toggleSnooze">
             {{ notificationData.isSnoozed ? 'Unsnooze' : 'Snooze Now' }}
           </Button>
         </div>
@@ -374,103 +351,26 @@
 </template>
 
 <script setup lang="ts">
+import type { NotificationSettingsType } from "~~/types"
+
 defineProps<{
   enabled: boolean
 }>()
 
-type NotificationData = {
-  types: {
-    reminders: boolean
-    milestones: boolean
-    streaks: boolean
-    system: boolean
-  }
-  defaultReminderTime: string
-  reminderTone: string
-  smartReminders: boolean
-  frequency: string
-  customSchedule: {
-    monday: boolean
-    tuesday: boolean
-    wednesday: boolean
-    thursday: boolean
-    friday: boolean
-    saturday: boolean
-    sunday: boolean
-  }
-  channels: {
-    inApp: boolean
-    email: boolean
-    push: boolean
-  }
-  quietHours: {
-    enabled: boolean
-    startTime: string
-    endTime: string
-    days: string[]
-  }
-  snoozeDuration: string
-  isSnoozed: boolean
-}
-
-const notificationData = reactive<NotificationData>({
-  types: {
-    reminders: true,
-    milestones: true,
-    streaks: true,
-    system: false
-  },
-  defaultReminderTime: '09:00',
-  reminderTone: 'gentle',
-  smartReminders: true,
-  frequency: 'instant',
-  customSchedule: {
-    monday: true,
-    tuesday: true,
-    wednesday: true,
-    thursday: true,
-    friday: true,
-    saturday: false,
-    sunday: false
-  },
-  channels: {
-    inApp: true,
-    email: true,
-    push: true
-  },
-  quietHours: {
-    enabled: true,
-    startTime: '22:00',
-    endTime: '08:00',
-    days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-  },
-  snoozeDuration: '1hour',
-  isSnoozed: false
-})
-
-const saving = ref(false)
-
-function saveNotificationSettings() {
-  saving.value = true
-  // Simulate API call
-  setTimeout(() => {
-    saving.value = false
-    // toast.success('Notification settings saved successfully!')
-  }, 1000)
-}
+const notificationData = defineModel<NotificationSettingsType>('notificationSettings', { required: true })
 
 function toggleQuietDay(day: string) {
-  const index = notificationData.quietHours.days.indexOf(day)
+  const index = notificationData.value.quietHoursDays.indexOf(day)
   if (index > -1) {
-    notificationData.quietHours.days.splice(index, 1)
+    notificationData.value.quietHoursDays.splice(index, 1)
   } else {
-    notificationData.quietHours.days.push(day)
+    notificationData.value.quietHoursDays.push(day)
   }
 }
 
 function toggleSnooze() {
-  notificationData.isSnoozed = !notificationData.isSnoozed
-  if (notificationData.isSnoozed) {
+  notificationData.value.isSnoozed = !notificationData.value.isSnoozed
+  if (notificationData.value.isSnoozed) {
     // toast.success(`Notifications snoozed for ${notificationData.snoozeDuration}`)
   } else {
     // toast.success('Notifications unsnoozed')
