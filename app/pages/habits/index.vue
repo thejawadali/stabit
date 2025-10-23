@@ -112,11 +112,6 @@
             <Button :variant="viewMode === 'list' ? 'default' : 'outline'" size="icon" @click="viewMode = 'list'">
               <IconList class="h-4 w-4" />
             </Button>
-            <!-- <Button @click="toast.info('Add habit - coming soon')"> -->
-            <Button @click="undefined">
-              <IconPlus class="h-4 w-4 mr-2" />
-              Add Habit
-            </Button>
           </div>
         </div>
 
@@ -195,7 +190,7 @@
 <script setup lang="ts">
 // import { toast } from 'vue-sonner'
 
-// const router = useRouter()
+const router = useRouter()
 
 type Habit = {
   id: string
@@ -335,8 +330,7 @@ const completedToday = computed(() => habits.value.filter(h => h.completedToday)
 const avgProgress = computed(() => Math.round(habits.value.reduce((sum, h) => sum + h.progress, 0) / habits.value.length))
 
 const navigateToCreateHabit = () => {
-  // router.push('/habits/create')
-  // toast.info('Create habit - coming soon')
+  router.push('/habits/create')
 }
 
 const selectHabit = (habitId: string) => {
