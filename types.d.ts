@@ -40,3 +40,8 @@ type GeneralSettingsType = Pick<UserProfile, 'language'|'dateFormat'|'autoSync'|
 type NotificationSettingsType = Pick<UserProfile, 'enableReminders'|'enableMilestones'|'enableStreaks'|'defaultReminderTime'|'reminderTone'|'smartReminders'|'inAppNotifications'|'emailNotifications'|'pushNotifications'|'quietHoursEnabled'|'quietHoursStart'|'quietHoursEnd'|'snoozeDuration'|'isSnoozed'|'snoozeUntil'> & {
   quietHoursDays: string[]
 }
+
+
+type Category = Pick<Category, 'name'|'description'|'color'|'icon'|'isActive'|'userId'|'habits'> & {
+  id: string;
+}

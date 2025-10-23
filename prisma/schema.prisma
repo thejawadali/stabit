@@ -121,3 +121,38 @@ enum SnoozeDuration {
   eightHours
   twentyFourHours
 }
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  color       String   @default("#3B82F6") @db.VarChar(7) // Hex color code
+  icon        String?  @db.VarChar(50) // Icon name or identifier
+  isActive    Boolean  @default(true)
+  userId      String   @db.VarChar(36) // User who created the category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  habits      Habit[]
+
+  @@map("categories")
+}
+
+model Habit {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  icon        String?  @db.VarChar(50)
+  color       String?  @db.VarChar(7) // Hex color code
+  isActive    Boolean  @default(true)
+  userId      String   @db.VarChar(36) // User who created the habit
+  categoryId  String   @db.VarChar(36) // Category this habit belongs to
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("habits")
+}

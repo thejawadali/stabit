@@ -41,7 +41,8 @@ import {
   IconBookOpen,
   IconBell,
   IconUser,
-  IconAward
+  IconAward,
+  IconTags
 } from "#components"
 
 const route = useRoute()
@@ -54,6 +55,7 @@ const navigationItems = [
     badge: { text: "5", variant: "secondary" }
   },
   { title: "My Habits", url: "/habits", icon: IconTarget },
+  { title: "Categories", url: "/categories", icon: IconTags },
   { title: "Analytics", url: "/analytics", icon: IconBarChart3 },
   { title: "Calendar", url: "/calendar", icon: IconCalendar },
   { title: "Progress", url: "/progress", icon: IconTrendingUp },

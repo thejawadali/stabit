@@ -73,7 +73,6 @@ const password = ref("")
 const isLoading = ref(false)
 const errorMessage = ref("")
 
-// eslint-disable-next-line no-undef
 const {validate} = useForm()
 const { signUp, signInWithProvider } = useAuth()
 const router = useRouter()
