@@ -26,59 +26,63 @@
     <!-- Form Content -->
     <div v-else>
 
-    <Tabs defaultValue="general" class="space-y-6 w-full">
-      <TabsList class="grid w-full grid-cols-5">
-        <TabsTrigger value="general">General</TabsTrigger>
-        <TabsTrigger value="schedule">Schedule</TabsTrigger>
-        <TabsTrigger value="growth">Growth</TabsTrigger>
-        <TabsTrigger value="custom">Custom Fields</TabsTrigger>
-        <TabsTrigger value="rewards">Rewards</TabsTrigger>
-      </TabsList>
+      <Tabs defaultValue="general" class="space-y-6 w-full">
+        <TabsList class="grid w-full grid-cols-5">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="growth">Growth</TabsTrigger>
+          <TabsTrigger value="custom">Custom Fields</TabsTrigger>
+          <TabsTrigger value="rewards">Rewards</TabsTrigger>
+        </TabsList>
 
-      <!-- General Information -->
-      <TabsContent value="general" class="space-y-4">
-        <HabitGeneralInfo v-model:icon="formData.icon" v-model:name="formData.name" v-model:category="formData.category" v-model:description="formData.description" :categories="categories" />
-      </TabsContent>
+        <!-- General Information -->
+        <TabsContent value="general" class="space-y-4">
+          <HabitGeneralInfo v-model:icon="formData.icon" v-model:name="formData.name"
+            v-model:categoryId="formData.categoryId" v-model:description="formData.description" :categories="categories" />
+        </TabsContent>
 
-      <!-- Schedule & Recurrence  -->
-      <TabsContent value="schedule" class="space-y-4">
-        <HabitSchedule v-model:recurrenceType="formData.recurrenceType" v-model:timeOfDay="formData.timeOfDay" v-model:startDate="formData.startDate" v-model:endDate="formData.endDate" v-model:notificationsEnabled="formData.notificationsEnabled" v-model:reminderTimes="formData.reminderTimes" v-model:missedYesterday="formData.smartReminders.missedYesterday" v-model:streakContinuation="formData.smartReminders.streakContinuation" />
-      </TabsContent>
+        <!-- Schedule & Recurrence  -->
+        <TabsContent value="schedule" class="space-y-4">
+          <HabitSchedule v-model:recurrenceType="formData.recurrenceType" v-model:timeOfDay="formData.timeOfDay"
+            v-model:notificationsEnabled="formData.enableNotifications" v-model:reminderTimes="formData.reminderTimes"/>
+        </TabsContent>
 
-      <!-- Difficulty & Growth -->
-      <TabsContent value="growth" class="space-y-4">
-        <HabitGrowth v-model:initialValue="formData.initialValue" v-model:difficultyRate="formData.difficultyRate" v-model:goalValue="formData.goalValue" v-model:goalMetric="formData.goalMetric" v-model:estimatedDate="formData.estimatedDate" />
-      </TabsContent>
+        <!-- Difficulty & Growth -->
+        <TabsContent value="growth" class="space-y-4">
+          <HabitGrowth v-model:initialValue="formData.initialValue" v-model:difficultyRate="formData.difficultyRate"
+            v-model:goalValue="formData.goalValue" v-model:goalMetric="formData.goalMetric"
+            v-model:estimatedDate="formData.estimatedCompletionDate" />
+        </TabsContent>
 
-      <!-- Custom Fields -->
-      <TabsContent value="custom" class="space-y-4">
-        <HabitCustomFields v-model:customFields="customFields" />
-      </TabsContent>
+        <!-- Custom Fields -->
+        <TabsContent value="custom" class="space-y-4">
+          <HabitCustomFields v-model:customFields="customFields" />
+        </TabsContent>
 
-      <!-- Rewards & Milestones -->
-      <TabsContent value="rewards" class="space-y-4">
-        <HabitRewards v-model:rewards="rewards" :goalMetric="formData.goalMetric" />
-      </TabsContent>
-    </Tabs>
+        <!-- Rewards & Milestones -->
+        <TabsContent value="rewards" class="space-y-4">
+          <HabitRewards v-model:rewards="rewards" :goalMetric="formData.goalMetric ?? 'sessions'" />
+        </TabsContent>
+      </Tabs>
 
-    <!-- Action Buttons -->
-    <div class="flex items-center justify-between mt-6 pt-6 border-t">
-      <Button variant="outline" @click="navigateTo('/habits')">
-        Cancel
-      </Button>
-      <div class="flex items-center gap-3">
-        <Button variant="outline" @click="showPreview = true">
-          Preview Summary
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between mt-6">
+        <Button variant="outline" @click="navigateTo('/habits')">
+          Cancel
         </Button>
-        <Button v-if="!isEditMode" variant="secondary" @click="handleSave(true)">
-          Save & Add Another
-        </Button>
-        <Button @click="handleSave(false)">
-          <IconSave class="w-4 h-4 mr-2" />
-          {{ isEditMode ? "Update Habit" : "Save Habit" }}
-        </Button>
+        <div class="flex items-center gap-3">
+          <Button variant="outline" @click="showPreview = true">
+            Preview Summary
+          </Button>
+          <Button v-if="!isEditMode" variant="secondary" @click="handleSave(true)">
+            Save & Add Another
+          </Button>
+          <Button @click="handleSave">
+            <IconSave class="w-4 h-4 mr-2" />
+            {{ isEditMode ? "Update Habit" : "Save Habit" }}
+          </Button>
+        </div>
       </div>
-    </div>
     </div>
   </main>
   <Dialog :open="showPreview" @update:open="showPreview = $event">
@@ -100,7 +104,7 @@
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
               <span class="text-muted-foreground">Category:</span>
-              <Badge>{{ formData.category || "Not set" }}</Badge>
+              <Badge>{{ categories.find(c => c.id === formData.categoryId)?.name || "Not set" }}</Badge>
             </div>
             <div v-if="formData.description">
               <span class="text-muted-foreground">Description:</span>
@@ -121,10 +125,6 @@
               <span class="text-muted-foreground">Time:</span>
               <span>{{ formData.timeOfDay }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">Start Date:</span>
-              <span>{{ formData.startDate }}</span>
-            </div>
           </div>
         </div>
 
@@ -141,10 +141,6 @@
               <span>+{{ formData.difficultyRate }} per week</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-muted-foreground">Auto-Growth:</span>
-              <span>{{ formData.autoGrowth ? "Enabled" : "Disabled" }}</span>
-            </div>
-            <div class="flex justify-between">
               <span class="text-muted-foreground">Goal:</span>
               <span>{{ formData.goalValue }} {{ formData.goalMetric }}</span>
             </div>
@@ -157,11 +153,7 @@
             Custom Fields ({{ customFields.length }})
           </h4>
           <div class="space-y-1 text-sm">
-            <div
-              v-for="field in customFields"
-              :key="field.id"
-              class="flex justify-between"
-            >
+            <div v-for="field in customFields" :key="field.id" class="flex justify-between">
               <span class="text-muted-foreground">{{ field.title }}:</span>
               <Badge variant="secondary">{{ field.type }}</Badge>
             </div>
@@ -174,11 +166,7 @@
             Rewards ({{ rewards.length }})
           </h4>
           <div class="space-y-2">
-            <div
-              v-for="reward in rewards"
-              :key="reward.id"
-              class="flex items-center gap-2 text-sm"
-            >
+            <div v-for="reward in rewards" :key="reward.id" class="flex items-center gap-2 text-sm">
               <span class="text-lg">{{ reward.icon }}</span>
               <span>{{ reward.name }}</span>
               <span class="text-muted-foreground">
@@ -192,21 +180,9 @@
         <div class="border-t pt-4">
           <h4 class="font-semibold mb-2">Notifications</h4>
           <div class="text-sm">
-            <template v-if="formData.notificationsEnabled">
+            <template v-if="formData.enableNotifications">
               <div class="space-y-1">
-                <p>Enabled at: {{ formData.reminderTimes.join(", ") }}</p>
-                <p
-                  v-if="formData.smartReminders.missedYesterday"
-                  class="text-muted-foreground"
-                >
-                  • Gentle reminder if missed
-                </p>
-                <p
-                  v-if="formData.smartReminders.streakContinuation"
-                  class="text-muted-foreground"
-                >
-                  • Streak continuation encouragement
-                </p>
+                <p>Enabled at: {{ formData.reminderTimes?.join(", ") || "Not set" }}</p>
               </div>
             </template>
             <p v-else class="text-muted-foreground">Disabled</p>
@@ -218,14 +194,12 @@
         <Button variant="outline" @click="showPreview = false">
           Back to Edit
         </Button>
-        <Button
-          @click="
-            () => {
-              showPreview = false;
-              handleSave(false);
-            }
-          "
-        >
+        <Button @click="
+          () => {
+            showPreview = false
+            handleSave(false)
+          }
+        ">
           Confirm & Save
         </Button>
       </DialogFooter>
@@ -234,6 +208,28 @@
 </template>
 
 <script setup lang="ts">
+import type { RecurrenceType } from "@prisma/client"
+import type { HabitFormData } from "~~/types"
+
+const { validate } = useForm()
+const INITIAL_FORM_DATA: HabitFormData = {
+  name: "",
+  categoryId: "", // categoryId
+  description: "",
+  icon: "🎯",
+  
+  recurrenceType: "daily" as RecurrenceType,
+  timeOfDay: "19:00",
+  reminderTimes: ["09:00"],
+  enableNotifications: true,
+
+  goalMetric: "sessions",
+  goalValue: 0,
+  estimatedCompletionDate: '',
+  initialValue: 0,
+  difficultyRate: 1,
+}
+
 type CustomField = {
   id: string
   title: string
@@ -250,36 +246,12 @@ type Reward = {
   icon: string
 }
 
-type FormData = {
-  name: string
-  category: string
-  description: string
-  icon: string
-  recurrenceType: "daily" | "weekly" | "monthly"
-  customRecurrence: string
-  timeOfDay: string
-  startDate: string
-  endDate: string
-  initialValue: number
-  difficultyRate: number
-  autoGrowth: boolean
-  goalValue: number
-  goalMetric: string
-  estimatedDate: string
-  notificationsEnabled: boolean
-  reminderTimes: string[]
-  smartReminders: {
-    missedYesterday: boolean
-    streakContinuation: boolean
-  }
-}
-
 // Props
 interface Props {
-  categories: {id: string, name: string, icon: string}[]
+  categories: { id: string, name: string, icon: string }[]
   habitId?: string
   isEditMode?: boolean
-  initialData?: FormData
+  initialData?: HabitFormData
   initialCustomFields?: CustomField[]
   initialRewards?: Reward[]
   loading?: boolean
@@ -296,37 +268,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Emits
 const emit = defineEmits<{
-  save: [andAddAnother: boolean]
-  update: []
+  save: [HabitFormData]
+  update: [HabitFormData]
 }>()
 
 const showPreview = ref(false)
 const router = useRouter()
 
+
+
 // Initialize form data
-const formData = reactive<FormData>({
-  name: "",
-  category: "",
-  description: "",
-  icon: "🎯",
-  recurrenceType: "daily",
-  customRecurrence: "",
-  timeOfDay: "09:00",
-  startDate: new Date().toISOString().split("T")[0] || "",
-  endDate: "",
-  initialValue: 0,
-  difficultyRate: 1,
-  autoGrowth: false,
-  goalValue: 0,
-  goalMetric: "sessions",
-  estimatedDate: "",
-  notificationsEnabled: true,
-  reminderTimes: ["09:00"],
-  smartReminders: {
-    missedYesterday: true,
-    streakContinuation: false,
-  },
-})
+const formData = reactive<HabitFormData>(INITIAL_FORM_DATA)
 
 const customFields = ref<CustomField[]>([])
 const rewards = ref<Reward[]>([])
@@ -336,9 +288,6 @@ onMounted(() => {
   initializeFormData()
 })
 
-watch(() => [props.initialData, props.initialCustomFields, props.initialRewards], () => {
-  initializeFormData()
-}, { deep: true })
 
 function initializeFormData() {
   if (props.isEditMode && props.initialData) {
@@ -353,71 +302,28 @@ function initializeFormData() {
 }
 
 function resetToDefaults() {
-  Object.assign(formData, {
-    name: "",
-    category: "",
-    description: "",
-    icon: "🎯",
-    recurrenceType: "daily",
-    customRecurrence: "",
-    timeOfDay: "09:00",
-    startDate: new Date().toISOString().split("T")[0] || "",
-    endDate: "",
-    initialValue: 0,
-    difficultyRate: 1,
-    autoGrowth: false,
-    goalValue: 0,
-    goalMetric: "sessions",
-    estimatedDate: "",
-    notificationsEnabled: true,
-    reminderTimes: ["09:00"],
-    smartReminders: {
-      missedYesterday: true,
-      streakContinuation: false,
-    },
-  })
+  Object.assign(formData, INITIAL_FORM_DATA)
   customFields.value = []
   rewards.value = []
 }
 
-function updateFormData<K extends keyof FormData>(key: K, value: FormData[K]) {
-  formData[key] = value
-}
+async function handleSave(andAddAnother = false) {
+  const { valid } = await validate()
+  if (!valid) return
 
-function handleSave(andAddAnother = false) {
-  if (!formData.name) {
-    // toast.error("Please enter a habit name");
-    return
-  }
-  if (!formData.category) {
-    // toast.error("Please select a category");
-    return
-  }
-  
   if (props.isEditMode) {
-    // In a real app, this would make an API call to update the habit
-    // toast.success("Habit updated successfully!");
-    emit('update')
+    emit('update', formData)
   } else {
-    // In a real app, this would make an API call to create the habit
-    // toast.success("Habit created successfully!");
-    emit('save', andAddAnother)
+    emit('save', formData)
   }
-  
+
   if (!andAddAnother) {
     router.push("/habits")
   } else {
     // Reset form for adding another habit
-    Object.assign(formData, {
-      name: "",
-      category: "",
-      description: "",
-      icon: "🎯",
-    })
+    Object.assign(formData, INITIAL_FORM_DATA)
     customFields.value = []
     rewards.value = []
   }
 }
 </script>
-
-<style scoped></style>

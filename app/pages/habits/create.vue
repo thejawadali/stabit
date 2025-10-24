@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-function handleSave(andAddAnother: boolean) {
-  // Handle save logic here if needed
-  // The HabitForm component already handles the main save logic
-  console.log('Save triggered:', andAddAnother)
-}
+import type { HabitFormData } from "~~/types"
 
+function handleSave(data: HabitFormData) {
+  console.log('Save triggered:', data)
+}
+  
 
 const { data: categories } = await useFetch<{id: string, name: string, icon: string}[]>('/api/categories', {
   transform: (data) => data.map((item) => ({

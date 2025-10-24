@@ -20,11 +20,6 @@
 
       <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="timeOfDay" />
 
-      <div class="grid grid-cols-2 gap-4">
-        <Input name="startDate" type="date" v-model="startDate" label="Start Date" />
-        <Input name="endDate" type="date" v-model="endDate" label="End Date (Optional)" />
-      </div>
-
       <!-- Notifications -->
       <div class="pt-4 border-t space-y-4">
         <div class="flex items-center justify-between">
@@ -52,7 +47,7 @@
           </Button>
         </div>
 
-        <div class="space-y-3">
+        <!-- <div class="space-y-3">
           <Label>Smart Reminders</Label>
           <div class="flex items-center justify-between">
             <Label for="missedYesterday" class="font-normal">
@@ -67,7 +62,7 @@
             </Label>
             <Switch id="streakContinuation" v-model="streakContinuation" />
           </div>
-        </div>
+        </div> -->
       </div>
     </CardContent>
   </Card>
@@ -77,12 +72,8 @@
 
 const recurrenceType = defineModel<string>('recurrenceType')
 const timeOfDay = defineModel<string>('timeOfDay')
-const startDate = defineModel<string>('startDate')
-const endDate = defineModel<string>('endDate')
 const notificationsEnabled = defineModel<boolean>('notificationsEnabled')
 const reminderTimes = defineModel<string[]>('reminderTimes')
-const missedYesterday = defineModel<boolean>('missedYesterday')
-const streakContinuation = defineModel<boolean>('streakContinuation')
 
 
 

@@ -62,6 +62,54 @@ model UserProfile {
   updatedAt DateTime @updatedAt
 }
 
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  color       String   @default("#3B82F6") @db.VarChar(7) // Hex color code
+  icon        String?  @db.VarChar(50) // Icon name or identifier
+  isActive    Boolean  @default(true)
+  userId      String   @db.VarChar(36) // User who created the category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  habits      Habit[]
+
+  @@map("categories")
+}
+
+model Habit {
+  id                    String            @id @default(uuid())
+  name                  String            @db.VarChar(255)
+  description           String            @default("") @db.Text
+  icon                  String            @default("🎯") @db.VarChar(50)
+  recurrenceType        RecurrenceType    @default(daily)
+  timeOfDay             String            @default("19:00") @db.VarChar(10)
+  initialValue          Int          @default(0)
+  difficultyRate        Int          @default(1)
+  goalValue             Int          @default(0)
+  goalMetric            String           @default("sessions") @db.VarChar(50)
+  estimatedCompletionDate DateTime?       @db.Date
+  status                HabitStatus       @default(active)
+  isArchived            Boolean           @default(false)
+  isActive              Boolean           @default(true)
+  userId                String            @db.VarChar(36) // User who created the habit
+  categoryId            String            @db.VarChar(36) // Category this habit belongs to
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  enableNotifications     Boolean           @default(true)
+  reminderTimes          Json?
+
+  // Relationships
+  category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("habits")
+}
+
+
 enum Theme {
   light
   dark
@@ -122,37 +170,15 @@ enum SnoozeDuration {
   twentyFourHours
 }
 
-model Category {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(100)
-  description String?  @db.Text
-  color       String   @default("#3B82F6") @db.VarChar(7) // Hex color code
-  icon        String?  @db.VarChar(50) // Icon name or identifier
-  isActive    Boolean  @default(true)
-  userId      String   @db.VarChar(36) // User who created the category
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
-  habits      Habit[]
-
-  @@map("categories")
+enum RecurrenceType {
+  daily
+  weekly
+  monthly
 }
 
-model Habit {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  icon        String?  @db.VarChar(50)
-  color       String?  @db.VarChar(7) // Hex color code
-  isActive    Boolean  @default(true)
-  userId      String   @db.VarChar(36) // User who created the habit
-  categoryId  String   @db.VarChar(36) // Category this habit belongs to
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@map("habits")
+enum HabitStatus {
+  active
+  inactive
+  completed
+  paused
 }

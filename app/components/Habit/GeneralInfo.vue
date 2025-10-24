@@ -21,10 +21,10 @@
       </div>
 
       <Input label="Habit Name" rules="required" name="name" placeholder="e.g., Daily Reading" validateOnBlur
-        v-model="name" />
+        v-model="name" customErrorMessage="Please enter a habit name" />
 
       <Select label="Category" v-model="category" rules="required" name="category"
-        placeholder="Select a category" validateOnBlur>
+        placeholder="Select a category" validateOnBlur customErrorMessage="Please select a category">
         <SelectTrigger>
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
@@ -45,7 +45,7 @@
 <script setup lang="ts">
 const icon = defineModel<string>('icon')
 const name = defineModel<string>('name')
-const category = defineModel<string>('category')
+const category = defineModel<string>('categoryId')
 const description = defineModel<string>('description')
 
 
