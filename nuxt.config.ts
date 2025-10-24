@@ -61,4 +61,12 @@ export default defineNuxtConfig({
     },
     '~/components',
   ],
+  imports: {
+    presets: [
+      {
+        from: '~/components/ui/toast/use-toast',
+        imports: ['useToast']
+      }
+    ]
+  },
 })
