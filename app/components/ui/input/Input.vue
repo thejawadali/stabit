@@ -66,3 +66,19 @@ const inputClasses = computed(() => {
     <p v-if="showError" class="text-sm text-destructive">{{ customErrorMessage || errorMessage }}</p>
   </div>
 </template>
+
+
+<style scoped>
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+:root input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+</style>
