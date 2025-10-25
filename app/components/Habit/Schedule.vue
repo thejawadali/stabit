@@ -2,7 +2,7 @@
   <Card>
     <CardHeader>
       <CardTitle class="flex items-center gap-2">
-        <CalendarIcon class="w-5 h-5" />
+        <IconCalendar class="w-5 h-5" />
         Recurrence & Schedule
       </CardTitle>
     </CardHeader>
@@ -31,7 +31,13 @@
         </div>
 
         <div class="space-y-2" v-if="notificationsEnabled">
-          <Label>Reminder Times</Label>
+          <div class="flex items-center justify-between">  
+            <Label>Reminder Times</Label>
+            <Button type="button" variant="outline" size="sm" @click="addReminderTime">
+              <IconPlus class="w-4 h-4 mr-2" />
+              Add Reminder Time
+            </Button>
+          </div>
           <div v-for="(_, index) in reminderTimes" :key="index" class="flex items-center gap-2">
             <template v-if="reminderTimes">
               <Input type="time" v-model="reminderTimes[index]" />
@@ -41,10 +47,6 @@
               </Button>
             </template>
           </div>
-          <Button type="button" variant="outline" size="sm" @click="addReminderTime">
-            <IconPlus class="w-4 h-4 mr-2" />
-            Add Reminder Time
-          </Button>
         </div>
 
         <!-- <div class="space-y-3">

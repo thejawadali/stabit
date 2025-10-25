@@ -107,7 +107,7 @@ const INITIAL_FORM_DATA: HabitFormData = {
 
   goalMetric: "sessions",
   goalValue: 0,
-  estimatedCompletionDate: '',
+  estimatedCompletionDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
   initialValue: 0,
   difficultyRate: 1,
 }

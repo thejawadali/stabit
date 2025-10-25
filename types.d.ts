@@ -44,7 +44,7 @@ type HabitFormData = {
   difficultyRate?: number
   goalValue?: number
   goalMetric?: string
-  estimatedCompletionDate?: string
+  estimatedCompletionDate?: Date
   enableNotifications?: boolean
   reminderTimes?: string[]
 }

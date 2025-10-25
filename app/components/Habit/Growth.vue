@@ -34,7 +34,7 @@
 
 
       <!-- estimated completion date -->
-      <Input name="estimatedDate" type="date" v-model="estimatedDate" label="Estimated Completion Date" />
+      <DatePicker label="Estimated Completion Date" v-model="estimatedDate" />
       <div class=" grid grid-cols-2 gap-4 lg:grid-cols-2">
         <!-- initial value -->
         <Input name="initialValue" label="Initial Value / Starting Point" type="number" placeholder="e.g., 5 pushups"
@@ -68,8 +68,8 @@ const initialValue = defineModel<number>('initialValue')
 const difficultyRate = defineModel<number>('difficultyRate')
 const goalValue = defineModel<number>('goalValue')
 const goalMetric = defineModel<string>('goalMetric')
-const estimatedDate = defineModel<string>('estimatedDate', {
-  default: ""
+const estimatedDate = defineModel<Date>('estimatedDate', {
+  default: new Date()
 })
 
 </script>
