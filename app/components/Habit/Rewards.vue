@@ -64,6 +64,9 @@
 
 <script setup lang="ts">
 
+const { toast } = useToast()
+
+
 type Reward = {
   id: string
   milestoneValue: number
@@ -84,6 +87,31 @@ withDefaults(defineProps<{
 
 const icons = ["🎁", "🎉", "🏆", "⭐", "🎊", "💎", "🎈", "🍕", "🍰", "🎮"]
 const addReward = () => {
+  // Check if there's a previous reward that's not properly filled
+  const previousReward = rewards.value[rewards.value.length - 1]
+  if (previousReward) {
+    // Check if name is empty
+    if (!previousReward.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill the reward name before adding a new reward.",
+        variant: "destructive"
+      })
+      return
+    }
+    
+    // Check if milestone value is valid
+    if (!previousReward.milestoneValue || previousReward.milestoneValue <= 0) {
+      const { toast } = useToast()
+      toast({
+        title: "Validation Error",
+        description: "Please set a valid milestone value before adding a new reward.",
+        variant: "destructive"
+      })
+      return
+    }
+  }
+  
   const newReward: Reward = {
     id: Date.now().toString(),
     milestoneValue: 10,

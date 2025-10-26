@@ -105,8 +105,44 @@ model Habit {
 
   // Relationships
   category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  customFields          HabitCustomField[]
+  rewards               HabitRewards[]
 
   @@map("habits")
+}
+
+
+model HabitCustomField {
+  id            String        @id @default(uuid())
+  habitId       String        @db.VarChar(36)
+  title         String        @db.VarChar(255)
+  fieldType     FieldType
+  options       Json?         // For select fields: ["Option1", "Option2"]
+  isRequired    Boolean       @default(false)
+  sortingOrder  Int           @default(0)
+  createdAt     DateTime      @default(now())
+
+  // Relationships
+  habit         Habit         @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_custom_fields")
+}
+
+model HabitRewards {
+  id             String   @id @default(uuid())
+  milestoneValue Int      @db.Int
+  name           String   @db.VarChar(255)
+  description    String   @db.Text
+  icon           String   @default("🏆") @db.VarChar(50)
+  sortingOrder  Int           @default(0)
+  habitId        String   @db.VarChar(36)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  habit          Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_rewards")
 }
 
 
@@ -181,4 +217,11 @@ enum HabitStatus {
   inactive
   completed
   paused
+}
+
+enum FieldType {
+  text
+  number
+  select
+  boolean
 }

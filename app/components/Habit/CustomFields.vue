@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-
+const { toast } = useToast()
 type CustomField = {
   id: string
   title: string
@@ -75,14 +75,31 @@ type CustomField = {
 const customFields = defineModel<CustomField[]>('customFields', { default: [] })
 
 const addCustomField = () => {
-  // if previous field is not filled, show error
+  // Check if there's a previous field that's not properly filled
   const previousField = customFields.value[customFields.value.length - 1]
-  if (previousField && previousField.title === "") {
-    // toast.error("Please fill the previous field first")
-    console.error("Please fill the previous field first")
-
-    return
+  if (previousField) {
+    // Check if title is empty
+    if (!previousField.title.trim()) {
+      // Show toast error
+      toast({
+        title: "Validation Error",
+        description: "Please fill the field title before adding a new custom field.",
+        variant: "destructive"
+      })
+      return
+    }
+    
+    // For select fields, check if options are provided
+    if (previousField.type === "select" && (!previousField.options || previousField.options.length === 0)) {
+      toast({
+        title: "Validation Error", 
+        description: "Please add at least one option for the select field before adding a new custom field.",
+        variant: "destructive"
+      })
+      return
+    }
   }
+  
   const newField: CustomField = {
     id: Date.now().toString(),
     title: "",
