@@ -107,7 +107,10 @@ model Habit {
   category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customFields          HabitCustomField[]
   rewards               HabitRewards[]
-
+  habitLogs             HabitLogs[]
+  habitStreak           HabitStreak[]
+  habitMilestones       HabitMilestones[]
+  notifications         Notifications[]
   @@map("habits")
 }
 
@@ -145,6 +148,131 @@ model HabitRewards {
   @@map("habit_rewards")
 }
 
+
+model HabitLogs {
+  id String @id @default(uuid())
+  habitId String @db.VarChar(36)
+  userId String @db.VarChar(36)
+  logDate DateTime @db.Date
+  completionStatus CompletionStatus @default(completed)
+  value Int @db.Int
+  notes String? @db.Text
+  completionTime DateTime? @db.Timestamp
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_logs")
+}
+
+model HabitStreak {
+  id String @id @default(uuid())
+  habitId String @db.VarChar(36)
+  userId String @db.VarChar(36)
+  currentStreak Int @db.Int
+  longestStreak Int @db.Int
+  lastCompletionDate DateTime? @db.Date
+  streakStartDate DateTime? @db.Date
+  totalCompletions Int @db.Int
+  totalSessions Int @db.Int
+  completionRate Float @db.Float
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_streaks")
+}
+
+model HabitMilestones {
+  id String @id @default(uuid())
+  habitId String @db.VarChar(36)
+  userId String @db.VarChar(36)
+  name String @db.VarChar(255)
+  description String? @db.Text
+  targetValue Float @db.Float
+  targetMetric String @default("sessions") @db.VarChar(50)
+  rewardName String? @db.VarChar(255)
+  rewardDescription String? @db.Text
+  rewardIcon String @default("🎉") @db.VarChar(50)
+  status MilestoneStatus @default(locked)
+  currentProgress Float @default(0)
+  achievedDate DateTime? @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_milestones")
+}
+
+model Notifications {
+  id String @id @default(uuid())
+  habitId String @db.VarChar(36)
+  userId String @db.VarChar(36)
+  type NotificationType @default(reminder)
+  title String @db.VarChar(255)
+  message String @db.Text
+  isRead Boolean @default(false)
+  sentAt DateTime @db.Timestamp
+  readAt DateTime? @db.Timestamp
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Achievements {
+  id String @id @default(uuid())
+  userId String @db.VarChar(36)
+  name String @db.VarChar(255)
+  description String? @db.Text
+  icon String @default("🏆") @db.VarChar(50)
+  category AchievementCategory @default(streak)
+  criteria Json? // {"type": "streak", "value": 30, "habit_type": "any"}
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  @@map("achievements")
+}
+enum AchievementCategory {
+  streak
+  completion
+  consistency
+  milestone
+  special
+}
+
+enum NotificationType {
+  reminder
+  streakBreak
+  milestoneAchieved
+  encouragement
+  system
+}
+
+enum MilestoneStatus {
+  locked
+  inProgress
+  achieved
+}
+
+enum CompletionStatus {
+  completed
+  partial
+  missed
+  skipped
+}
 
 enum Theme {
   light
