@@ -198,7 +198,8 @@ async function handleSave(andAddAnother = false) {
 
   const cleanFields = customFields.value
       .filter(({ title = "" }) => title.trim() !== "")
-      .map(({ title, type, options, required }) => ({
+      .map(({ title, type, options, required }, index) => ({
+        sortingOrder: index+1,
         title: title.trim(),
         fieldType: type as FieldType,
         options: options || [],

@@ -22,7 +22,6 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="text-2xl">{{ reward.icon }}</span>
-            <!-- <span class="font-medium">Reward {{ index + 1 }}</span> -->
             <span class="font-medium">
               {{ reward.name || `Reward ${index + 1}` }}
             </span>
