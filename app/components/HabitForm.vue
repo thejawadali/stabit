@@ -38,13 +38,15 @@
         <!-- General Information -->
         <TabsContent value="general" class="space-y-4">
           <HabitGeneralInfo v-model:icon="formData.icon" v-model:name="formData.name"
-            v-model:categoryId="formData.categoryId" v-model:description="formData.description" :categories="categories" />
+            v-model:categoryId="formData.categoryId" v-model:description="formData.description"
+            :categories="categories" />
         </TabsContent>
 
         <!-- Schedule & Recurrence  -->
         <TabsContent value="schedule" class="space-y-4">
           <HabitSchedule v-model:recurrenceType="formData.recurrenceType" v-model:timeOfDay="formData.timeOfDay"
-            v-model:notificationsEnabled="formData.enableNotifications" v-model:reminderTimes="formData.reminderTimes"/>
+            v-model:notificationsEnabled="formData.enableNotifications"
+            v-model:reminderTimes="formData.reminderTimes" />
         </TabsContent>
 
         <!-- Difficulty & Growth -->
@@ -86,11 +88,12 @@
     </div>
   </main>
 
-  <HabitPreviewDialog v-model="showPreview" :formData="formData" :categories="categories" :customFields="customFields" :rewards="rewards" @save="handleSave" />
+  <HabitPreviewDialog v-model="showPreview" :formData="formData" :categories="categories" :customFields="customFields"
+    :rewards="rewards" @save="handleSave" />
 </template>
 
 <script setup lang="ts">
-import type { RecurrenceType } from "@prisma/client"
+import type { FieldType, RecurrenceType } from "@prisma/client"
 import type { HabitFormData } from "~~/types"
 
 const { validate } = useForm()
@@ -99,7 +102,7 @@ const INITIAL_FORM_DATA: HabitFormData = {
   categoryId: "", // categoryId
   description: "",
   icon: "🎯",
-  
+
   recurrenceType: "daily" as RecurrenceType,
   timeOfDay: "19:00",
   reminderTimes: ["09:00"],
@@ -193,19 +196,44 @@ async function handleSave(andAddAnother = false) {
   const { valid } = await validate()
   if (!valid) return
 
-  if (props.isEditMode) {
-    emit('update', formData)
-  } else {
-    emit('save', formData)
+  const cleanFields = customFields.value
+      .filter(({ title = "" }) => title.trim() !== "")
+      .map(({ title, type, options, required }) => ({
+        title: title.trim(),
+        fieldType: type as FieldType,
+        options: options || [],
+        isRequired: !!required,
+      }))
+
+  const cleanRewards = rewards.value
+      .filter(({ name = "" }) => name.trim() !== "")
+      .map(({ name, description, icon, milestoneValue }) => ({
+        name,
+        description,
+        icon,
+        milestoneValue,
+      }))
+
+  const payload = {
+    ...formData,
+    customFields: cleanFields,
+    rewards: cleanRewards,
   }
 
-  if (!andAddAnother) {
-    router.push("/habits")
+
+  if (props.isEditMode) {
+    emit('update', payload)
   } else {
-    // Reset form for adding another habit
-    Object.assign(formData, INITIAL_FORM_DATA)
-    customFields.value = []
-    rewards.value = []
+    emit('save', payload)
   }
+
+  // if (!andAddAnother) {
+  //   router.push("/habits")
+  // } else {
+  //   // Reset form for adding another habit
+  //   Object.assign(formData, INITIAL_FORM_DATA)
+  //   customFields.value = []
+  //   rewards.value = []
+  // }
 }
 </script>

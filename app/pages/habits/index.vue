@@ -145,7 +145,7 @@
       <!-- Habits Display -->
       <Card v-if="filteredHabits.length === 0">
         <CardContent class="p-12 text-center">
-          <Target class="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <IconTarget class="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 class="text-lg font-semibold mb-2">No habits found</h3>
           <p class="text-muted-foreground mb-4">Try adjusting your filters or create a new habit</p>
           <Button @click="navigateToCreateHabit">

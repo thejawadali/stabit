@@ -5,74 +5,89 @@ const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-    
+    const user = await serverSupabaseUser(event);
+
     if (!user) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
+        statusMessage: "Unauthorized",
+      });
     }
 
-    const body = await readBody(event)
-    // const {
-    //   name,
-    //   description,
-    //   icon,
-    //   color,
-    //   recurrenceType,
-    //   customRecurrence,
-    //   timeOfDay,
-    //   initialValue,
-    //   difficultyRate,
-    //   autoGrowth,
-    //   goalValue,
-    //   goalMetric,
-    //   estimatedCompletionDate,
-    //   status,
-    //   categoryId,
-    //   customFields,
-    //   milestones
-    // } = body
+    const body = await readBody(event);
 
-    // Validate required fields
-    if (!body.name || !body.categoryId) {
+    // ✅ Validate required fields
+    const { name, categoryId, customFields = [], rewards = [], ...rest } = body;
+
+    if (!name || !categoryId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Name, categoryId are required'
-      })
+        statusMessage: "Both 'name' and 'categoryId' are required.",
+      });
     }
 
-    // Check if category exists
+    // ✅ Check if category exists
     const category = await prisma.category.findUnique({
-      where: { id: body.categoryId }
-    })
+      where: { id: categoryId },
+    });
 
     if (!category) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Category not found'
-      })
+        statusMessage: "Category not found.",
+      });
     }
 
-    // Create habit with related data
-    const habit = await prisma.habit.create({
-      data: {
-        ...body,
-        userId: user.sub
-      }
-    })
+    // ✅ Atomic creation using transaction
+    const [habit] = await prisma.$transaction([
+      prisma.habit.create({
+        data: {
+          ...rest,
+          name,
+          categoryId,
+          userId: user.sub,
+          customFields: customFields.length
+            ? {
+                create: customFields.map((field: any) => ({
+                  title: field.title,
+                  fieldType: field.fieldType,
+                  options: field.options ?? null,
+                  isRequired: field.isRequired ?? false,
+                  sortingOrder: field.sortingOrder ?? 0,
+                })),
+              }
+            : undefined,
+          rewards: rewards.length
+            ? {
+                create: rewards.map((reward: any) => ({
+                  milestoneValue: reward.milestoneValue,
+                  name: reward.name,
+                  description: reward.description ?? "",
+                  icon: reward.icon ?? "🏆",
+                  sortingOrder: reward.sortingOrder ?? 0,
+                })),
+              }
+            : undefined,
+        },
+        include: {
+          customFields: true,
+          rewards: true,
+        },
+      }),
+    ]);
 
     return {
       success: true,
+      message: "Habit created successfully.",
       data: habit,
-      message: 'Habit created successfully'
-    }
-  } catch (error) {
-    console.error('Error creating habit:', error)
+    };
+  } catch (error: any) {
+    console.error("Error creating habit:", error);
+
     throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to create habit'
-    })
+      statusCode: error.statusCode || 500,
+      statusMessage: error.statusMessage || "Failed to create habit.",
+    });
   }
-})
+});
+
