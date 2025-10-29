@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div>
     <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 mx-auto w-full">
       <!-- Header -->
       <div class="mb-6 flex items-start justify-between">
@@ -207,7 +207,28 @@ type Habit = {
   completedToday: boolean
 }
 
-const habits = ref<Habit[]>([
+
+const { data: habits } = await useFetch<Habit[]>('/api/habits', {
+  default: () => [],
+  transform: (data: any) => data.data.map((habit: any) => ({
+    id: habit.id,
+    icon: habit.icon,
+    name: habit.name,
+    description: habit.description,
+    category: habit.category.name,
+    recurrence: habit.recurrenceType?.toUpperCase(),
+    status: "active",
+    streak: 12,
+    progress: 75,
+    goalProgress: { current: 38, target: 50 },
+    nextDue: "Today, 8:00 PM",
+    hasMilestone: true,
+    completedToday: false,
+  }))
+})
+
+
+const _habits = ref<Habit[]>([
   {
     id: "1",
     icon: "📚",
