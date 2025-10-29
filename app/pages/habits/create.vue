@@ -1,11 +1,14 @@
 <template>
-  <HabitForm :is-edit-mode="false" @save="handleSave" :categories="categories || []" />
+  <HabitForm :is-edit-mode="false" @save="handleSave" :categories="categories || []" :loading="loading" />
 </template>
 
 <script setup lang="ts">
+import type HabitForm from "~/components/HabitForm.vue"
 import type { HabitFormData } from "~~/types"
 
 const { toast } = useToast()
+
+const loading = ref(false)
 
 const { data: categories } = await useFetch<{ id: string, name: string, icon: string }[]>('/api/categories', {
   transform: (data) => data.map((item) => ({
@@ -15,8 +18,8 @@ const { data: categories } = await useFetch<{ id: string, name: string, icon: st
   }))
 })
 
-
 const handleSave = async (data: HabitFormData) => {
+  loading.value = true
   try {
     await $fetch('/api/habits', {
       method: 'POST',
@@ -34,6 +37,9 @@ const handleSave = async (data: HabitFormData) => {
       description: 'The habit has not been created',
       variant: 'destructive',
     })
+  }
+  finally {
+    loading.value = false
   }
 }
 </script>
