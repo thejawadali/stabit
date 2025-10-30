@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
             ? {
                 create: customFields.map((field: any) => ({
                   title: field.title,
-                  fieldType: field.fieldType,
+                  type: field.type,
                   options: field.options ?? null,
                   isRequired: field.isRequired ?? false,
                   sortingOrder: field.sortingOrder ?? 0,

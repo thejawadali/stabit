@@ -20,14 +20,10 @@
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <!-- <DropdownMenuItem @click="toast.info('View details - coming soon')"> -->
-            <DropdownMenuItem>
-              View Details
-            </DropdownMenuItem>
             <DropdownMenuItem @click="handleMarkComplete">
               Add Log / Session
             </DropdownMenuItem>
-            <DropdownMenuItem @click="navigate">
+            <DropdownMenuItem @click="handleEdit">
               <IconEdit class="h-4 w-4 mr-2" />
               Edit Habit
             </DropdownMenuItem>
@@ -120,6 +116,7 @@ const emit = defineEmits<{
   (e: 'markComplete'): void
   (e: 'toggleStatus'): void
   (e: 'deleteHabit'): void
+  (e: 'edit'): void
 }>()
 
 
@@ -131,6 +128,9 @@ const handleSelectHabit = () => {
 const handleMarkComplete = () => {
   emit('markComplete')
 }
+const handleEdit = () => {
+  emit('edit')
+}
 
 const handleToggleStatus = () => {
   emit('toggleStatus')
@@ -139,12 +139,6 @@ const handleToggleStatus = () => {
 const handleDeleteHabit = () => {
   emit('deleteHabit')
 }
-
-const navigate = async () => {
-  // await navigateTo({
-  //   path: `/habits/edit/${props.habit.id}?edit=true`,
-  // })
-};
 
 
 </script>

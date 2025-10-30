@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FieldType, RecurrenceType } from "@prisma/client"
+import type { FieldType, Habit, RecurrenceType } from "@prisma/client"
 import type { HabitFormData } from "~~/types"
 
 const { validate } = useForm()
@@ -114,21 +114,15 @@ type Reward = {
 // Props
 interface Props {
   categories: { id: string, name: string, icon: string }[]
-  habitId?: string
   isEditMode?: boolean
-  initialData?: HabitFormData
-  initialCustomFields?: CustomField[]
-  initialRewards?: Reward[]
   loading?: boolean
+  habit?: Habit | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  habitId: undefined,
   isEditMode: false,
-  initialData: undefined,
-  initialCustomFields: undefined,
-  initialRewards: undefined,
-  loading: false
+  loading: false,
+  habit: null
 })
 
 // Emits
@@ -138,33 +132,27 @@ const emit = defineEmits<{
 }>()
 
 const showPreview = ref(false)
-const router = useRouter()
 
 
 
-// Initialize form data
+// Initialize form data to initial state
 const formData = reactive<HabitFormData>(INITIAL_FORM_DATA)
 
 const customFields = ref<CustomField[]>([])
 const rewards = ref<Reward[]>([])
 
-// Load habit data on component mount or when props change
+
 onMounted(() => {
-  initializeFormData()
-})
-
-
-function initializeFormData() {
-  if (props.isEditMode && props.initialData) {
-    // Use data passed from parent (fetched from API)
-    Object.assign(formData, props.initialData)
-    customFields.value = props.initialCustomFields || []
-    rewards.value = props.initialRewards || []
+  if (props.isEditMode && props.habit) {
+    Object.assign(formData, props.habit)
+    customFields.value = (props.habit as any).customFields || []
+    rewards.value = (props.habit as any).rewards || []
   } else if (!props.isEditMode) {
     // For create mode, use default values
     resetToDefaults()
   }
-}
+})
+
 
 function resetToDefaults() {
   Object.assign(formData, INITIAL_FORM_DATA)
@@ -181,7 +169,7 @@ async function handleSave() {
     .map(({ title, type, options, required }, index) => ({
       sortingOrder: index + 1,
       title: title.trim(),
-      fieldType: type as FieldType,
+      type: type as FieldType,
       options: options || [],
       isRequired: !!required,
     }))

@@ -119,7 +119,7 @@ model HabitCustomField {
   id            String        @id @default(uuid())
   habitId       String        @db.VarChar(36)
   title         String        @db.VarChar(255)
-  fieldType     FieldType
+  type     FieldType
   options       Json?         // For select fields: ["Option1", "Option2"]
   isRequired    Boolean       @default(false)
   sortingOrder  Int           @default(0)

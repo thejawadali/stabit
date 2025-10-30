@@ -1,109 +1,56 @@
 <template>
   <HabitForm 
-    :habit-id="habitId" 
-    :is-edit-mode="true" 
-    :initial-data="habitData || undefined"
-    :initial-custom-fields="customFields"
-    :initial-rewards="rewards"
-    :loading="loading"
+    :habit="habit"
+    :categories="categories || []"
+    :is-edit-mode="true"
+    :loading="false"
     @update="handleUpdate" 
   />
 </template>
 
 <script setup lang="ts">
-type CustomField = {
-  id: string
-  title: string
-  type: "text" | "number" | "select" | "boolean"
-  options?: string[]
-  required: boolean
-}
-
-type Reward = {
-  id: string
-  milestoneValue: number
-  name: string
-  description: string
-  icon: string
-}
-
-type FormData = {
-  name: string
-  category: string
-  description: string
-  icon: string
-  recurrenceType: "daily" | "weekly" | "monthly"
-  customRecurrence: string
-  timeOfDay: string
-  startDate: string
-  endDate: string
-  initialValue: number
-  difficultyRate: number
-  autoGrowth: boolean
-  goalValue: number
-  goalMetric: string
-  estimatedDate: string
-  notificationsEnabled: boolean
-  reminderTimes: string[]
-  smartReminders: {
-    missedYesterday: boolean
-    streakContinuation: boolean
-  }
-}
+import type { Habit } from "@prisma/client"
 
 const route = useRoute()
-const router = useRouter()
 const habitId = route.params.id as string
 
-// Reactive data
-const habitData = ref<FormData | null>(null)
-const customFields = ref<CustomField[]>([])
-const rewards = ref<Reward[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
-
-
-// Use the composable for data fetching
-const { fetchHabit, fetchHabitCustomFields, fetchHabitRewards } = useHabitData()
-
-// Fetch habit data
-async function fetchHabitData() {
-  try {
-    loading.value = true
-    error.value = null
-    
-    // Fetch habit data, custom fields, and rewards in parallel
-    const [habit, customFieldsData, rewardsData] = await Promise.all([
-      fetchHabit(habitId),
-      fetchHabitCustomFields(habitId),
-      fetchHabitRewards(habitId)
-    ])
-    
-    if (habit) {
-      habitData.value = habit
-      customFields.value = customFieldsData
-      rewards.value = rewardsData
-    } else {
-      error.value = "Habit not found"
-      // Redirect to habits list if habit not found
-      router.push('/habits')
-    }
-  } catch (err) {
-    error.value = "Failed to load habit data"
-    console.error('Error fetching habit:', err)
-  } finally {
-    loading.value = false
-  }
+interface CombinedData {
+  habit: Habit | null;
+  categories: { id: string; name: string; icon: string }[];
 }
 
-// Load data on mount
-onMounted(() => {
-  fetchHabitData()
+
+const { data: combinedData } = await useAsyncData<CombinedData>(
+  'habit-and-categories',
+  async () => {
+    const [habitRes, categoriesRes] = await Promise.all([
+      $fetch<{ success: boolean; data: Habit }>(`/api/habits/${habitId}`),
+      $fetch<{ id: string; name: string; icon: string }[]>('/api/categories')
+    ]);
+
+    return {
+      habit: habitRes.data,
+      categories: categoriesRes.map(item => ({
+        id: item.id,
+        name: item.name,
+        icon: item.icon
+      }))
+    };
+  },
+  {
+    default: () => ({ habit: null, categories: [] })
+  }
+);
+
+const habit = computed(() => combinedData.value.habit)
+const categories = computed(() => combinedData.value.categories)
+
+useHead({
+  title: habit.value?.name || 'Habit'
 })
 
+
 function handleUpdate() {
-  // Handle update logic here if needed
-  // The HabitForm component already handles the main update logic
   console.log('Update triggered for habit:', habitId)
 }
 </script>

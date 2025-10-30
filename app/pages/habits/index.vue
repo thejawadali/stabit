@@ -158,12 +158,12 @@
         <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
             @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
-            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
+            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" @edit="editHabit(habit.id)" />
         </div>
         <div v-else class="space-y-3">
           <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit" :selected-habits="selectedHabits"
             @select-habit="selectHabit(habit.id)" @mark-complete="markComplete(habit.id)"
-            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" />
+            @toggle-status="toggleStatus(habit.id)" @delete-habit="deleteHabit(habit.id)" @edit="editHabit(habit.id)" />
         </div>
       </template>
     </main>
@@ -352,6 +352,10 @@ const avgProgress = computed(() => Math.round(habits.value.reduce((sum, h) => su
 
 const navigateToCreateHabit = () => {
   router.push('/habits/create')
+}
+
+const editHabit = (habitId: string) => {
+  router.push(`/habits/${habitId}`)
 }
 
 const selectHabit = (habitId: string) => {
