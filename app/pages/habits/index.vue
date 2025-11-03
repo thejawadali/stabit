@@ -188,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-// import { toast } from 'vue-sonner'
+const { toast } = useToast()
 
 const router = useRouter()
 
@@ -382,11 +382,33 @@ const setDeleteDialogOpen = (value: boolean) => {
   deleteDialogOpen.value = value
 }
 
-const confirmDelete = () => {
-  setDeleteDialogOpen(false)
-  habits.value = habits.value.filter(habit => habit.id !== habitToDelete)
-  // toast.success(`Deleted ${habitId}`)
-  selectedHabits.value = selectedHabits.value.filter(id => id !== habitToDelete)
+const confirmDelete = async () => {
+  if (!habitToDelete) return
+  
+  try {
+    await $fetch(`/api/habits/${habitToDelete}`, {
+      method: 'DELETE'
+    })
+
+    habits.value = habits.value.filter(habit => habit.id !== habitToDelete)
+    selectedHabits.value = selectedHabits.value.filter(id => id !== habitToDelete)
+    
+    toast({
+      title: 'Habit deleted',
+      description: 'The habit has been deleted successfully.',
+    })
+  } catch (error: any) {
+    console.error('Error deleting habit:', error)
+    const errorMessage = error?.data?.message || error?.message || 'Failed to delete habit. Please try again.'
+    toast({
+      title: 'Error',
+      description: errorMessage,
+      variant: 'destructive',
+    })
+  } finally {
+    setDeleteDialogOpen(false)
+    habitToDelete = null
+  }
 }
 
 const deleteHabit = (habitId: string) => {

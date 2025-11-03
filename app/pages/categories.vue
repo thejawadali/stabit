@@ -139,6 +139,7 @@ import type { Category } from "~~/types"
 
 const {validate} = useForm()
 
+const { toast } = useToast()
 
 const isDialogOpen = ref(false)
 const isEditing = ref(false)
@@ -228,9 +229,18 @@ const deleteCategory = async (id: string) => {
     })
 
     categories.value = categories.value?.filter(c => c.id !== id)
-  } catch (error) {
+    toast({
+      title: 'Category deleted',
+      description: 'The category has been deleted successfully.',
+    })
+  } catch (error: any) {
     console.error('Error deleting category:', error)
-    // You might want to show a toast notification here
+    const errorMessage = error?.data?.message || error?.message || 'Failed to delete category. Please try again.'
+    toast({
+      title: 'Error',
+      description: errorMessage,
+      variant: 'destructive',
+    })
   }
 }
 
