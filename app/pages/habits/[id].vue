@@ -1,5 +1,6 @@
 <template>
   <HabitForm 
+    v-if="!pending"
     :habit="habit"
     :categories="categories || []"
     :is-edit-mode="true"
@@ -10,9 +11,12 @@
 
 <script setup lang="ts">
 import type { Habit } from "@prisma/client"
+import type { HabitFormData } from "~~/types"
 
+const { toast } = useToast()
 const route = useRoute()
 const habitId = route.params.id as string
+const loading = ref(false)
 
 interface CombinedData {
   habit: Habit | null;
@@ -20,7 +24,7 @@ interface CombinedData {
 }
 
 
-const { data: combinedData } = await useAsyncData<CombinedData>(
+const { data: combinedData, pending } = await useAsyncData<CombinedData>(
   'habit-and-categories',
   async () => {
     const [habitRes, categoriesRes] = await Promise.all([
@@ -50,8 +54,27 @@ useHead({
 })
 
 
-function handleUpdate() {
-  console.log('Update triggered for habit:', habitId)
+
+async function handleUpdate(data: HabitFormData) {
+  loading.value = true
+  try {
+    await $fetch(`/api/habits/${habitId}`, {
+      method: 'PUT',
+      body: data
+    })
+    toast({
+      title: 'Habit updated successfully',
+      description: 'The habit has been updated successfully'
+    })
+    navigateTo('/habits')
+  } catch (error) {
+    console.error('Error updating habit:', error)
+    toast({
+      title: 'Error updating habit',
+      description: 'The habit has not been updated',
+      variant: 'destructive',
+    })
+  }
 }
 </script>
 
