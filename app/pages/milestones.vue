@@ -19,125 +19,10 @@
       </div>
 
       <!-- Filters -->
-      <Card>
-        <CardContent class="pt-6">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <!-- Filter by Habit -->
-            <div class="space-y-2">
-              <Label class="text-xs font-medium text-muted-foreground">Filter by Habit</Label>
-              <Select v-model="filterHabit">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Habits</SelectItem>
-                  <SelectItem value="Morning Workout">Morning Workout</SelectItem>
-                  <SelectItem value="Daily Reading">Daily Reading</SelectItem>
-                  <SelectItem value="Meditation">Meditation</SelectItem>
-                  <SelectItem value="Language Learning">Language Learning</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <!-- filter by status -->
-            <div class="space-y-2">
-              <Label class="text-xs font-medium text-muted-foreground">Filter by Status</Label>
-              <Select v-model="filterStatus">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Achieved">Achieved</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Locked">Locked</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <!-- sort by -->
-            <div class="space-y-2">
-              <Label class="text-xs font-medium text-muted-foreground">Sort By</Label>
-              <Select v-model="sortBy">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="progress">Progress Level</SelectItem>
-                  <SelectItem value="newest">Newest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div class="flex items-end">
-              <Button variant="outline" class="w-full gap-2">
-                <IconFilter class="w-4 h-4" />
-                Apply Filters
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <MilestoneFilters :habits="habits" v-model:filterHabit="filterHabit" v-model:filterStatus="filterStatus" v-model:sortBy="sortBy" />
 
       <!-- Stats Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent class="pt-6">
-            <div class="flex items-center gap-3">
-              <div class="p-3 rounded-lg bg-primary/10">
-                <IconTrophy class="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <p class="text-2xl font-bold">
-                  {{milestones.filter((m: Milestone) => m.status === "Achieved").length}}
-                </p>
-                <p class="text-xs text-muted-foreground">Achieved</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent class="pt-6">
-            <div class="flex items-center gap-3">
-              <div class="p-3 rounded-lg bg-warning/10">
-                <IconTarget class="w-6 h-6 text-warning" />
-              </div>
-              <div>
-                <p class="text-2xl font-bold">
-                  {{milestones.filter((m: Milestone) => m.status === "In Progress").length}}
-                </p>
-                <p class="text-xs text-muted-foreground">In Progress</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent class="pt-6">
-            <div class="flex items-center gap-3">
-              <div class="p-3 rounded-lg bg-muted">
-                <IconMedal class="w-6 h-6 text-muted-foreground" />
-              </div>
-              <div>
-                <p class="text-2xl font-bold">
-                  {{milestones.filter((m: Milestone) => m.status === "Locked").length}}
-                </p>
-                <p class="text-xs text-muted-foreground">Locked</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent class="pt-6">
-            <div class="flex items-center gap-3">
-              <div class="p-3 rounded-lg bg-success/10">
-                <IconGift class="w-6 h-6 text-success" />
-              </div>
-              <div>
-                <p class="text-2xl font-bold">{{ milestones.length }}</p>
-                <p class="text-xs text-muted-foreground">Total Rewards</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <MilestoneStats :stats="stats" />
 
       <!-- Milestones Table -->
       <Card>
@@ -160,7 +45,7 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="milestone in filteredMilestones" :key="milestone.id">
+              <TableRow v-for="milestone in milestones" :key="milestone.id">
                 <TableCell>
                   <div class="flex items-center gap-2">
                     <!-- icon -->
@@ -168,18 +53,21 @@
                       :class="getStatusIcon(milestone.status).class" />
                     <!-- badge -->
                     <Badge :class="getStatusBadge(milestone.status).class"
-                      :variant="getStatusBadge(milestone.status).variant">{{ milestone.status }}</Badge>
+                      :variant="getStatusBadge(milestone.status).variant">{{ formatStatus(milestone.status) }}</Badge>
                   </div>
                 </TableCell>
                 <TableCell class="font-medium">
-                  {{ milestone.habitName }}
+                  <div class="flex items-center gap-2">
+                    <span>{{ milestone.habitIcon }}</span>
+                    <span>{{ milestone.habitName }}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div class="flex items-center gap-2">
-                    <span class="text-2xl">{{ milestone.emoji }}</span>
+                    <span class="text-2xl">{{ milestone.rewardIcon }}</span>
                     <div>
-                      <p class="font-medium">{{ milestone.title }}</p>
-                      <p class="text-sm text-muted-foreground">
+                      <p class="font-medium">{{ milestone.name }}</p>
+                      <p v-if="milestone.description" class="text-sm text-muted-foreground">
                         {{ milestone.description }}
                       </p>
                     </div>
@@ -189,45 +77,51 @@
                   <div class="space-y-1 min-w-[200px]">
                     <div class="flex justify-between text-sm">
                       <span class="text-muted-foreground">
-                        {{ milestone.current }} / {{ milestone.target }}
+                        {{ milestone.currentProgress }} / {{ milestone.targetValue }}
                       </span>
                       <span class="font-medium">
-                        {{ Math.round((milestone.current / milestone.target) * 100) }}%
+                        {{ Math.round((milestone.currentProgress / milestone.targetValue) * 100) }}%
                       </span>
                     </div>
-                    <Progress :value="(milestone.current / milestone.target) * 100" class="h-2" />
+                    <Progress :value="(milestone.currentProgress / milestone.targetValue) * 100" class="h-2" />
                   </div>
                 </TableCell>
                 <TableCell>
                   <div>
-                    <p class="font-medium text-sm">{{ milestone.rewardTitle }}</p>
-                    <p class="text-xs text-muted-foreground">
+                    <p class="font-medium text-sm">{{ milestone.rewardName }}</p>
+                    <p v-if="milestone.rewardDescription" class="text-xs text-muted-foreground">
                       {{ milestone.rewardDescription }}
                     </p>
-                    <p v-if="milestone.dateAchieved" class="text-xs text-success mt-1">
-                      Achieved: {{ milestone.dateAchieved }}
+                    <p v-if="milestone.achievedDate" class="text-xs text-success mt-1">
+                      Achieved: {{ formatDate(milestone.achievedDate) }}
                     </p>
                   </div>
                 </TableCell>
                 <TableCell class="text-right">
-                  <Button v-if="milestone.status === 'Achieved'" size="sm" variant="outline"
-                    @click="handleCelebration(milestone)" class="gap-1">
-                    <IconSparkles class="w-3 h-3" />
-                    Celebrate
-                  </Button>
-                  <Button v-else size="sm" variant="ghost" @click="viewMilestone = milestone; isViewDetailOpen = true">
-                    View
-                  </Button>
+                  <div class="flex items-center justify-end gap-2">
+                    <Button v-if="milestone.status === 'achieved'" size="sm" variant="outline"
+                      @click="handleCelebration(milestone)" class="gap-1">
+                      <IconSparkles class="w-3 h-3" />
+                      Celebrate
+                    </Button>
+                    <template v-else>
+                      <IconEye class="w-4 h-4 cursor-pointer" @click="viewMilestone = milestone; isViewDetailOpen = true"/>
+                      <IconTrash2 class="w-4 h-4 cursor-pointer text-destructive hover:text-destructive ml-2" @click="handleDelete(milestone)" />
+                    </template>
+                  </div>
                 </TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <div v-if="filteredMilestones.length === 0" class="text-center py-12">
+          <div v-if="milestones.length === 0 && !pending" class="text-center py-12">
             <IconTrophy class="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-3" />
             <p class="text-muted-foreground">No milestones found</p>
             <p class="text-sm text-muted-foreground mt-1">
               Try adjusting your filters or create a new milestone
             </p>
+          </div>
+          <div v-if="pending" class="text-center py-12">
+            <p class="text-muted-foreground">Loading milestones...</p>
           </div>
         </CardContent>
       </Card>
@@ -242,28 +136,28 @@
         </CardHeader>
         <CardContent>
           <div class="space-y-3">
-            <div v-for="milestone in milestones.filter((m: Milestone) => m.status === 'Achieved')" :key="milestone.id"
+            <div v-for="reward in completedHistory" :key="reward.id"
               class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
               <div class="flex items-center gap-4">
-                <div class="text-4xl">{{ milestone.emoji }}</div>
+                <div class="text-4xl">{{ reward.rewardIcon }}</div>
                 <div>
-                  <p class="font-medium">{{ milestone.title }}</p>
+                  <p class="font-medium">{{ reward.milestoneName }}</p>
                   <p class="text-sm text-muted-foreground">
-                    {{ milestone.habitName }}
+                    {{ reward.habitIcon }} {{ reward.habitName }}
                   </p>
-                  <p class="text-xs text-success mt-1">
-                    Completed on {{ milestone.dateAchieved }}
+                  <p v-if="reward.achievedDate" class="text-xs text-success mt-1">
+                    Completed on {{ formatDate(reward.achievedDate) }}
                   </p>
                 </div>
               </div>
               <div class="text-right">
-                <p class="font-medium text-sm">{{ milestone.rewardTitle }}</p>
-                <p class="text-xs text-muted-foreground">
-                  {{ milestone.rewardDescription }}
+                <p class="font-medium text-sm">{{ reward.rewardName }}</p>
+                <p v-if="reward.rewardDescription" class="text-xs text-muted-foreground">
+                  {{ reward.rewardDescription }}
                 </p>
               </div>
             </div>
-            <div v-if="milestones.filter((m: Milestone) => m.status === 'Achieved').length === 0"
+            <div v-if="completedHistory.length === 0 && !pending"
               class="text-center py-8 text-muted-foreground">
               <IconCrown class="w-10 h-10 mx-auto opacity-50 mb-2" />
               <p>No rewards achieved yet</p>
@@ -273,30 +167,56 @@
         </CardContent>
       </Card>
     </div>
-    <MilestoneCreateDialog v-model:isAddDialogOpen="isAddDialogOpen" />
+    <MilestoneCreateDialog v-model:isAddDialogOpen="isAddDialogOpen" :habits="habits" @created="refreshMilestones" />
     <MilestoneViewDetail v-model:isOpen="isViewDetailOpen" :viewMilestone="viewMilestone" />
   </main>
 </template>
 
 <script setup lang="ts">
 import { IconCrown, IconTarget, IconMedal } from '#components'
-
-
+const { toast } = useToast()
+const { confirm } = useConfirm()
 
 interface Milestone {
   id: string
+  habitId: string
   habitName: string
-  title: string
-  description: string
-  target: number
-  current: number
-  status: "Locked" | "In Progress" | "Achieved"
-  rewardTitle: string
-  rewardDescription: string
-  emoji: string
-  dateAchieved?: string
+  habitIcon: string
+  name: string
+  description: string | null
+  targetValue: number
+  targetMetric: string
+  currentProgress: number
+  status: "locked" | "inProgress" | "achieved"
+  rewardName: string | null
+  rewardDescription: string | null
+  rewardIcon: string
+  achievedDate: string | null
+  createdAt: string
+  updatedAt: string
 }
 
+interface MilestoneStats {
+  achieved: number
+  inProgress: number
+  locked: number
+  totalRewards: number
+}
+
+interface CompletedReward {
+  id: string
+  habitId: string
+  habitName: string
+  habitIcon: string
+  milestoneName: string
+  milestoneDescription: string | null
+  rewardName: string | null
+  rewardDescription: string | null
+  rewardIcon: string
+  achievedDate: string | null
+  targetValue: number
+  targetMetric: string
+}
 
 const filterHabit = ref<string>("all")
 const filterStatus = ref<string>("all")
@@ -305,117 +225,159 @@ const isAddDialogOpen = ref(false)
 const isViewDetailOpen = ref(false)
 const viewMilestone = ref<Milestone | null>(null)
 
-// Mock data
-const milestones = ref<Milestone[]>([
-  {
-    id: "1",
-    habitName: "Morning Workout",
-    title: "First 10 Sessions",
-    description: "Complete 10 workout sessions",
-    target: 10,
-    current: 7,
-    status: "In Progress",
-    rewardTitle: "Weekend Treat",
-    rewardDescription: "Buy your favorite smoothie",
-    emoji: "💪",
-  },
-  {
-    id: "2",
-    habitName: "Daily Reading",
-    title: "30 Day Streak",
-    description: "Maintain a 30-day reading streak",
-    target: 30,
-    current: 30,
-    status: "Achieved",
-    rewardTitle: "New Book",
-    rewardDescription: "Buy a new book from your wishlist",
-    emoji: "📚",
-    dateAchieved: "2024-01-15",
-  },
-  {
-    id: "3",
-    habitName: "Meditation",
-    title: "7 Day Challenge",
-    description: "Meditate for 7 consecutive days",
-    target: 7,
-    current: 4,
-    status: "In Progress",
-    rewardTitle: "Relaxation Day",
-    rewardDescription: "Take a spa day or relaxation time",
-    emoji: "🧘",
-  },
-  {
-    id: "4",
-    habitName: "Language Learning",
-    title: "100 Sessions Mastery",
-    description: "Complete 100 language practice sessions",
-    target: 100,
-    current: 15,
-    status: "Locked",
-    rewardTitle: "Premium Course",
-    rewardDescription: "Unlock a premium language course",
-    emoji: "🌍",
-  },
-])
-
-const filteredMilestones = computed(() => {
-  return milestones.value
-    .filter((m) => filterHabit.value === "all" || m.habitName === filterHabit.value)
-    .filter((m) => filterStatus.value === "all" || m.status === filterStatus.value)
-    .sort((a, b) => {
-      if (sortBy.value === "progress") {
-        return (b.current / b.target) - (a.current / a.target)
-      } else if (sortBy.value === "newest") {
-        return b.id.localeCompare(a.id)
-      } else {
-        return a.id.localeCompare(b.id)
-      }
-    })
+// Fetch habits for filter dropdown
+const { data: habitsData } = await useFetch('/api/habits', {
+  default: () => ({ success: true, data: [] }),
+  transform: (data: any) => data.data || []
 })
 
+const habits = computed(() => habitsData.value || [])
+
+// Fetch milestones using useFetch with reactive query
+const { data: milestonesData, pending, refresh: refreshMilestones } = await useFetch<{
+  success: boolean
+  data: Milestone[]
+  stats: MilestoneStats
+  completedHistory: CompletedReward[]
+}>('/api/milestones', {
+  default: () => ({
+    success: true,
+    data: [],
+    stats: {
+      achieved: 0,
+      inProgress: 0,
+      locked: 0,
+      totalRewards: 0
+    },
+    completedHistory: []
+  }),
+  query: computed(() => {
+    const query: any = {
+      sortBy: sortBy.value
+    }
+    
+    if (filterHabit.value !== 'all') {
+      query.habitId = filterHabit.value
+    }
+    
+    if (filterStatus.value !== 'all') {
+      query.status = filterStatus.value
+    }
+
+    return query
+  }),
+  transform: (data: any) => data
+})
+
+const milestones = computed(() => milestonesData.value?.data || [])
+const stats = computed(() => milestonesData.value?.stats || {
+  achieved: 0,
+  inProgress: 0,
+  locked: 0,
+  totalRewards: 0
+})
+const completedHistory = computed(() => milestonesData.value?.completedHistory || [])
+
+
 const handleCelebration = (milestone: Milestone) => {
-  // toast.success
-  console.log(`🎉 You've reached your ${milestone.title}! 🎊`, {
-    description: `Reward unlocked: ${milestone.rewardTitle}`,
+  toast({
+    title: `🎉 You've reached your ${milestone.name}! 🎊`,
+    description: `Reward unlocked: ${milestone.rewardName}`,
     duration: 5000,
   })
+}
+
+const handleDelete = async (milestone: Milestone) => {
+  const confirmed = await confirm({
+    title: 'Delete Milestone?',
+    description: `Are you sure you want to delete the milestone "${milestone.name}"? This action cannot be undone.`,
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    variant: 'destructive',
+  })
+
+  if (!confirmed) return
+
+  try {
+    await $fetch(`/api/milestones/${milestone.id}`, {
+      method: 'DELETE'
+    })
+
+    toast({
+      title: 'Milestone deleted',
+      description: 'The milestone has been deleted successfully.',
+    })
+
+    // Refresh the milestones list
+    await refreshMilestones()
+  } catch (error: any) {
+    console.error('Error deleting milestone:', error)
+    const errorMessage = error?.data?.message || error?.message || 'Failed to delete milestone. Please try again.'
+    toast({
+      title: 'Error',
+      description: errorMessage,
+      variant: 'destructive',
+    })
+  }
+}
+
+const formatStatus = (status: string) => {
+  switch (status) {
+    case 'achieved':
+      return 'Achieved'
+    case 'inProgress':
+      return 'In Progress'
+    case 'locked':
+      return 'Locked'
+    default:
+      return status
+  }
+}
+
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "Achieved":
-      return { class: "bg-success/20 text-success border-success/30", variant: "success" }
-    case "In Progress":
-      return { class: "", variant: "secondary" }
-    case "Locked":
-      return { class: "", variant: "outline" }
+    case "achieved":
+      return { class: "bg-success/20 text-success border-success/30", variant: "success" as any }
+    case "inProgress":
+      return { class: "", variant: "secondary" as any }
+    case "locked":
+      return { class: "", variant: "outline" as any }
     default:
-      return null
+      return { class: "", variant: "outline" as any }
   }
 }
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case "Achieved":
+    case "achieved":
       return {
         icon: IconCrown,
         class: "w-5 h-5 text-warning"
       }
-    case "In Progress":
+    case "inProgress":
       return {
         icon: IconTarget,
         class: "w-5 h-5 text-primary"
       }
-    case "Locked":
+    case "locked":
       return {
         icon: IconMedal,
         class: "w-5 h-5 text-muted-foreground"
       }
     default:
-      return null
+      return {
+        icon: IconMedal,
+        class: "w-5 h-5 text-muted-foreground"
+      }
   }
-};
+}
 
 
 </script>
