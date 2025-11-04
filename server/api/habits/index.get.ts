@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
     const habits = await prisma.habit.findMany({
       where: {
-        userId: user.id,
+        userId: user.sub,
       },
       select: {
         id: true,

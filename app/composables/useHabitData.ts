@@ -7,14 +7,6 @@ export const useHabitData = () => {
     required: boolean
   }
 
-  type Reward = {
-    id: string
-    milestoneValue: number
-    name: string
-    description: string
-    icon: string
-  }
-
   type FormData = {
     name: string
     category: string
@@ -184,59 +176,6 @@ export const useHabitData = () => {
     }
   }
 
-  const fetchHabitRewards = async (habitId: string): Promise<Reward[]> => {
-    try {
-      // Replace with actual API call
-      // const response = await $fetch(`/api/habits/${habitId}/rewards`)
-      // return response.data
-      
-      // Mock implementation
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      const mockRewards = {
-        "1": [
-          {
-            id: "1",
-            milestoneValue: 7,
-            name: "Week Reader",
-            description: "Read for 7 consecutive days",
-            icon: "📖"
-          },
-          {
-            id: "2",
-            milestoneValue: 30,
-            name: "Monthly Scholar",
-            description: "Read for 30 consecutive days",
-            icon: "🎓"
-          }
-        ],
-        "2": [
-          {
-            id: "1",
-            milestoneValue: 14,
-            name: "Two Week Warrior",
-            description: "Run for 14 consecutive days",
-            icon: "🏆"
-          }
-        ],
-        "3": [
-          {
-            id: "1",
-            milestoneValue: 21,
-            name: "Mindful Master",
-            description: "Meditate for 21 consecutive days",
-            icon: "🧘‍♂️"
-          }
-        ]
-      }
-      
-      return mockRewards[habitId as keyof typeof mockRewards] || []
-    } catch (error) {
-      console.error('Error fetching rewards:', error)
-      throw error
-    }
-  }
-
   const updateHabit = async (habitId: string, data: FormData) => {
     try {
       // Replace with actual API call
@@ -278,7 +217,6 @@ export const useHabitData = () => {
   return {
     fetchHabit,
     fetchHabitCustomFields,
-    fetchHabitRewards,
     updateHabit,
     createHabit
   }

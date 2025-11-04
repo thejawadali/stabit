@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     const existingHabit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.id
+        userId: user.sub
       }
     })
 

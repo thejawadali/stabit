@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     const existingHabit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.id
+        userId: user.sub
       }
     })
 
@@ -53,7 +53,6 @@ export default defineEventHandler(async (event) => {
       name,
       categoryId,
       customFields = [],
-      rewards = [],
       description,
       icon,
       recurrenceType,
@@ -159,73 +158,11 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      // Step 5: Handle rewards (similar pattern)
-      if (Array.isArray(rewards)) {
-        const existingRewards = await tx.habitRewards.findMany({
-          where: { habitId }
-        })
-
-        const rewardPayload = rewards as Array<{
-          id?: string
-          milestoneValue: number
-          name: string
-          description?: string
-          icon?: string
-          sortingOrder?: number
-        }>
-
-        const rewardPayloadIds = rewardPayload.filter((r) => r.id).map((r) => r.id!)
-
-        const rewardsToDelete = existingRewards.filter((r: { id: string }) => !rewardPayloadIds.includes(r.id))
-        const rewardsToUpdate = rewardPayload.filter((r: { id?: string }) => r.id)
-        const rewardsToCreate = rewardPayload.filter((r: { id?: string }) => !r.id)
-
-        // Delete removed rewards
-        if (rewardsToDelete.length) {
-          await tx.habitRewards.deleteMany({
-            where: { id: { in: rewardsToDelete.map((r: { id: string }) => r.id) } }
-          })
-        }
-
-        // Update existing rewards
-        for (const reward of rewardsToUpdate) {
-          await tx.habitRewards.update({
-            where: { id: reward.id },
-            data: {
-              milestoneValue: reward.milestoneValue,
-              name: reward.name,
-              description: reward.description ?? '',
-              icon: reward.icon ?? '🏆',
-              sortingOrder: reward.sortingOrder ?? 0
-            }
-          })
-        }
-
-        // Create new rewards
-        if (rewardsToCreate.length) {
-          await tx.habitRewards.createMany({
-            data: rewardsToCreate.map(r => ({
-              habitId,
-              milestoneValue: r.milestoneValue,
-              name: r.name,
-              description: r.description ?? '',
-              icon: r.icon ?? '🏆',
-              sortingOrder: r.sortingOrder ?? 0
-            }))
-          })
-        }
-      }
-
-      // Step 6: Return updated habit with fields
+      // Step 5: Return updated habit with fields
       return tx.habit.findUnique({
         where: { id: habitId },
         include: {
           customFields: {
-            orderBy: {
-              sortingOrder: 'asc'
-            }
-          },
-          rewards: {
             orderBy: {
               sortingOrder: 'asc'
             }

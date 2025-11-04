@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     const habit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.id
+        userId: user.sub
       },
       include: {
         category: {
@@ -45,8 +45,7 @@ export default defineEventHandler(async (event) => {
             options: true,
             isRequired: true
           }
-        },
-        rewards: true
+        }
       }
     })
 

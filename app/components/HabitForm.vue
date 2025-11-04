@@ -12,12 +12,11 @@
     </div>
 
     <Tabs defaultValue="general" class="space-y-6 w-full">
-      <TabsList class="grid w-full grid-cols-5">
+      <TabsList class="grid w-full grid-cols-4">
         <TabsTrigger value="general">General</TabsTrigger>
         <TabsTrigger value="schedule">Schedule</TabsTrigger>
         <TabsTrigger value="growth">Growth</TabsTrigger>
         <TabsTrigger value="custom">Custom Fields</TabsTrigger>
-        <TabsTrigger value="rewards">Rewards</TabsTrigger>
       </TabsList>
 
       <!-- General Information -->
@@ -44,11 +43,6 @@
       <TabsContent value="custom" class="space-y-4">
         <HabitCustomFields v-model:customFields="customFields" />
       </TabsContent>
-
-      <!-- Rewards & Milestones -->
-      <TabsContent value="rewards" class="space-y-4">
-        <HabitRewards v-model:rewards="rewards" :goalMetric="formData.goalMetric ?? 'sessions'" />
-      </TabsContent>
     </Tabs>
 
     <!-- Action Buttons -->
@@ -69,7 +63,7 @@
   </main>
 
   <HabitPreviewDialog v-model="showPreview" :formData="formData" :categories="categories" :customFields="customFields"
-    :rewards="rewards" @save="handleSave" />
+    @save="handleSave" />
 </template>
 
 <script setup lang="ts">
@@ -103,14 +97,6 @@ type CustomField = {
   required: boolean
 }
 
-type Reward = {
-  id: string
-  milestoneValue: number
-  name: string
-  description: string
-  icon: string
-}
-
 // Props
 interface Props {
   categories: { id: string, name: string, icon: string }[]
@@ -139,14 +125,12 @@ const showPreview = ref(false)
 const formData = reactive<HabitFormData>(INITIAL_FORM_DATA)
 
 const customFields = ref<CustomField[]>([])
-const rewards = ref<Reward[]>([])
 
 
 onMounted(() => {
   if (props.isEditMode && props.habit) {
     Object.assign(formData, props.habit)
     customFields.value = (props.habit as any).customFields || []
-    rewards.value = (props.habit as any).rewards || []
   } else if (!props.isEditMode) {
     // For create mode, use default values
     resetToDefaults()
@@ -157,7 +141,6 @@ onMounted(() => {
 function resetToDefaults() {
   Object.assign(formData, INITIAL_FORM_DATA)
   customFields.value = []
-  rewards.value = []
 }
 
 async function handleSave() {
@@ -174,19 +157,9 @@ async function handleSave() {
       isRequired: !!required,
     }))
 
-  const cleanRewards = rewards.value
-    .filter(({ name = "" }) => name.trim() !== "")
-    .map(({ name, description, icon, milestoneValue }) => ({
-      name,
-      description,
-      icon,
-      milestoneValue,
-    }))
-
   const payload = {
     ...formData,
     customFields: cleanFields,
-    rewards: cleanRewards,
   }
 
 

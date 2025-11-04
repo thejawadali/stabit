@@ -74,22 +74,6 @@
           </div>
         </div>
 
-        <!-- Rewards -->
-        <div v-if="rewards.length > 0" class="border-t pt-4">
-          <h4 class="font-semibold mb-2">
-            Rewards ({{ rewards.length }})
-          </h4>
-          <div class="space-y-2">
-            <div v-for="reward in rewards" :key="reward.id" class="flex items-center gap-2 text-sm">
-              <span class="text-lg">{{ reward.icon }}</span>
-              <span>{{ reward.name }}</span>
-              <span class="text-muted-foreground">
-                (after {{ reward.milestoneValue }} {{ formData.goalMetric }})
-              </span>
-            </div>
-          </div>
-        </div>
-
         <!-- Notifications -->
         <div class="border-t pt-4">
           <h4 class="font-semibold mb-2">Notifications</h4>
@@ -132,19 +116,10 @@ type CustomField = {
   required: boolean
 }
 
-type Reward = {
-  id: string
-  milestoneValue: number
-  name: string
-  description: string
-  icon: string
-}
-
 defineProps<{
   formData: HabitFormData
   categories: { id: string, name: string, icon: string }[]
   customFields: CustomField[]
-  rewards: Reward[]
 }>()
 
 const emit = defineEmits<{

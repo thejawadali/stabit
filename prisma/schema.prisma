@@ -106,7 +106,6 @@ model Habit {
   // Relationships
   category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customFields          HabitCustomField[]
-  rewards               HabitRewards[]
   habitLogs             HabitLogs[]
   habitStreak           HabitStreak[]
   habitMilestones       HabitMilestones[]
@@ -130,24 +129,6 @@ model HabitCustomField {
 
   @@map("habit_custom_fields")
 }
-
-model HabitRewards {
-  id             String   @id @default(uuid())
-  milestoneValue Int      @db.Int
-  name           String   @db.VarChar(255)
-  description    String   @db.Text
-  icon           String   @default("🏆") @db.VarChar(50)
-  sortingOrder  Int           @default(0)
-  habitId        String   @db.VarChar(36)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  // Relationships
-  habit          Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
-
-  @@map("habit_rewards")
-}
-
 
 model HabitLogs {
   id String @id @default(uuid())

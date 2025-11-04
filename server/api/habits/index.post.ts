@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     // ✅ Validate required fields
-    const { name, categoryId, customFields = [], rewards = [], ...rest } = body;
+    const { name, categoryId, customFields = [], ...rest } = body;
 
     if (!name || !categoryId) {
       throw createError({
@@ -57,21 +57,9 @@ export default defineEventHandler(async (event) => {
                 })),
               }
             : undefined,
-          rewards: rewards.length
-            ? {
-                create: rewards.map((reward: any) => ({
-                  milestoneValue: reward.milestoneValue,
-                  name: reward.name,
-                  description: reward.description ?? "",
-                  icon: reward.icon ?? "🏆",
-                  sortingOrder: reward.sortingOrder ?? 0,
-                })),
-              }
-            : undefined,
         },
         include: {
           customFields: true,
-          rewards: true,
         },
       }),
     ]);
