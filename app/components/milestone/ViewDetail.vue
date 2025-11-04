@@ -14,10 +14,8 @@
       <div v-if="viewMilestone" class="space-y-6 py-4">
         <!-- Status Badge -->
         <div class="flex items-center gap-3">
-          <!-- assume you have functions or components for icon and badge -->
-          <component :is="getStatusIcon(viewMilestone).icon" :class="getStatusIcon(viewMilestone).class" />
-          <!-- <component :is="getStatusBadge(viewMilestone.status)" /> -->
-          <Badge :class="getStatusBadge(viewMilestone).class" :variant="getStatusBadge(viewMilestone).variant">
+          <component :is="getStatusIcon(viewMilestone)?.icon" :class="getStatusIcon(viewMilestone)?.class" />
+          <Badge :class="getStatusBadge(viewMilestone)?.class" :variant="getStatusBadge(viewMilestone)?.variant">
             {{ viewMilestone.status }}</Badge>
         </div>
 
@@ -111,7 +109,7 @@ const isOpen = defineModel<boolean>('isOpen', { default: false })
 
 
 // Optionally: methods to return status icon/badge components
-const getStatusIcon = (milestone: Milestone) => {
+const getStatusIcon = (milestone: Milestone | null) => {
   if (!milestone) return null
   switch (milestone.status) {
     case "Achieved":
@@ -138,11 +136,11 @@ const getStatusBadge = (milestone: Milestone) => {
   if (!milestone) return null
   switch (milestone.status) {
     case "Achieved":
-      return { class: "bg-success/20 text-success border-success/30", variant: "success" }
+      return { class: "bg-success/20 text-success border-success/30", variant: "success" as any }
     case "In Progress":
-      return { class: "", variant: "secondary" }
+      return { class: "", variant: "secondary" as any }
     case "Locked":
-      return { class: "", variant: "outline" }
+      return { class: "", variant: "outline" as any }
     default:
       return null
   }
