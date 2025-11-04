@@ -219,10 +219,17 @@ const saveCategory = async () => {
     loading.value = false
   }
 }
+const { confirm } = useConfirm()
 
 const deleteCategory = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this category?')) return
-
+  const confirmed = await confirm({
+    title: 'Delete Category?',
+    description: 'Are you sure you want to delete this category? BHSK',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    variant: 'destructive',
+  })
+  if (!confirmed) return
   try {
     await $fetch(`/api/categories/${id}`, {
       method: 'DELETE'

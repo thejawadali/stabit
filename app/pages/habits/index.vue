@@ -167,23 +167,6 @@
         </div>
       </template>
     </main>
-    <AlertDialog :open="deleteDialogOpen" @update:open="setDeleteDialogOpen">
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Habit?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the habit and all its data.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel @click="setDeleteDialogOpen(false)">Cancel</AlertDialogCancel>
-          <AlertDialogAction @click="confirmDelete"
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   </div>
 </template>
 
@@ -376,22 +359,25 @@ const toggleStatus = (habitId: string) => {
   // toast.success("Status toggled!");
 }
 
-const deleteDialogOpen = ref(false)
-let habitToDelete = null as string | null
-const setDeleteDialogOpen = (value: boolean) => {
-  deleteDialogOpen.value = value
-}
+const { confirm } = useConfirm()
 
-const confirmDelete = async () => {
-  if (!habitToDelete) return
-  
+const deleteHabit = async (habitId: string) => {
+  const confirmed = await confirm({
+      title: 'Delete Habit?',
+      description: 'This action cannot be undone. This will permanently delete the habit and all its data.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/habits/${habitToDelete}`, {
+
+    await $fetch(`/api/habits/${habitId}`, {
       method: 'DELETE'
     })
 
-    habits.value = habits.value.filter(habit => habit.id !== habitToDelete)
-    selectedHabits.value = selectedHabits.value.filter(id => id !== habitToDelete)
+    habits.value = habits.value.filter(habit => habit.id !== habitId)
+    selectedHabits.value = selectedHabits.value.filter(id => id !== habitId)
     
     toast({
       title: 'Habit deleted',
@@ -405,15 +391,7 @@ const confirmDelete = async () => {
       description: errorMessage,
       variant: 'destructive',
     })
-  } finally {
-    setDeleteDialogOpen(false)
-    habitToDelete = null
   }
-}
-
-const deleteHabit = (habitId: string) => {
-  habitToDelete = habitId
-  setDeleteDialogOpen(true)
 }
 
 
