@@ -23,7 +23,7 @@
               </div>
               <div>
                 <h3 class="font-semibold text-gray-900 dark:text-white">{{ category.name }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ category.habits?.length || 0 }} habits</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ category.habitsCount }} habits</p>
               </div>
             </div>
             <DropdownMenu>
@@ -37,7 +37,7 @@
                   <IconEdit class="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem @click="deleteCategory(category.id)" class="text-red-600">
+                <DropdownMenuItem @click="deleteCategory(category.id)" class="text-red-600" :disabled="category.habitsCount > 0">
                   <IconTrash class="h-4 w-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
@@ -134,6 +134,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import dayjs from "dayjs"
 import { ref } from 'vue'
 import type { Category } from "~~/types"
 
@@ -254,8 +255,9 @@ const deleteCategory = async (id: string) => {
 
 const { data: categories, error } = await useFetch<Category[]>('/api/categories')
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString()
+const formatDate = (dateString: Date) => {
+  return dayjs(dateString).format('DD/MM/YYYY')
 }
+
 
 </script>

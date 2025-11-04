@@ -12,11 +12,9 @@ export default defineEventHandler(async (event) => {
         userId: user?.sub
       },
       include: {
-        habits: {
+        _count: {
           select: {
-            id: true,
-            name: true,
-            isActive: true
+            habits: true
           }
         }
       },
@@ -25,7 +23,11 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    return categories
+    return categories.map(({ _count, ...category }) => ({
+      ...category,
+      _count: undefined,
+      habitsCount: _count.habits
+    }))
   } catch (error) {
     console.error('Error fetching categories:', error)
     throw createError({

@@ -29,8 +29,9 @@ type NotificationSettingsType = Pick<UserProfile, 'enableReminders' | 'enableMil
 }
 
 
-type Category = Pick<Category, 'name' | 'description' | 'color' | 'icon' | 'isActive' | 'userId' | 'habits'> & {
+type Category = Pick<Category, 'name' | 'description' | 'color' | 'icon' | 'isActive' | 'userId' | 'createdAt'> & {
   id: string
+  habitsCount: number
 }
 
 type HabitFormData = {
