@@ -1,5 +1,4 @@
 <template>
-  {{ state }}
   <AlertDialog :open="state.isOpen">
     <AlertDialogContent>
       <AlertDialogHeader>

@@ -12,55 +12,17 @@
             Track your progress and celebrate achievements
           </p>
         </div>
-        <Dialog :open="isAddDialogOpen" @update:open="isAddDialogOpen = $event">
-          <DialogTrigger asChild>
-            <Button class="gap-2">
-              <IconPlus class="w-4 h-4" />
-              Add Milestone
-            </Button>
-          </DialogTrigger>
-          <DialogContent class="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Create New Milestone</DialogTitle>
-              <DialogDescription>
-                Set up a new milestone and reward for your habit
-              </DialogDescription>
-            </DialogHeader>
-            <div class="space-y-4 py-4">
-              <Select label="Habit">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select habit" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="workout">Morning Workout</SelectItem>
-                  <SelectItem value="reading">Daily Reading</SelectItem>
-                  <SelectItem value="meditation">Meditation</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input label="Milestone Name" placeholder="e.g., First 10 Sessions" />
-              <Input label="Target (sessions or days)" type="number" placeholder="10" />
-              <Input label="Reward Name" placeholder="e.g., Weekend Treat" />
-              <Textarea label="Reward Description" placeholder="Describe your reward..." />
-              <div class="space-y-2">
-                <Input label="Emoji / Icon" placeholder="🎉" maxLength={2} />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" @click="isAddDialogOpen = false">
-                Cancel
-              </Button>
-              <Button @click="isAddDialogOpen = false">
-                Create Milestone
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button class="gap-2" @click="isAddDialogOpen = true">
+        <IconPlus class="w-4 h-4" />
+        Add Milestone
+      </Button>
       </div>
 
       <!-- Filters -->
       <Card>
         <CardContent class="pt-6">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Filter by Habit -->
             <div class="space-y-2">
               <Label class="text-xs font-medium text-muted-foreground">Filter by Habit</Label>
               <Select v-model="filterHabit">
@@ -76,6 +38,7 @@
                 </SelectContent>
               </Select>
             </div>
+            <!-- filter by status -->
             <div class="space-y-2">
               <Label class="text-xs font-medium text-muted-foreground">Filter by Status</Label>
               <Select v-model="filterStatus">
@@ -90,6 +53,7 @@
                 </SelectContent>
               </Select>
             </div>
+            <!-- sort by -->
             <div class="space-y-2">
               <Label class="text-xs font-medium text-muted-foreground">Sort By</Label>
               <Select v-model="sortBy">
@@ -251,7 +215,7 @@
                     <IconSparkles class="w-3 h-3" />
                     Celebrate
                   </Button>
-                  <Button v-else size="sm" variant="ghost">
+                  <Button v-else size="sm" variant="ghost" @click="viewMilestone = milestone; isViewDetailOpen = true">
                     View
                   </Button>
                 </TableCell>
@@ -309,6 +273,8 @@
         </CardContent>
       </Card>
     </div>
+    <MilestoneCreateDialog v-model:isAddDialogOpen="isAddDialogOpen" />
+    <MilestoneViewDetail v-model:isOpen="isViewDetailOpen" :viewMilestone="viewMilestone" />
   </main>
 </template>
 
@@ -336,6 +302,8 @@ const filterHabit = ref<string>("all")
 const filterStatus = ref<string>("all")
 const sortBy = ref<string>("progress")
 const isAddDialogOpen = ref(false)
+const isViewDetailOpen = ref(false)
+const viewMilestone = ref<Milestone | null>(null)
 
 // Mock data
 const milestones = ref<Milestone[]>([
