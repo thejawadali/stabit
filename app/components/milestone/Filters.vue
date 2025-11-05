@@ -1,7 +1,12 @@
 <template>
   <Card>
     <CardContent class="pt-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search by name -->
+        <div class="space-y-2">
+          <Label class="text-xs font-medium text-muted-foreground">Search by Name</Label>
+          <Input v-model="inputValue" placeholder="Search by name" />
+        </div>
         <!-- Filter by Habit -->
         <div class="space-y-2">
           <Label class="text-xs font-medium text-muted-foreground">Filter by Habit</Label>
@@ -52,9 +57,21 @@
 </template>
 
 <script setup lang="ts">
-const filterHabit = defineModel<string>("filterHabit", {default: 'all'})
-const filterStatus = defineModel<string>("filterStatus", {default: 'all'})
-const sortBy = defineModel<string>("sortBy", {default: 'progress'})
+const filterHabit = defineModel<string>("filterHabit", { default: 'all' })
+const filterStatus = defineModel<string>("filterStatus", { default: 'all' })
+const sortBy = defineModel<string>("sortBy", { default: 'progress' })
+const searchValue = defineModel<string>("searchValue", { default: '' })
+
+const inputValue = ref("")
+
+
+watchDebounced(
+  inputValue,
+  () => {
+    searchValue.value = inputValue.value
+  },
+  { debounce: 1000, maxWait: 5000 }
+)
 
 interface Habit {
   id: string

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const habitId = query.habitId as string | undefined
     const status = query.status as string | undefined // 'locked' | 'inProgress' | 'achieved'
     const sortBy = (query.sortBy as string) || 'progress' // 'progress' | 'newest' | 'oldest'
-
+    const search = query.search as string | undefined
     // Build where clause
     const where: any = {
       userId: user.sub
@@ -28,6 +28,13 @@ export default defineEventHandler(async (event) => {
 
     if (status && status !== 'all') {
       where.status = status
+    }
+
+    if (search && search.trim() !== '') {
+      where.name = {
+        contains: search.trim(),
+        // mode: 'insensitive' // TODO: case-insensitive search
+      }
     }
 
     // Fetch milestones

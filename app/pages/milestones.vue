@@ -19,7 +19,7 @@
       </div>
 
       <!-- Filters -->
-      <MilestoneFilters :habits="habits" v-model:filterHabit="filterHabit" v-model:filterStatus="filterStatus" v-model:sortBy="sortBy" />
+      <MilestoneFilters :habits="habits" v-model:filterHabit="filterHabit" v-model:filterStatus="filterStatus" v-model:sortBy="sortBy" v-model:searchValue="searchValue" />
 
       <!-- Stats Overview -->
       <MilestoneStats :stats="stats" />
@@ -221,6 +221,7 @@ interface CompletedReward {
 const filterHabit = ref<string>("all")
 const filterStatus = ref<string>("all")
 const sortBy = ref<string>("progress")
+const searchValue = ref<string>("")
 const isAddDialogOpen = ref(false)
 const isViewDetailOpen = ref(false)
 const viewMilestone = ref<Milestone | null>(null)
@@ -255,7 +256,11 @@ const { data: milestonesData, pending, refresh: refreshMilestones } = await useF
     const query: any = {
       sortBy: sortBy.value
     }
-    
+
+    if (searchValue.value) {
+      query.search = searchValue.value
+    }
+
     if (filterHabit.value !== 'all') {
       query.habitId = filterHabit.value
     }

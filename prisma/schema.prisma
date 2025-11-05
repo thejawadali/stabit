@@ -188,7 +188,8 @@ model HabitMilestones {
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
-
+  
+  @@index([name])
   @@map("habit_milestones")
 }
 
