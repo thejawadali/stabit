@@ -9,13 +9,13 @@
       </DialogHeader>
       <form @submit.prevent="handleSubmit" class="py-4 grid grid-cols-2 gap-4">
         <!-- milestone name -->
-        <Input v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" />
+        <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" custom-error-message="Please enter a milestone name" />
 
         <!-- icon -->
-        <Input v-model="formData.rewardIcon" label="Icon" placeholder="🎉" maxlength="2" />
+        <Input name="rewardIcon" v-model="formData.rewardIcon" label="Icon" placeholder="🎉" maxlength="2" />
         
         <!-- habit -->
-        <Select v-model="formData.habitId" label="Habit" rules="required">
+        <Select name="habitId" v-model="formData.habitId" label="Habit" rules="required" custom-error-message="Please select a habit">
           <SelectTrigger>
             <SelectValue placeholder="Select habit" />
           </SelectTrigger>
@@ -27,7 +27,7 @@
         </Select>
 
         <!-- reward -->
-        <Input v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat" rules="required" />
+        <Input name="rewardName" v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat" rules="required" custom-error-message="Please enter a reward name" />
 
         <!-- target metric -->
         <Select v-model="formData.targetMetric" label="Target Metric">
@@ -44,8 +44,8 @@
         </Select>
 
         <!-- target value -->
-        <Input v-model.number="formData.targetValue" label="Target Value" type="number" placeholder="10"
-          rules="required" />
+        <Input name="targetValue" v-model.number="formData.targetValue" label="Target Value" type="number" placeholder="10"
+          rules="required" custom-error-message="Please enter a target value" />
 
         <!-- milestone description -->
         <Textarea v-model="formData.description" label="Milestone Description"
@@ -58,9 +58,8 @@
           <Button type="button" variant="outline" @click="isAddDialogOpen = false" :disabled="loading">
             Cancel
           </Button>
-          <Button type="submit" :disabled="loading">
-            <span v-if="loading">Creating...</span>
-            <span v-else>Create Milestone</span>
+          <Button type="submit" :is-loading="loading">
+            <span>Create Milestone</span>
           </Button>
         </DialogFooter>
       </form>
@@ -102,17 +101,10 @@ const props = withDefaults(defineProps<{
   habits: () => []
 })
 
-
+const {validate} = useForm()
 const handleSubmit = async () => {
-  if (!formData.name || !formData.habitId || !formData.targetValue || !formData.rewardName) {
-    toast({
-      title: 'Validation Error',
-      description: 'Please fill in all required fields',
-      variant: 'destructive'
-    })
-    return
-  }
-
+  const { valid } = await validate()
+  if (!valid) return
   loading.value = true
   try {
     await $fetch('/api/milestones', {
