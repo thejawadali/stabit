@@ -36,9 +36,9 @@
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Habit</TableHead>
                 <TableHead>Milestone</TableHead>
+                <TableHead>Habit</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Progress</TableHead>
                 <TableHead>Reward</TableHead>
                 <TableHead class="text-right">Actions</TableHead>
@@ -48,12 +48,13 @@
               <TableRow v-for="milestone in milestones" :key="milestone.id">
                 <TableCell>
                   <div class="flex items-center gap-2">
-                    <!-- icon -->
-                    <component :is="getStatusIcon(milestone.status).icon"
-                      :class="getStatusIcon(milestone.status).class" />
-                    <!-- badge -->
-                    <Badge :class="getStatusBadge(milestone.status).class"
-                      :variant="getStatusBadge(milestone.status).variant">{{ formatStatus(milestone.status) }}</Badge>
+                    <span class="text-2xl">{{ milestone.rewardIcon }}</span>
+                    <div>
+                      <p class="font-medium">{{ milestone.name }}</p>
+                      <p v-if="milestone.description" class="text-sm text-muted-foreground">
+                        {{ milestone.description }}
+                      </p>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell class="font-medium">
@@ -64,13 +65,12 @@
                 </TableCell>
                 <TableCell>
                   <div class="flex items-center gap-2">
-                    <span class="text-2xl">{{ milestone.rewardIcon }}</span>
-                    <div>
-                      <p class="font-medium">{{ milestone.name }}</p>
-                      <p v-if="milestone.description" class="text-sm text-muted-foreground">
-                        {{ milestone.description }}
-                      </p>
-                    </div>
+                    <!-- icon -->
+                    <component :is="getStatusIcon(milestone.status).icon"
+                      :class="getStatusIcon(milestone.status).class" />
+                    <!-- badge -->
+                    <Badge :class="getStatusBadge(milestone.status).class"
+                      :variant="getStatusBadge(milestone.status).variant">{{ formatStatus(milestone.status) }}</Badge>
                   </div>
                 </TableCell>
                 <TableCell>
