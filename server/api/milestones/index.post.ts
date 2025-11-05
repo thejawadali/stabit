@@ -33,6 +33,22 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // make sure milestone with same habit, taragetMetric and targetValue does not exist
+    const existingMilestone = await prisma.habitMilestones.findFirst({
+      where: {
+        habitId,
+        targetMetric,
+        targetValue
+      }
+    })
+    if (existingMilestone) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Déjà vu? You\'ve already created this milestone.'
+        // statusMessage: 'A milestone with the same habit, target metric, and target value already exists.'
+      })
+    }
+
     // Verify habit belongs to user
     const habit = await prisma.habit.findFirst({
       where: {
