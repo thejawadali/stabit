@@ -163,6 +163,7 @@
 .sb-loading-parent--relative{
   position: relative !important;
   overflow: hidden !important;
+  min-height: 72px !important;
 }
 
 @keyframes spin {

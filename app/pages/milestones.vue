@@ -33,7 +33,7 @@
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table v-loading="pending">
             <TableHeader>
               <TableRow>
                 <TableHead>Milestone</TableHead>
@@ -119,9 +119,6 @@
             <p class="text-sm text-muted-foreground mt-1">
               Try adjusting your filters or create a new milestone
             </p>
-          </div>
-          <div v-if="pending" class="text-center py-12">
-            <p class="text-muted-foreground">Loading milestones...</p>
           </div>
         </CardContent>
       </Card>

@@ -70,7 +70,7 @@ watchDebounced(
   () => {
     searchValue.value = inputValue.value
   },
-  { debounce: 1000, maxWait: 5000 }
+  { debounce: 500, maxWait: 5000 }
 )
 
 interface Habit {
