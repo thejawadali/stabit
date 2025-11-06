@@ -56,9 +56,9 @@ const navigationItems = [
   },
   { title: "My Habits", url: "/habits", icon: IconTarget },
   { title: "Categories", url: "/categories", icon: IconTags },
-  { title: "Analytics", url: "/analytics", icon: IconBarChart3 },
-  { title: "Calendar", url: "/calendar", icon: IconCalendar },
-  { title: "Progress", url: "/progress", icon: IconTrendingUp },
+  // { title: "Analytics", url: "/analytics", icon: IconBarChart3 },
+  // { title: "Calendar", url: "/calendar", icon: IconCalendar },
+  // { title: "Progress", url: "/progress", icon: IconTrendingUp },
   { title: "Milestones", url: "/milestones", icon: IconAward },
   { title: "Settings", url: "/settings", icon: IconSettings },
 ]
