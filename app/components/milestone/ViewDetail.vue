@@ -37,7 +37,7 @@
         <!-- Description -->
         <div v-if="viewMilestone.description" class="space-y-2">
           <h3 class="font-semibold">Description</h3>
-          <p class="text-muted-foreground">{{ viewMilestone.description }}</p>
+          <p class="text-muted-foreground line-clamp-4">{{ viewMilestone.description }}</p>
         </div>
 
         <!-- Reward Section -->
@@ -48,7 +48,7 @@
           </div>
           <div>
             <p class="font-medium text-success">{{ viewMilestone.rewardName }}</p>
-            <p v-if="viewMilestone.rewardDescription" class="text-sm text-muted-foreground mt-1">
+            <p v-if="viewMilestone.rewardDescription" class="text-sm text-muted-foreground mt-1 line-clamp-4">
               {{ viewMilestone.rewardDescription }}
             </p>
           </div>

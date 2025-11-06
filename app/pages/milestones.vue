@@ -51,7 +51,7 @@
                     <span class="text-2xl">{{ milestone.rewardIcon }}</span>
                     <div>
                       <p class="font-medium">{{ milestone.name }}</p>
-                      <p v-if="milestone.description" class="text-sm text-muted-foreground">
+                      <p v-if="milestone.description" class="text-sm text-muted-foreground line-clamp-2">
                         {{ milestone.description }}
                       </p>
                     </div>
@@ -89,7 +89,7 @@
                 <TableCell>
                   <div>
                     <p class="font-medium text-sm">{{ milestone.rewardName }}</p>
-                    <p v-if="milestone.rewardDescription" class="text-xs text-muted-foreground">
+                    <p v-if="milestone.rewardDescription" class="text-xs text-muted-foreground line-clamp-2">
                       {{ milestone.rewardDescription }}
                     </p>
                     <p v-if="milestone.achievedDate" class="text-xs text-success mt-1">
