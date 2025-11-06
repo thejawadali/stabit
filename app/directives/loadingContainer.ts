@@ -9,7 +9,7 @@ interface LoadingOpts {
 
 function createOverlay(el: HTMLElement, opts: LoadingOpts = {}) {
   const overlay = document.createElement('div');
-  overlay.className = 'my‑loading‑overlay';
+  overlay.className = 'sb-loading‑overlay';
   if (opts.customClass) {
     overlay.classList.add(...opts.customClass.split(' '));
   }
@@ -18,12 +18,12 @@ function createOverlay(el: HTMLElement, opts: LoadingOpts = {}) {
   }
 
   const spinner = document.createElement('div');
-  spinner.className = 'my‑loading‑spinner';
+  spinner.className = 'sb-loading‑spinner';
   overlay.appendChild(spinner);
 
   if (opts.text) {
     const textEl = document.createElement('div');
-    textEl.className = 'my‑loading‑text';
+    textEl.className = 'sb-loading‑text';
     textEl.innerText = opts.text;
     overlay.appendChild(textEl);
   }
@@ -44,12 +44,6 @@ function removeOverlay(el: HTMLElement) {
 // create directive for loading container
 export const vLoading = {
   mounted(el: HTMLElement, binding: DirectiveBinding<boolean | LoadingOpts>) {
-    // ensure container is positioned for overlay
-    const computedStyle = getComputedStyle(el);
-    if (computedStyle.position === 'static') {
-      el.style.position = 'relative';
-      el.style.overflow = 'hidden';
-    }
     toggle(el, binding);
   },
   updated(el: HTMLElement, binding: DirectiveBinding<boolean | LoadingOpts>) {
@@ -57,6 +51,8 @@ export const vLoading = {
   },
   unmounted(el: HTMLElement) {
     removeOverlay(el);
+    // Remove custom 'relative' class when the directive is unmounted
+    el.classList.remove('sb-loading-parent--relative');
   }
 };
 
@@ -69,12 +65,17 @@ function toggle(el: HTMLElement, binding: DirectiveBinding<boolean | LoadingOpts
   const show = typeof value === 'boolean' ? value : !!value;
 
   if (show) {
-    // if overlay exists, remove previous
+    // Add the custom 'relative' class when the loader is shown
+    el.classList.add('sb-loading-parent--relative');
+
+    // If overlay exists, remove previous
     removeOverlay(el);
     nextTick(() => {
       createOverlay(el, opts);
     });
   } else {
+    // Remove the custom 'relative' class when the loader is hidden
+    el.classList.remove('sb-loading-parent--relative');
     removeOverlay(el);
   }
 }

@@ -136,7 +136,7 @@
 
 
 /* loading‑overlay.css */
-.my‑loading‑overlay {
+.sb-loading‑overlay {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -150,7 +150,7 @@
   z-index: 1000;
 }
 
-.my‑loading‑spinner {
+.sb-loading‑spinner {
   width: 40px;
   height: 40px;
   border: 2px solid hsl(var(--primary));
@@ -158,6 +158,11 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 8px;
+}
+
+.sb-loading-parent--relative{
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 @keyframes spin {
