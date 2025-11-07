@@ -9,7 +9,9 @@
       </DialogHeader>
       <form @submit.prevent="handleSubmit" class="py-4 grid grid-cols-2 gap-4">
         <!-- milestone name -->
-        <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" custom-error-message="Please enter a milestone name" />
+        <div class="col-span-2">
+          <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" custom-error-message="Please enter a milestone name" />
+        </div>
 
         <!-- icon -->
         <Input name="rewardIcon" v-model="formData.rewardIcon" label="Icon" placeholder="🎉" maxlength="2" />
@@ -28,20 +30,6 @@
 
         <!-- reward -->
         <Input name="rewardName" v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat" rules="required" custom-error-message="Please enter a reward name" />
-
-        <!-- target metric -->
-        <Select v-model="formData.targetMetric" label="Target Metric">
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="sessions">Sessions</SelectItem>
-            <SelectItem value="days">Days</SelectItem>
-            <SelectItem value="streak">Streak</SelectItem>
-            <SelectItem value="minutes">Minutes</SelectItem>
-            <SelectItem value="hours">Hours</SelectItem>
-          </SelectContent>
-        </Select>
 
         <!-- target value -->
         <Input name="targetValue" v-model.number="formData.targetValue" label="Target Value" type="number" placeholder="10"
@@ -80,7 +68,6 @@ const formData = reactive({
   description: '',
   habitId: '',
   targetValue: 10,
-  targetMetric: 'sessions',
   rewardName: '',
   rewardDescription: '',
   rewardIcon: '🎉'
@@ -122,7 +109,6 @@ const handleSubmit = async () => {
     formData.description = ''
     formData.habitId = ''
     formData.targetValue = 10
-    formData.targetMetric = 'sessions'
     formData.rewardName = ''
     formData.rewardDescription = ''
     formData.rewardIcon = '🎉'
@@ -147,7 +133,6 @@ watch(isAddDialogOpen, (open) => {
     formData.description = ''
     formData.habitId = ''
     formData.targetValue = 10
-    formData.targetMetric = 'sessions'
     formData.rewardName = ''
     formData.rewardDescription = ''
     formData.rewardIcon = '🎉'

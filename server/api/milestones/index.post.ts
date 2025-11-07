@@ -20,7 +20,6 @@ export default defineEventHandler(async (event) => {
       name,
       description,
       targetValue,
-      targetMetric = 'sessions',
       rewardName,
       rewardDescription,
       rewardIcon = '🎉'
@@ -32,6 +31,24 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'habitId, name, and targetValue are required'
       })
     }
+
+    // Verify habit belongs to user and get its goalMetric
+    const habit = await prisma.habit.findFirst({
+      where: {
+        id: habitId,
+        userId: user.sub
+      }
+    })
+
+    if (!habit) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Habit not found'
+      })
+    }
+
+    // Use habit's goalMetric as targetMetric
+    const targetMetric = habit.goalMetric
 
     // make sure milestone with same habit, taragetMetric and targetValue does not exist
     const existingMilestone = await prisma.habitMilestones.findFirst({
@@ -46,21 +63,6 @@ export default defineEventHandler(async (event) => {
         statusCode: 400,
         statusMessage: 'Déjà vu? You\'ve already created this milestone.'
         // statusMessage: 'A milestone with the same habit, target metric, and target value already exists.'
-      })
-    }
-
-    // Verify habit belongs to user
-    const habit = await prisma.habit.findFirst({
-      where: {
-        id: habitId,
-        userId: user.sub
-      }
-    })
-
-    if (!habit) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Habit not found'
       })
     }
 
