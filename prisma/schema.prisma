@@ -92,7 +92,7 @@ model Habit {
   goalValue             Int          @default(0)
   goalMetric            String           @default("sessions") @db.VarChar(50)
   estimatedCompletionDate DateTime?       @db.Date
-  // nextDueDate DateTime?       @db.Date // TODO: nextDueDate
+  nextDueDate           DateTime?       @db.Date
   status                HabitStatus       @default(active)
   isArchived            Boolean           @default(false)
   userId                String            @db.VarChar(36)
