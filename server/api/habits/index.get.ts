@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         name: true,
         description: true,
         icon: true,
-        recurrenceType: true,
+        frequency: true,
         categoryId: true,
         category: {
           select: {

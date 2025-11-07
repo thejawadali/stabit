@@ -33,7 +33,7 @@
           <div class="space-y-1 text-sm">
             <div class="flex justify-between">
               <span class="text-muted-foreground">Recurrence:</span>
-              <span class="capitalize">{{ formData.recurrenceType }}</span>
+              <span class="capitalize">{{ formData.frequency }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-muted-foreground">Time:</span>

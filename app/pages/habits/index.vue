@@ -199,7 +199,7 @@ const { data: habits } = await useFetch<Habit[]>('/api/habits', {
     name: habit.name,
     description: habit.description,
     category: habit.category.name,
-    recurrence: habit.recurrenceType?.toUpperCase(),
+    recurrence: habit.frequency?.toUpperCase(),
     status: "active",
     streak: 12,
     progress: 75,

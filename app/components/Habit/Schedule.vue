@@ -7,7 +7,7 @@
       </CardTitle>
     </CardHeader>
     <CardContent class="space-y-4">
-      <Select label="Recurrence Type" v-model="recurrenceType">
+      <Select label="Frequency" v-model="frequency">
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>
@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 
-const recurrenceType = defineModel<string>('recurrenceType')
+const frequency = defineModel<string>('frequency')
 const timeOfDay = defineModel<string>('timeOfDay')
 const notificationsEnabled = defineModel<boolean>('notificationsEnabled')
 const reminderTimes = defineModel<string[]>('reminderTimes')

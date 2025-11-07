@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
       customFields = [],
       description,
       icon,
-      recurrenceType,
+      frequency,
       timeOfDay,
       initialValue,
       difficultyRate,
@@ -66,7 +66,6 @@ export default defineEventHandler(async (event) => {
       enableNotifications,
       reminderTimes,
       isArchived,
-      isActive,
     } = body
 
     if (!name || !categoryId) {
@@ -84,7 +83,7 @@ export default defineEventHandler(async (event) => {
         name,
         categoryId,
         icon,
-        recurrenceType,
+        frequency,
         timeOfDay,
         initialValue,
         difficultyRate,
@@ -98,7 +97,6 @@ export default defineEventHandler(async (event) => {
       updateData.enableNotifications = enableNotifications || false
       updateData.reminderTimes = JSON.parse(JSON.stringify(reminderTimes)) || []
       updateData.isArchived = isArchived || false
-      updateData.isActive = isActive || true
 
       // Update the habit itself
       await tx.habit.update({

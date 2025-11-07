@@ -85,31 +85,38 @@ model Habit {
   name                  String            @db.VarChar(255)
   description           String            @default("") @db.Text
   icon                  String            @default("🎯") @db.VarChar(50)
-  recurrenceType        RecurrenceType    @default(daily)
+  frequency             Frequency         @default(daily)
   timeOfDay             String            @default("19:00") @db.VarChar(10)
   initialValue          Int          @default(0)
   difficultyRate        Int          @default(1)
   goalValue             Int          @default(0)
   goalMetric            String           @default("sessions") @db.VarChar(50)
   estimatedCompletionDate DateTime?       @db.Date
+  // nextDueDate DateTime?       @db.Date // TODO: nextDueDate
   status                HabitStatus       @default(active)
   isArchived            Boolean           @default(false)
-  isActive              Boolean           @default(true)
-  userId                String            @db.VarChar(36) // User who created the habit
-  categoryId            String            @db.VarChar(36) // Category this habit belongs to
+  userId                String            @db.VarChar(36)
+  categoryId            String            @db.VarChar(36)
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
 
   enableNotifications     Boolean           @default(true)
   reminderTimes          Json?
 
+  // Statistics
+  totalCompletions      Int               @default(0)
+  totalMissed           Int               @default(0)
+  totalSkipped          Int               @default(0)
+  currentStreak         Int               @default(0)
+  longestStreak         Int               @default(0)
+
   // Relationships
   category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customFields          HabitCustomField[]
   habitLogs             HabitLogs[]
-  habitStreak           HabitStreak[]
   habitMilestones       HabitMilestones[]
   notifications         Notifications[]
+  @@unique([name, userId])
   @@map("habits")
 }
 
@@ -138,7 +145,7 @@ model HabitLogs {
   completionStatus CompletionStatus @default(completed)
   value Int @db.Int
   notes String? @db.Text
-  completionTime DateTime? @db.Timestamp
+  completionTime DateTime? @db.Timestamp //TODO: logTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -148,26 +155,6 @@ model HabitLogs {
   @@map("habit_logs")
 }
 
-model HabitStreak {
-  id String @id @default(uuid())
-  habitId String @db.VarChar(36)
-  userId String @db.VarChar(36)
-  currentStreak Int @db.Int
-  longestStreak Int @db.Int
-  lastCompletionDate DateTime? @db.Date
-  streakStartDate DateTime? @db.Date
-  totalCompletions Int @db.Int
-  totalSessions Int @db.Int
-  completionRate Float @db.Float
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
-
-  @@map("habit_streaks")
-}
 
 model HabitMilestones {
   id String @id @default(uuid())
@@ -188,7 +175,7 @@ model HabitMilestones {
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
-  
+
   @@index([name])
   @@map("habit_milestones")
 }
@@ -316,7 +303,7 @@ enum SnoozeDuration {
   twentyFourHours
 }
 
-enum RecurrenceType {
+enum Frequency {
   daily
   weekly
   monthly

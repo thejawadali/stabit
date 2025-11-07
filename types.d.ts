@@ -39,7 +39,7 @@ type HabitFormData = {
   categoryId: string
   description?: string
   icon?: string
-  recurrenceType?: string
+  frequency?: string
   timeOfDay?: string
   initialValue?: number
   difficultyRate?: number

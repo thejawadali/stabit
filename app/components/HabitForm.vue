@@ -28,7 +28,7 @@
 
       <!-- Schedule & Recurrence  -->
       <TabsContent value="schedule" class="space-y-4">
-        <HabitSchedule v-model:recurrenceType="formData.recurrenceType" v-model:timeOfDay="formData.timeOfDay"
+        <HabitSchedule v-model:frequency="formData.frequency" v-model:timeOfDay="formData.timeOfDay"
           v-model:notificationsEnabled="formData.enableNotifications" v-model:reminderTimes="formData.reminderTimes" />
       </TabsContent>
 
@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FieldType, Habit, RecurrenceType } from "@prisma/client"
+import type { FieldType, Habit, Frequency } from "@prisma/client"
 import type { HabitFormData } from "~~/types"
 
 const { validate } = useForm()
@@ -77,7 +77,7 @@ const INITIAL_FORM_DATA: HabitFormData = {
   description: "",
   icon: "🎯",
 
-  recurrenceType: "daily" as RecurrenceType,
+  frequency: "daily" as Frequency,
   timeOfDay: "19:00",
   reminderTimes: ["09:00"],
   enableNotifications: true,
