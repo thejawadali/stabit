@@ -101,7 +101,7 @@
             </div>
 
             <!-- Icon -->
-            <Input id="icon" label="Icon" v-model="form.icon" placeholder="🏃‍♂️" maxlength="2" />
+            <IconPicker name="categoryIcon" label="Icon" v-model="form.icon" />
           </div>
 
           <div class="flex items-center space-x-2">
@@ -151,7 +151,7 @@ const form = ref({
   name: '',
   description: '',
   color: '#3B82F6',
-  icon: '',
+  icon: '💪',
   isActive: true
 })
 
@@ -162,7 +162,7 @@ const openCreateDialog = () => {
     name: '',
     description: '',
     color: '#3B82F6',
-    icon: '',
+    icon: '💪',
     isActive: true
   }
   isDialogOpen.value = true

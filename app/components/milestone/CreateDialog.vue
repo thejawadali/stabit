@@ -13,9 +13,6 @@
           <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" custom-error-message="Please enter a milestone name" />
         </div>
 
-        <!-- icon -->
-        <Input name="rewardIcon" v-model="formData.rewardIcon" label="Icon" placeholder="🎉" maxlength="2" />
-        
         <!-- habit -->
         <Select name="habitId" v-model="formData.habitId" label="Habit" rules="required" custom-error-message="Please select a habit">
           <SelectTrigger>
@@ -27,6 +24,9 @@
             </SelectItem>
           </SelectContent>
         </Select>
+        
+        <!-- icon -->
+        <IconPicker name="rewardIcon" v-model="formData.rewardIcon" label="Icon" />
 
         <!-- reward -->
         <Input name="rewardName" v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat" rules="required" custom-error-message="Please enter a reward name" />
