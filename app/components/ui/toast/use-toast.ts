@@ -3,7 +3,7 @@ import type { ToastProps } from "."
 import { computed, ref } from "vue"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 3000 // 3 seconds
 
 export type StringOrVNode
   = | string
@@ -56,6 +56,7 @@ interface State {
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+const autoDismissTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
 function addToRemoveQueue(toastId: string) {
   if (toastTimeouts.has(toastId))
@@ -70,6 +71,14 @@ function addToRemoveQueue(toastId: string) {
   }, TOAST_REMOVE_DELAY)
 
   toastTimeouts.set(toastId, timeout)
+}
+
+function clearAutoDismissTimeout(toastId: string) {
+  const timeout = autoDismissTimeouts.get(toastId)
+  if (timeout) {
+    clearTimeout(timeout)
+    autoDismissTimeouts.delete(toastId)
+  }
 }
 
 const state = ref<State>({
@@ -92,10 +101,12 @@ function dispatch(action: Action) {
       const { toastId } = action
 
       if (toastId) {
+        clearAutoDismissTimeout(toastId)
         addToRemoveQueue(toastId)
       }
       else {
         state.value.toasts.forEach((toast) => {
+          clearAutoDismissTimeout(toast.id)
           addToRemoveQueue(toast.id)
         })
       }
@@ -154,6 +165,13 @@ function toast(props: Toast) {
       },
     },
   })
+
+  // Auto-dismiss after 5 seconds
+  const autoDismissTimeout = setTimeout(() => {
+    autoDismissTimeouts.delete(id)
+    dismiss()
+  }, TOAST_REMOVE_DELAY)
+  autoDismissTimeouts.set(id, autoDismissTimeout)
 
   return {
     id,
