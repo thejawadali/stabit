@@ -20,14 +20,20 @@
           </div>
 
           <div class="hidden md:flex items-center space-x-4">
-            <ThemeToggle />
             <template v-if="isHomePage">
-              <NuxtLink to="/login">
-                <Button variant="ghost">Login</Button>
-              </NuxtLink>
-              <NuxtLink to="/signup">
-                <Button variant="hero">Get Started</Button>
-              </NuxtLink>
+              <template v-if="isAuthenticated">
+                <NuxtLink to="/dashboard">
+                  <Button variant="hero">Dashboard</Button>
+                </NuxtLink>
+              </template>
+              <template v-else>
+                <NuxtLink to="/login">
+                  <Button variant="ghost">Login</Button>
+                </NuxtLink>
+                <NuxtLink to="/signup">
+                  <Button variant="hero">Get Started</Button>
+                </NuxtLink>
+              </template>
             </template>
           </div>
 
@@ -54,15 +60,19 @@
             </a>
           </template>
           <div class="flex flex-col space-y-2 pt-4">
-            <div class="flex justify-center">
-              <ThemeToggle />
-            </div>
-            <NuxtLink to="/signup">
-              <Button class="w-full" variant="hero">Get Started</Button>
-            </NuxtLink>
-            <NuxtLink to="/login">
-              <Button variant="ghost" class="w-full">Login</Button>
-            </NuxtLink>
+            <template v-if="isAuthenticated">
+              <NuxtLink to="/dashboard">
+                <Button class="w-full" variant="hero">Dashboard</Button>
+              </NuxtLink>
+            </template>
+            <template v-else>
+              <NuxtLink to="/signup">
+                <Button class="w-full" variant="hero">Get Started</Button>
+              </NuxtLink>
+              <NuxtLink to="/login">
+                <Button variant="ghost" class="w-full">Login</Button>
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </div>
@@ -71,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+const { isAuthenticated } = useAuth()
 
 const isMenuOpen = ref(false)
 const route = useRoute()
