@@ -135,6 +135,7 @@ export default defineEventHandler(async (event) => {
               title: field.title,
               type: field.type,
               options: field.options ? JSON.parse(JSON.stringify(field.options)) : null,
+              placeholder: field.placeholder ?? null,
               isRequired: field.isRequired ?? field.required ?? false,
               sortingOrder: field.sortingOrder ?? 0
             }
@@ -149,6 +150,7 @@ export default defineEventHandler(async (event) => {
               title: f.title,
               type: f.type,
               options: f.options ? JSON.parse(JSON.stringify(f.options)) : null,
+              placeholder: f.placeholder ?? null,
               isRequired: f.isRequired ?? f.required ?? false,
               sortingOrder: f.sortingOrder ?? 0
             }))

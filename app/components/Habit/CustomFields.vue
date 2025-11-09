@@ -46,6 +46,7 @@
             </Select>
 
           </div>
+          <Input name="placeholder" label="Placeholder (optional)" placeholder="e.g., Enter duration in minutes" v-model="field.placeholder" />
           <TagsInput v-if="field.type === 'select'" v-model="field.options">
             <TagsInputItem v-for="item in field.options" :key="item" :value="item">
               <TagsInputItemText />
@@ -72,6 +73,7 @@ type CustomField = {
   title: string
   type: "text" | "number" | "select" | "boolean"
   options?: string[]
+  placeholder?: string
   required: boolean
 }
 
@@ -116,6 +118,7 @@ const addCustomField = () => {
     type: "text",
     required: false,
     options: [],
+    placeholder: "",
   }
   customFields.value.push(newField)
 }

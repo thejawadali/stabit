@@ -43,6 +43,7 @@ export default defineEventHandler(async (event) => {
             title: true,
             type: true,
             options: true,
+            placeholder: true,
             isRequired: true
           }
         }

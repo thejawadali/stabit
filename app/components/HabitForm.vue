@@ -94,6 +94,7 @@ type CustomField = {
   title: string
   type: "text" | "number" | "select" | "boolean"
   options?: string[]
+  placeholder?: string
   required: boolean
 }
 
@@ -130,7 +131,16 @@ const customFields = ref<CustomField[]>([])
 onMounted(() => {
   if (props.isEditMode && props.habit) {
     Object.assign(formData, props.habit)
-    customFields.value = (props.habit as any).customFields || []
+    // Map custom fields from API format to component format
+    const apiCustomFields = (props.habit as any).customFields || []
+    customFields.value = apiCustomFields.map((field: any) => ({
+      id: field.id,
+      title: field.title,
+      type: field.type,
+      options: field.options || [],
+      placeholder: field.placeholder || "",
+      required: field.isRequired || false,
+    }))
   } else if (!props.isEditMode) {
     // For create mode, use default values
     resetToDefaults()
@@ -149,11 +159,12 @@ async function handleSave() {
 
   const cleanFields = customFields.value
     .filter(({ title = "" }) => title.trim() !== "")
-    .map(({ title, type, options, required }, index) => ({
+    .map(({ title, type, options, placeholder, required }, index) => ({
       sortingOrder: index + 1,
       title: title.trim(),
       type: type as FieldType,
       options: options || [],
+      placeholder: placeholder?.trim() || null,
       isRequired: !!required,
     }))
 

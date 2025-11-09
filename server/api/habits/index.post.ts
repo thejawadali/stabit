@@ -52,6 +52,7 @@ export default defineEventHandler(async (event) => {
                   title: field.title,
                   type: field.type,
                   options: field.options ?? null,
+                  placeholder: field.placeholder ?? null,
                   isRequired: field.isRequired ?? false,
                   sortingOrder: field.sortingOrder ?? 0,
                 })),
