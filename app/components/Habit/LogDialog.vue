@@ -3,13 +3,20 @@
   <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
     <DialogContent class="max-w-md max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Record Progress-isLoading: {{ isLoading }}</DialogTitle>
+        <DialogTitle>Record Progress</DialogTitle>
         <DialogDescription>
           {{ habitName ? `Track your progress for ${habitName}` : "Record your habit completion" }}
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit="handleSubmit" class="space-y-4">
+      <!-- loading skeleton -->
+      <div v-if="isLoading" class="flex flex-col gap-4">
+        <Skeleton class="w-full h-9 rounded-sm" />
+        <Skeleton class="w-full h-9 rounded-sm" />
+        <Skeleton class="w-full h-9 rounded-sm" />
+        <Skeleton class="w-full h-[78px] rounded-sm" />
+      </div>
+      <div v-else class="space-y-4">
         <!-- Duration -->
         <div class="space-y-2">
           <Label for="duration">Duration in Minutes (optional)</Label>
@@ -23,18 +30,18 @@
             <Input v-if="fieldConfig.type === 'text'" :id="`custom-${fieldConfig.id}`" type="text"
               v-model="customFieldsValues[fieldConfig.id]" :placeholder="fieldConfig.placeholder"
               :label="fieldConfig.title" :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" />
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`" />
 
             <!-- Number -->
             <Input v-else-if="fieldConfig.type === 'number'" :id="`custom-${fieldConfig.id}`" type="number"
               v-model="customFieldsValues[fieldConfig.id]" :placeholder="fieldConfig.placeholder"
               :label="fieldConfig.title" :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" />
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`" />
 
             <!-- Select -->
             <Select v-else-if="fieldConfig.type === 'select'" v-model="customFieldsValues[fieldConfig.id]"
               :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :label="fieldConfig.title">
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :label="fieldConfig.title" :custom-error-message="`${fieldConfig.title} is required`">
               <SelectTrigger>
                 <SelectValue :placeholder="fieldConfig.placeholder || 'Select an option'" />
               </SelectTrigger>
@@ -49,7 +56,6 @@
             <div v-else-if="fieldConfig.type === 'boolean'" class="flex items-center justify-between">
               <Label :for="`custom-${fieldConfig.id}`">
                 {{ fieldConfig.title }}
-                <span v-if="fieldConfig.isRequired" class="text-destructive">*</span>
               </Label>
               <Switch :id="`custom-${fieldConfig.id}`" v-model="customFieldsValues[fieldConfig.id]" />
             </div>
@@ -61,10 +67,10 @@
           <Label for="notes">Notes (optional)</Label>
           <Textarea id="notes" v-model="notes" placeholder="How did it go?" rows="3" />
         </div>
-      </form>
+      </div>
 
       <DialogFooter>
-        <Button type="submit" class="flex-1" :loading="isSubmitting || isLoading">
+        <Button @click="handleSubmit" class="flex-1" :is-loading="isSubmitting || isLoading">
           Save Progress
         </Button>
       </DialogFooter>
@@ -73,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+const { validate } = useForm()
 // Props
 const props = defineProps<{
   habitId?: string | number
@@ -134,17 +141,9 @@ async function fetchCustomFields() {
   }
 }
 
-async function handleSubmit(e: Event) {
-  e.preventDefault()
-
-  if (!props.habitId) {
-    toast({
-      title: "Error",
-      description: "No habit selected",
-      variant: "destructive",
-    })
-    return
-  }
+async function handleSubmit() {
+  const { valid } = await validate()
+  if (!valid) return
 
   isSubmitting.value = true
 
