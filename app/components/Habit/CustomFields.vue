@@ -39,14 +39,13 @@
               <SelectContent>
                 <SelectItem value="text">Text</SelectItem>
                 <SelectItem value="number">Number</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
                 <SelectItem value="select">Select</SelectItem>
                 <SelectItem value="boolean">Checkbox/Switch</SelectItem>
               </SelectContent>
             </Select>
 
           </div>
-          <Input name="placeholder" label="Placeholder (optional)" placeholder="e.g., Enter duration in minutes" v-model="field.placeholder" />
+
           <TagsInput v-if="field.type === 'select'" v-model="field.options">
             <TagsInputItem v-for="item in field.options" :key="item" :value="item">
               <TagsInputItemText />
@@ -55,6 +54,9 @@
 
             <TagsInputInput placeholder="Options..." />
           </TagsInput>
+          
+          <Input v-if="field.type !== 'boolean'" name="placeholder" label="Placeholder (optional)" placeholder="e.g., Enter duration in minutes" v-model="field.placeholder" />
+          
           <div class="flex items-center gap-2">
             <Switch v-model="field.required" />
             <Label class="font-normal">Required field</Label>

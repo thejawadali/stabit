@@ -167,6 +167,7 @@
         </div>
       </template>
     </main>
+    <HabitLogDialog :habit-id="selectedHabit?.id" :habit-name="selectedHabit?.name" v-model:is-dialog-open="isLogHabitDialogOpen" />
   </div>
 </template>
 
@@ -190,7 +191,8 @@ type Habit = {
   completedToday: boolean
 }
 
-
+const isLogHabitDialogOpen = ref(false)
+const selectedHabit = ref<{id: string, name: string} | null>(null)
 const { data: habits } = await useFetch<Habit[]>('/api/habits', {
   default: () => [],
   transform: (data: any) => data.data.map((habit: any) => ({
@@ -209,94 +211,6 @@ const { data: habits } = await useFetch<Habit[]>('/api/habits', {
     completedToday: false,
   }))
 })
-
-
-const _habits = ref<Habit[]>([
-  {
-    id: "1",
-    icon: "📚",
-    name: "Daily Reading",
-    category: "Learning",
-    recurrence: "Daily",
-    status: "active",
-    streak: 12,
-    progress: 75,
-    goalProgress: { current: 38, target: 50 },
-    nextDue: "Today, 8:00 PM",
-    hasMilestone: true,
-    completedToday: false,
-  },
-  {
-    id: "2",
-    icon: "🏃",
-    name: "Morning Run",
-    category: "Health",
-    recurrence: "Daily",
-    status: "active",
-    streak: 25,
-    progress: 100,
-    goalProgress: { current: 25, target: 100 },
-    nextDue: "Tomorrow, 6:00 AM",
-    hasMilestone: false,
-    completedToday: true,
-  },
-  {
-    id: "3",
-    icon: "🧘",
-    name: "Meditation",
-    category: "Mindfulness",
-    recurrence: "Daily",
-    status: "active",
-    streak: 45,
-    progress: 100,
-    goalProgress: { current: 45, target: 50 },
-    nextDue: "Tomorrow, 7:00 AM",
-    hasMilestone: true,
-    completedToday: true,
-  },
-  {
-    id: "4",
-    icon: "💻",
-    name: "Code Practice",
-    category: "Productivity",
-    recurrence: "Every 2 days",
-    status: "active",
-    streak: 8,
-    progress: 40,
-    goalProgress: { current: 16, target: 40 },
-    nextDue: "Tomorrow, 2:00 PM",
-    hasMilestone: false,
-    completedToday: false,
-  },
-  {
-    id: "5",
-    icon: "🎨",
-    name: "Creative Writing",
-    category: "Learning",
-    recurrence: "Weekly",
-    status: "inactive",
-    streak: 0,
-    progress: 30,
-    goalProgress: { current: 6, target: 20 },
-    nextDue: "Saturday, 3:00 PM",
-    hasMilestone: false,
-    completedToday: false,
-  },
-  {
-    id: "6",
-    icon: "💧",
-    name: "Drink Water",
-    category: "Health",
-    recurrence: "Daily",
-    status: "active",
-    streak: 60,
-    progress: 62,
-    goalProgress: { current: 60, target: 100 },
-    nextDue: "Throughout the day",
-    hasMilestone: true,
-    completedToday: false,
-  },
-])
 
 
 const searchQuery = ref('')
@@ -350,8 +264,8 @@ const selectHabit = (habitId: string) => {
 }
 
 const markComplete = (habitId: string) => {
-  habits.value = habits.value.map(habit => habit.id === habitId ? { ...habit, completedToday: true, progress: Math.min(100, habit.progress + 10) } : habit)
-  // toast.success("Habit marked as complete!");
+  selectedHabit.value = { id: habitId, name: habits.value.find(habit => habit.id === habitId)?.name || '' }
+  isLogHabitDialogOpen.value = true
 }
 
 const toggleStatus = (habitId: string) => {

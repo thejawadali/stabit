@@ -85,7 +85,7 @@
 
       <Button v-if="!habit.completedToday && habit.status === 'active'" @click="handleMarkComplete"
         class="w-full" size="sm">
-        Mark Complete Today
+        Mark as Complete
       </Button>
     </CardContent>
   </Card>
