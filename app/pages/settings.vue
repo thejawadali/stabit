@@ -117,6 +117,12 @@ const updateProfile = async () => {
         ...notificationSettings
       },
     })
+    
+    // Update colorMode when theme is changed in settings
+    const colorMode = useColorMode()
+    if (profileInfo.theme) {
+      colorMode.preference = profileInfo.theme
+    }
   } catch (error) {
     console.error(error)
   }

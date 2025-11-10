@@ -2,9 +2,6 @@
   <!-- empty div as placeholder -->
   <div />
   <div class="flex items-center space-x-4">
-    <!-- Theme Toggle -->
-    <ThemeToggle />
-
     <!-- Notifications Dropdown -->
     <!-- Hidden for MVP -->
     <DropdownMenu v-if="false">
