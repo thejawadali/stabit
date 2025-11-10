@@ -44,11 +44,6 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Auto-fill date and time with current date/time
-    const now = new Date()
-    const logDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    const completionTime = now
-
     // Default status to 'completed'
     const completionStatus = 'completed'
 
@@ -57,12 +52,10 @@ export default defineEventHandler(async (event) => {
       data: {
         habitId,
         userId: user.sub,
-        logDate,
         completionStatus,
         value: 0, // Default value since quantity is removed
         durationMinutes: durationMinutes ? parseInt(String(durationMinutes)) : null,
         notes: notes?.trim() || null,
-        completionTime,
         customFields: customFields && Object.keys(customFields).length > 0 
           ? customFields 
           : null
