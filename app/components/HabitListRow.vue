@@ -2,7 +2,7 @@
   <Card :key="habit.id" :class="habit.status === 'inactive' ? 'opacity-60' : ''">
     <CardContent class="p-4">
       <div class="flex items-center gap-4">
-        <Checkbox :model-value="value" @update:model-value="handleSelectHabit" />
+        <Checkbox :checked="selectedHabits.includes(habit.id)" @update:checked="handleSelectHabit" />
         <div class="text-2xl">{{ habit.icon }}</div>
         <div class="flex-1 grid grid-cols-6 gap-4 items-center">
           <div class="col-span-2">
@@ -38,6 +38,10 @@
               <DropdownMenuContent align="end">
                 <DropdownMenuItem @click="handleMarkComplete">
                   Add Log / Session
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="handleViewDetails">
+                  <IconBarChart3 class="h-4 w-4 mr-2" />
+                  View Details
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="handleEdit">
                   <IconEdit class="h-4 w-4 mr-2" />
@@ -92,6 +96,7 @@ const emit = defineEmits<{
   (e: 'toggleStatus'): void
   (e: 'deleteHabit'): void
   (e: 'edit'): void
+  (e: 'viewDetails'): void
 }>()
 
 
@@ -104,6 +109,10 @@ const handleSelectHabit = () => {
 const handleMarkComplete = () => {
   // Handle mark complete logic
   emit('markComplete')
+}
+
+const handleViewDetails = () => {
+  emit('viewDetails')
 }
 
 const handleToggleStatus = () => {
