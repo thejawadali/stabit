@@ -297,6 +297,14 @@ const personalInfo = defineModel<Partial<ProfileInfoType>>("personalInfo", {
   required: true
 })
 
+const colorMode = useColorMode()
+
+watch(() => personalInfo.value.theme, (newTheme) => {
+  if (newTheme) {
+    colorMode.preference = newTheme
+  }
+})
+
 </script>
 
 <style scoped></style>
