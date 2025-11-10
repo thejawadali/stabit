@@ -142,15 +142,12 @@ model HabitLogs {
   id String @id @default(uuid())
   habitId String @db.VarChar(36)
   userId String @db.VarChar(36)
-  logDate DateTime @db.Date
   completionStatus CompletionStatus @default(completed)
   value Int @db.Int
   durationMinutes Int? @db.Int
   notes String? @db.Text
-  completionTime DateTime? @db.Timestamp //TODO: logTime
   customFields Json? // Store custom field values as JSON
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
