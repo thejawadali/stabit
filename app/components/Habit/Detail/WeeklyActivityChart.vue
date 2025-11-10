@@ -18,16 +18,7 @@ import dayjs from 'dayjs'
 import { Chart, registerables } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 
-
 Chart.register(...registerables)
-
-interface HabitLog {
-  id: string
-  createdAt: string
-  completionStatus: string
-  durationMinutes?: number
-  notes?: string
-}
 
 const props = defineProps<{
   logs: HabitLog[]

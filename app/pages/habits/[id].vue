@@ -10,18 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Habit } from "@prisma/client"
-import type { HabitFormData } from "~~/types"
 
 const { toast } = useToast()
 const route = useRoute()
 const habitId = route.params.id as string
 const loading = ref(false)
-
-interface CombinedData {
-  habit: Habit | null;
-  categories: { id: string; name: string; icon: string }[];
-}
 
 
 const { data: combinedData, pending } = await useAsyncData<CombinedData>(

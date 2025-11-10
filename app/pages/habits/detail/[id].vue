@@ -85,37 +85,12 @@ import dayjs from 'dayjs'
 import { IconFlame, IconTarget, IconTrophy, IconClock } from "#components";
 const { confirm } = useConfirm()
 
-interface Habit {
-  id: string
-  name: string
-  description: string
-  icon: string
-  currentStreak: number
-  longestStreak: number
-  totalCompletions: number
-  status: string
-
-
-  currentGoal: number
-  category: string
-  frequency: string
-  createdAt: string
-}
-
-interface HabitLog {
-  id: string
-  createdAt: string
-  completionStatus: string
-  durationMinutes?: number
-  notes?: string
-}
-
 const route = useRoute()
 const router = useRouter()
 const { toast } = useToast()
 const id = String(route.params.id || '')
 
-const habit = ref<Habit | null>(null)
+const habit = ref<HabitDetail | null>(null)
 const logs = ref<HabitLog[]>([])
 const isLoading = ref(true)
 
@@ -239,7 +214,7 @@ async function fetchHabitDetails() {
   }
 }
 
-function calculateStats(logsData: HabitLog[], habitData: Habit) {
+function calculateStats(logsData: HabitLog[], habitData: HabitDetail) {
   const last30Days = 30
   const completedLogs = logsData.filter((l) => l.completionStatus === 'completed')
   const completionRate = (completedLogs.length / last30Days) * 100

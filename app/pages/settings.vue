@@ -52,8 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import type { CountUnit, DashboardView, Gender, GoalFrequency, ReminderTone, SnoozeDuration, Theme, TimeUnit, TrackingType } from "@prisma/client"
-import type { GeneralSettingsType, NotificationSettingsType, ProfileInfoType } from "~~/types"
 
 const saving = ref(false)
 const { data: profile } = await useFetch('/api/profile')

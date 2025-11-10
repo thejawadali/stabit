@@ -63,14 +63,8 @@
 
 <script setup lang="ts">
 
-interface Stats {
-  achieved: number
-  inProgress: number
-  locked: number
-  totalRewards: number
-}
 defineProps<{
-  stats: Stats
+  stats: MilestoneStats
 }>()
 
 </script>

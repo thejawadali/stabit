@@ -1,6 +1,24 @@
-import type { CountUnit, GoalFrequency, Theme, TimeUnit, TrackingType, UserProfile, Category, Habit } from "@prisma/client"
+// Types
+type Theme = 'light' | 'dark' | 'system'
+type Gender = 'male' | 'female' | 'other'
+type TimeUnit = 'minutes' | 'hours'
+type CountUnit = 'repetitions' | 'sessions' | 'times' | 'items'
+type TrackingType = 'duration' | 'count' | 'both'
+type GoalFrequency = 'daily' | 'weekly' | 'monthly'
+type Frequency = 'daily' | 'weekly' | 'monthly'
+type DashboardView = 'overview' | 'analytics' | 'calendar' | 'progress'
+type ReminderTone = 'gentle' | 'motivational' | 'energetic' | 'calm' | 'custom'
+type SnoozeDuration = 'fifteenMinutes' | 'oneHour' | 'twoHours' | 'fourHours' | 'eightHours' | 'twentyFourHours'
+type HabitStatus = 'active' | 'inactive' | 'completed' | 'paused'
+type FieldType = 'text' | 'number' | 'select' | 'boolean'
+type MilestoneStatus = 'locked' | 'inProgress' | 'achieved'
+type CompletionStatus = 'completed' | 'partial' | 'missed' | 'skipped'
+type NotificationType = 'reminder' | 'streakBreak' | 'milestoneAchieved' | 'encouragement' | 'system'
+type AchievementCategory = 'streak' | 'completion' | 'consistency' | 'milestone' | 'special'
 
 
+
+// Activity & Dashboard Types
 interface Activity {
   id: string
   habit: string
@@ -9,30 +27,47 @@ interface Activity {
   icon: string
 }
 
-interface Milestone {
+// Habit Types
+interface Habit {
   id: string
-  habit: string
+  name: string
+  description: string
   icon: string
-  nextMilestone: string
-  progress: number
-  daysRemaining: number
+  frequency: Frequency
+  timeOfDay: string
+  initialValue: number
+  difficultyRate: number
+  goalValue: number
+  goalMetric: string
+  estimatedCompletionDate: Date | null
+  nextDueDate: Date | null
+  status: HabitStatus
+  isArchived: boolean
+  userId: string
+  categoryId: string
+  createdAt: Date
+  updatedAt: Date
+  enableNotifications: boolean
+  reminderTimes: any | null
+  totalCompletions: number
+  totalMissed: number
+  totalSkipped: number
+  currentStreak: number
+  longestStreak: number
 }
 
+type HabitDetail = Pick<Habit, 'id' | 'name' | 'description' | 'icon' | 'currentStreak' | 'longestStreak' | 'totalCompletions' | 'status' | 'currentGoal' | 'category' | 'frequency' | 'createdAt'>
 
-
-type ProfileInfoType = Pick<UserProfile, 'name' | 'email' | 'avatarUrl' | 'age' | 'height' | 'gender' | 'personalGoals' | 'preferredTimeUnits' | 'preferredCountUnits' | 'defaultReminderTime' | 'defaultTrackingType' | 'defaultGoalFrequency' | 'theme'>
-
-type GeneralSettingsType = Pick<UserProfile, 'language' | 'dateFormat' | 'autoSync' | 'lastSyncTime' | 'defaultDashboardView' | 'showWelcomeMessage' | 'notificationsEnabled'>
-
-type NotificationSettingsType = Pick<UserProfile, 'enableReminders' | 'enableMilestones' | 'enableStreaks' | 'defaultReminderTime' | 'reminderTone' | 'smartReminders' | 'inAppNotifications' | 'emailNotifications' | 'pushNotifications' | 'quietHoursEnabled' | 'quietHoursStart' | 'quietHoursEnd' | 'snoozeDuration' | 'isSnoozed' | 'snoozeUntil'> & {
-  quietHoursDays: string[]
-}
-
-
-type Category = Pick<Category, 'name' | 'description' | 'color' | 'icon' | 'isActive' | 'userId' | 'createdAt'> & {
+interface HabitLog {
   id: string
-  habitsCount: number
+  createdAt: string
+  completionStatus: string
+  durationMinutes?: number
+  notes?: string
 }
+
+type HabitListItem = Pick<Habit, 'id' | 'name' | 'icon' >
+
 
 type HabitFormData = {
   name: string
@@ -50,4 +85,141 @@ type HabitFormData = {
   reminderTimes?: string[]
 }
 
-type Habit = Omit<Habit>
+
+
+// Custom Field Types
+type CustomField = {
+  id: string
+  title: string
+  type: "text" | "number" | "select" | "boolean"
+  options?: string[]
+  placeholder?: string
+  required: boolean
+}
+
+
+
+
+// Category Types
+interface Category {
+  id: string
+  name: string
+  description: string | null
+  color: string
+  icon: string | null
+  isActive: boolean
+  userId: string
+  createdAt: Date
+  updatedAt: Date
+  habitsCount: number
+}
+
+
+
+
+// User Profile & Settings Types
+interface UserProfile {
+  userId: string
+  name: string
+  email: string
+  avatarUrl: string
+  timezone: string
+  language: string
+  dateFormat: string
+  theme: Theme
+  age: number
+  gender: Gender
+  height: number
+  isActive: boolean
+  personalGoals: string
+  preferredTimeUnits: TimeUnit
+  preferredCountUnits: CountUnit
+  defaultTrackingType: TrackingType
+  defaultGoalFrequency: GoalFrequency
+  autoSync: boolean
+  lastSyncTime: Date | null
+  defaultDashboardView: DashboardView
+  showWelcomeMessage: boolean
+  notificationsEnabled: boolean
+  enableReminders: boolean
+  enableMilestones: boolean
+  enableStreaks: boolean
+  defaultReminderTime: string | null
+  reminderTone: ReminderTone
+  smartReminders: boolean
+  inAppNotifications: boolean
+  emailNotifications: boolean
+  pushNotifications: boolean
+  quietHoursEnabled: boolean
+  quietHoursStart: string | null
+  quietHoursEnd: string | null
+  quietHoursDays: any | null
+  snoozeDuration: SnoozeDuration
+  isSnoozed: boolean
+  snoozeUntil: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+type ProfileInfoType = Pick<UserProfile, 'name' | 'email' | 'avatarUrl' | 'age' | 'height' | 'gender' | 'personalGoals' | 'preferredTimeUnits' | 'preferredCountUnits' | 'defaultReminderTime' | 'defaultTrackingType' | 'defaultGoalFrequency' | 'theme'>
+
+type GeneralSettingsType = Pick<UserProfile, 'language' | 'dateFormat' | 'autoSync' | 'lastSyncTime' | 'defaultDashboardView' | 'showWelcomeMessage' | 'notificationsEnabled'>
+
+type NotificationSettingsType = Pick<UserProfile, 'enableReminders' | 'enableMilestones' | 'enableStreaks' | 'defaultReminderTime' | 'reminderTone' | 'smartReminders' | 'inAppNotifications' | 'emailNotifications' | 'pushNotifications' | 'quietHoursEnabled' | 'quietHoursStart' | 'quietHoursEnd' | 'snoozeDuration' | 'isSnoozed' | 'snoozeUntil'> & {
+  quietHoursDays: string[]
+}
+
+
+
+
+
+
+// Component Props Types
+interface CombinedData {
+  habit: Habit | null
+  categories: { id: string; name: string; icon: string }[]
+}
+
+
+
+// Milestone Types
+interface Milestone {
+  id: string
+  habitId: string
+  habitName: string
+  habitIcon: string
+  name: string
+  description: string | null
+  targetValue: number
+  targetMetric: string
+  currentProgress: number
+  status: "locked" | "inProgress" | "achieved"
+  rewardName: string | null
+  rewardDescription: string | null
+  rewardIcon: string
+  achievedDate: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+interface MilestoneStats {
+  achieved: number
+  inProgress: number
+  locked: number
+  totalRewards: number
+}
+
+interface CompletedReward {
+  id: string
+  habitId: string
+  habitName: string
+  habitIcon: string
+  milestoneName: string
+  milestoneDescription: string | null
+  rewardName: string | null
+  rewardDescription: string | null
+  rewardIcon: string
+  achievedDate: string | null
+  targetValue: number
+  targetMetric: string
+}

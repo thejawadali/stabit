@@ -178,21 +178,6 @@ const { toast } = useToast()
 
 const router = useRouter()
 
-type Habit = {
-  id: string
-  icon: string
-  name: string
-  category: string
-  recurrence: string
-  status: "active" | "inactive" | "completed"
-  streak: number
-  progress: number
-  goalProgress: { current: number; target: number }
-  nextDue: string
-  hasMilestone: boolean
-  completedToday: boolean
-}
-
 const isLogHabitDialogOpen = ref(false)
 const selectedHabit = ref<{id: string, name: string} | null>(null)
 const { data: habits } = await useFetch<Habit[]>('/api/habits', {

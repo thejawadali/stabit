@@ -73,13 +73,8 @@ watchDebounced(
   { debounce: 500, maxWait: 5000 }
 )
 
-interface Habit {
-  id: string
-  name: string
-  icon: string
-}
 defineProps<{
-  habits: Habit[]
+  habits: HabitListItem[]
 }>()
 </script>
 

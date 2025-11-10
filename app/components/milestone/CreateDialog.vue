@@ -75,15 +75,8 @@ const formData = reactive({
 
 const loading = ref(false)
 
-// Accept habits as prop
-interface Habit {
-  id: string
-  name: string
-  icon: string
-}
-
-const props = withDefaults(defineProps<{
-  habits?: Habit[]
+withDefaults(defineProps<{
+  habits?: HabitListItem[]
 }>(), {
   habits: () => []
 })

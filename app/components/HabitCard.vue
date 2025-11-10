@@ -97,21 +97,6 @@
 
 <script setup lang="ts">
 // import { toast } from 'vue-sonner'
-
-type Habit = {
-  id: string
-  icon: string
-  name: string
-  category: string
-  recurrence: string
-  status: "active" | "inactive" | "completed"
-  streak: number
-  progress: number
-  goalProgress: { current: number; target: number }
-  nextDue: string
-  hasMilestone: boolean
-  completedToday: boolean
-}
 // Props
 const props = defineProps<{ habit: Habit, selectedHabits: string[] }>()
 

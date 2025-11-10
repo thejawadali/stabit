@@ -70,14 +70,6 @@
 <script setup lang="ts">
 import { useSortable } from '@vueuse/integrations/useSortable'
 const { toast } = useToast()
-type CustomField = {
-  id: string
-  title: string
-  type: "text" | "number" | "select" | "boolean"
-  options?: string[]
-  placeholder?: string
-  required: boolean
-}
 
 const customFieldsRef = useTemplateRef<HTMLElement>('customFieldsRef')
 

@@ -67,8 +67,6 @@
 </template>
 
 <script setup lang="ts">
-import type { FieldType, Habit, Frequency } from "@prisma/client"
-import type { HabitFormData } from "~~/types"
 
 const { validate } = useForm()
 const INITIAL_FORM_DATA: HabitFormData = {
@@ -87,15 +85,6 @@ const INITIAL_FORM_DATA: HabitFormData = {
   estimatedCompletionDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
   initialValue: 0,
   difficultyRate: 1,
-}
-
-type CustomField = {
-  id: string
-  title: string
-  type: "text" | "number" | "select" | "boolean"
-  options?: string[]
-  placeholder?: string
-  required: boolean
 }
 
 // Props

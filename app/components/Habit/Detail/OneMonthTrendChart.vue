@@ -21,14 +21,6 @@ import { Line } from 'vue-chartjs'
 
 Chart.register(...registerables)
 
-interface HabitLog {
-  id: string
-  createdAt: string
-  completionStatus: string
-  durationMinutes?: number
-  notes?: string
-}
-
 const props = defineProps<{
   logs: HabitLog[]
 }>()

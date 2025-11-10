@@ -107,15 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import type { HabitFormData } from "~~/types"
 
-type CustomField = {
-  id: string
-  title: string
-  type: "text" | "number" | "select" | "boolean"
-  options?: string[]
-  required: boolean
-}
 
 defineProps<{
   formData: HabitFormData

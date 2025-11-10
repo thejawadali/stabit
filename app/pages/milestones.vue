@@ -174,47 +174,6 @@ import { IconCrown, IconTarget, IconMedal } from '#components'
 const { toast } = useToast()
 const { confirm } = useConfirm()
 
-interface Milestone {
-  id: string
-  habitId: string
-  habitName: string
-  habitIcon: string
-  name: string
-  description: string | null
-  targetValue: number
-  targetMetric: string
-  currentProgress: number
-  status: "locked" | "inProgress" | "achieved"
-  rewardName: string | null
-  rewardDescription: string | null
-  rewardIcon: string
-  achievedDate: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-interface MilestoneStats {
-  achieved: number
-  inProgress: number
-  locked: number
-  totalRewards: number
-}
-
-interface CompletedReward {
-  id: string
-  habitId: string
-  habitName: string
-  habitIcon: string
-  milestoneName: string
-  milestoneDescription: string | null
-  rewardName: string | null
-  rewardDescription: string | null
-  rewardIcon: string
-  achievedDate: string | null
-  targetValue: number
-  targetMetric: string
-}
-
 const filterHabit = ref<string>("all")
 const filterStatus = ref<string>("all")
 const sortBy = ref<string>("progress")

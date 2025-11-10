@@ -84,25 +84,6 @@
 <script setup lang="ts">
 import { IconCrown, IconTarget, IconMedal, IconTrophy } from '#components'
 
-interface Milestone {
-  id: string
-  habitId: string
-  habitName: string
-  habitIcon: string
-  name: string
-  description: string | null
-  targetValue: number
-  targetMetric: string
-  currentProgress: number
-  status: "locked" | "inProgress" | "achieved"
-  rewardName: string | null
-  rewardDescription: string | null
-  rewardIcon: string
-  achievedDate: string | null
-  createdAt: string
-  updatedAt: string
-}
-
 withDefaults(defineProps<{
   viewMilestone: Milestone | null
 }>(), {
