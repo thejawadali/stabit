@@ -6,7 +6,8 @@
     <ThemeToggle />
 
     <!-- Notifications Dropdown -->
-    <DropdownMenu>
+    <!-- Hidden for MVP -->
+    <DropdownMenu v-if="false">
       <DropdownMenuTrigger>
         <button class="relative flex items-center justify-center w-10 h-10 rounded-md hover:bg-muted transition">
           <IconBell class="w-5 h-5" />

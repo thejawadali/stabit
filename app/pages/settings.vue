@@ -10,10 +10,11 @@
     </div>
 
     <Tabs defaultValue="profile" class="space-y-6 w-full">
-      <TabsList class="grid w-full grid-cols-3">
+      <TabsList class="grid w-full grid-cols-2">
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="general">General</TabsTrigger>
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        <!-- Hidden for MVP -->
+        <TabsTrigger value="notifications" v-if="false">Notifications</TabsTrigger>
         <!-- <TabsTrigger value="security">Security</TabsTrigger> -->
       </TabsList>
 
@@ -28,7 +29,8 @@
       </TabsContent>
 
       <!-- Notifications Settings -->
-      <TabsContent value="notifications" class="space-y-4">
+      <!-- Hidden for MVP -->
+      <TabsContent value="notifications" v-if="false" class="space-y-4">
         <SettingsNotifications :enabled="generalSettings.notificationsEnabled"
           v-model:notificationSettings="notificationSettings" />
       </TabsContent>

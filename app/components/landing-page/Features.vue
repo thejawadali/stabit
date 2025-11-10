@@ -58,11 +58,12 @@ const features = ref([
     title: "Insightful Analytics",
     description: "Understand your patterns with detailed charts and progress insights to optimize your habits."
   },
-  {
-    icon: IconBell,
-    title: "Smart Reminders",
-    description: "Gentle, encouraging notifications that adapt to your schedule and help maintain momentum."
-  },
+  // Hidden for MVP
+  // {
+  //   icon: IconBell,
+  //   title: "Smart Reminders",
+  //   description: "Gentle, encouraging notifications that adapt to your schedule and help maintain momentum."
+  // },
   {
     icon: IconZap,
     title: "Burnout Prevention",

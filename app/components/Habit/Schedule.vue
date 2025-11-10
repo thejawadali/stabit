@@ -21,7 +21,8 @@
       <Input name="timeOfDay" label="Preferred Time of Day" type="time" v-model="timeOfDay" />
 
       <!-- Notifications -->
-      <div class="pt-4 border-t space-y-4">
+      <!-- Hidden for MVP -->
+      <div class="pt-4 border-t space-y-4 hidden">
         <div class="flex items-center justify-between">
           <div>
             <Label class="text-base">Notifications & Reminders</Label>

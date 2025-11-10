@@ -75,7 +75,8 @@
         </div>
 
         <!-- Notifications -->
-        <div class="border-t pt-4">
+        <!-- Hidden for MVP -->
+        <div v-if="false" class="border-t pt-4">
           <h4 class="font-semibold mb-2">Notifications</h4>
           <div class="text-sm">
             <template v-if="formData.enableNotifications">

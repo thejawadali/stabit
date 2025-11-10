@@ -149,7 +149,8 @@
           </CardDescription>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div class="flex items-center justify-between">
+          <!-- Hidden for MVP -->
+          <div v-if="false" class="flex items-center justify-between">
             <div>
               <p class="font-medium">Enable Notifications</p>
               <p class="text-sm text-muted-foreground">
