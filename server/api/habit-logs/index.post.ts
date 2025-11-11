@@ -1,5 +1,99 @@
 import prisma from '../../../lib/prisma'
 import { serverSupabaseUser } from '#supabase/server'
+import { Frequency, CompletionStatus, MilestoneStatus } from '@prisma/client'
+
+/**
+ * Calculate next due date based on habit frequency
+ */
+function calculateNextDueDate(frequency: Frequency, currentDate: Date = new Date()): Date {
+  const nextDate = new Date(currentDate)
+  
+  switch (frequency) {
+    case Frequency.daily:
+      nextDate.setDate(nextDate.getDate() + 1)
+      break
+    case Frequency.weekly:
+      nextDate.setDate(nextDate.getDate() + 7)
+      break
+    case Frequency.monthly:
+      nextDate.setMonth(nextDate.getMonth() + 1)
+      break
+    default:
+      nextDate.setDate(nextDate.getDate() + 1)
+  }
+  
+  return nextDate
+}
+
+/**
+ * Check if there are 3 consecutive missed logs
+ */
+async function hasThreeConsecutiveMisses(habitId: string): Promise<boolean> {
+  const recentLogs = await prisma.habitLogs.findMany({
+    where: {
+      habitId
+    },
+    orderBy: {
+      createdAt: 'desc'
+    },
+    take: 3
+  })
+
+  if (recentLogs.length < 3) {
+    return false
+  }
+
+  // Check if all 3 most recent logs are missed
+  return recentLogs.every(log => log.completionStatus === CompletionStatus.missed)
+}
+
+/**
+ * Update milestone progress and status
+ */
+async function updateMilestones(habitId: string, value: number, durationMinutes: number | null) {
+  const milestones = await prisma.habitMilestones.findMany({
+    where: {
+      habitId,
+      status: { in: [MilestoneStatus.locked, MilestoneStatus.inProgress] }
+    }
+  })
+
+  for (const milestone of milestones) {
+    let progressIncrement = 0
+
+    // Calculate progress based on target metric
+    if (milestone.targetMetric === 'sessions') {
+      progressIncrement = 1
+    } else if (milestone.targetMetric === 'minutes' || milestone.targetMetric === 'hours') {
+      progressIncrement = durationMinutes ? durationMinutes : 0
+      if (milestone.targetMetric === 'hours') {
+        progressIncrement = progressIncrement / 60
+      }
+    } else {
+      // For other metrics, use the value from the log
+      progressIncrement = value
+    }
+
+    const newProgress = milestone.currentProgress + progressIncrement
+    const isAchieved = newProgress >= milestone.targetValue
+
+    // Update milestone - unlock if it was locked and progress starts
+    const newStatus = isAchieved 
+      ? MilestoneStatus.achieved 
+      : (milestone.status === MilestoneStatus.locked && newProgress > 0)
+        ? MilestoneStatus.inProgress
+        : MilestoneStatus.inProgress
+
+    await prisma.habitMilestones.update({
+      where: { id: milestone.id },
+      data: {
+        currentProgress: newProgress,
+        status: newStatus,
+        achievedDate: isAchieved ? new Date() : milestone.achievedDate
+      }
+    })
+  }
+}
 
 export default defineEventHandler(async (event) => {
   try {
@@ -18,7 +112,8 @@ export default defineEventHandler(async (event) => {
       habitId,
       durationMinutes,
       notes,
-      customFields
+      customFields,
+      completionStatus = 'completed' // Allow status to be passed, default to completed
     } = body
 
     // Validate required fields
@@ -44,15 +139,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Default status to 'completed'
-    const completionStatus = 'completed'
-
     // Create habit log
     const habitLog = await prisma.habitLogs.create({
       data: {
         habitId,
         userId: user.sub,
-        completionStatus,
+        completionStatus: completionStatus as CompletionStatus,
         value: 0, // Default value since quantity is removed
         durationMinutes: durationMinutes ? parseInt(String(durationMinutes)) : null,
         notes: notes?.trim() || null,
@@ -71,12 +163,59 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    // Update habit statistics
+    // Update habit statistics based on completion status
+    const updateData: any = {}
+
+    if (completionStatus === 'completed' || completionStatus === 'partial') {
+      // Increment current streak
+      const newCurrentStreak = habit.currentStreak + 1
+      updateData.currentStreak = newCurrentStreak
+      
+      // Update longest streak if current is greater
+      if (newCurrentStreak > habit.longestStreak) {
+        updateData.longestStreak = newCurrentStreak
+      }
+      
+      // Increment total completions
+      updateData.totalCompletions = { increment: 1 }
+      
+      // Update next due date
+      updateData.nextDueDate = calculateNextDueDate(habit.frequency)
+      
+      // Update milestones (only for completed/partial)
+      await updateMilestones(
+        habitId, 
+        0, 
+        durationMinutes ? parseInt(String(durationMinutes)) : null
+      )
+    } else if (completionStatus === 'missed') {
+      // Reset current streak to 0
+      updateData.currentStreak = 0
+      updateData.totalMissed = { increment: 1 }
+      
+      // Check for 3 consecutive misses and lock milestones
+      const hasThreeMisses = await hasThreeConsecutiveMisses(habitId)
+      if (hasThreeMisses) {
+        await prisma.habitMilestones.updateMany({
+          where: {
+            habitId,
+            status: { in: [MilestoneStatus.inProgress, MilestoneStatus.achieved] }
+          },
+          data: {
+            status: MilestoneStatus.locked
+          }
+        })
+      }
+    } else if (completionStatus === 'skipped') {
+      // Reset current streak to 0
+      updateData.currentStreak = 0
+      updateData.totalSkipped = { increment: 1 }
+    }
+
+    // Update habit
     await prisma.habit.update({
       where: { id: habitId },
-      data: {
-        totalCompletions: { increment: 1 }
-      }
+      data: updateData
     })
 
     return {

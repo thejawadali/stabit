@@ -152,14 +152,14 @@ async function fetchHabitDetails() {
     name: "Morning Meditation",
     description: "Start the day with 15 minutes of mindfulness meditation",
     category: "Health",
-    frequency: "Daily",
+    frequency: "daily",
     icon: "🧘",
     currentStreak: 12,
     longestStreak: 25,
     totalCompletions: 87,
     currentGoal: 100,
     status: "active",
-    createdAt: "2024-01-15"
+    createdAt: new Date("2024-01-15")
   }
 
   logs.value = [
