@@ -1,0 +1,664 @@
+import { Frequency, CompletionStatus, FieldType, Category, Habit } from '@prisma/client'
+import prisma from '../lib/prisma'
+import { DEFAULT_CATEGORIES } from '../server/utils/seedCategories'
+
+
+declare const process: {
+  env: {
+    SEED_USER_ID?: string
+  }
+  exit: (code: number) => never
+}
+
+function randomElement<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)]
+}
+
+/**
+ * Get a random number between min and max
+ */
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+/**
+ * Get a random date between start and end
+ */
+function randomDate(start: Date, end: Date): Date {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+}
+
+/**
+ * Add days to a date
+ */
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
+}
+
+/**
+ * Get start of day
+ */
+function startOfDay(date: Date): Date {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  return result
+}
+
+/**
+ * Check if date is weekend
+ */
+function isWeekend(date: Date): boolean {
+  const day = date.getDay()
+  return day === 0 || day === 6
+}
+
+interface HabitTemplate {
+  name: string
+  description: string
+  icon: string
+  frequency: Frequency
+  goalValue: number
+  goalMetric: string
+  customFields?: Array<{
+    title: string
+    type: FieldType
+    options?: string[]
+    placeholder?: string
+    isRequired: boolean
+  }>
+}
+
+const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
+  'Health & Fitness': [
+    {
+      name: 'Morning Run',
+      description: 'Run for at least 30 minutes every morning',
+      icon: '🏃',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Distance (km)', type: FieldType.number, placeholder: 'Enter distance', isRequired: false },
+        { title: 'Weather', type: FieldType.select, options: ['Sunny', 'Cloudy', 'Rainy', 'Cold'], isRequired: false }
+      ]
+    },
+    {
+      name: 'Gym Workout',
+      description: 'Hit the gym for strength training',
+      icon: '💪',
+      frequency: Frequency.weekly,
+      goalValue: 3,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Workout Type', type: FieldType.select, options: ['Upper Body', 'Lower Body', 'Full Body', 'Cardio'], isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    },
+    {
+      name: 'Drink Water',
+      description: 'Drink 8 glasses of water daily',
+      icon: '💧',
+      frequency: Frequency.daily,
+      goalValue: 8,
+      goalMetric: 'glasses',
+      customFields: [
+        { title: 'Amount (ml)', type: FieldType.number, placeholder: 'Enter amount', isRequired: false }
+      ]
+    },
+    {
+      name: 'Yoga Session',
+      description: 'Practice yoga for flexibility and mindfulness',
+      icon: '🧘',
+      frequency: Frequency.weekly,
+      goalValue: 4,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Style', type: FieldType.select, options: ['Hatha', 'Vinyasa', 'Yin', 'Power'], isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    }
+  ],
+  'Productivity': [
+    {
+      name: 'Deep Work Session',
+      description: 'Focus on important tasks without distractions',
+      icon: '🎯',
+      frequency: Frequency.daily,
+      goalValue: 2,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Task Focus', type: FieldType.text, placeholder: 'What did you work on?', isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    },
+    {
+      name: 'Review Daily Goals',
+      description: 'Review and plan daily goals',
+      icon: '📋',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'sessions'
+    },
+    {
+      name: 'Email Management',
+      description: 'Process and organize emails',
+      icon: '📧',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Emails Processed', type: FieldType.number, placeholder: 'Number of emails', isRequired: false }
+      ]
+    },
+    {
+      name: 'Weekly Planning',
+      description: 'Plan the week ahead',
+      icon: '📅',
+      frequency: Frequency.weekly,
+      goalValue: 1,
+      goalMetric: 'sessions'
+    }
+  ],
+  'Mindfulness': [
+    {
+      name: 'Meditation',
+      description: 'Daily meditation practice',
+      icon: '🧘‍♀️',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false },
+        { title: 'Type', type: FieldType.select, options: ['Guided', 'Unguided', 'Walking', 'Body Scan'], isRequired: false }
+      ]
+    },
+    {
+      name: 'Gratitude Journal',
+      description: 'Write down things you are grateful for',
+      icon: '🙏',
+      frequency: Frequency.daily,
+      goalValue: 3,
+      goalMetric: 'items',
+      customFields: [
+        { title: 'Gratitude Items', type: FieldType.text, placeholder: 'What are you grateful for?', isRequired: false }
+      ]
+    },
+    {
+      name: 'Breathing Exercises',
+      description: 'Practice breathing exercises for relaxation',
+      icon: '🌬️',
+      frequency: Frequency.daily,
+      goalValue: 2,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    }
+  ],
+  'Learning': [
+    {
+      name: 'Read Books',
+      description: 'Read for personal growth',
+      icon: '📚',
+      frequency: Frequency.daily,
+      goalValue: 30,
+      goalMetric: 'minutes',
+      customFields: [
+        { title: 'Book Title', type: FieldType.text, placeholder: 'What are you reading?', isRequired: false },
+        { title: 'Pages Read', type: FieldType.number, placeholder: 'Number of pages', isRequired: false }
+      ]
+    },
+    {
+      name: 'Online Course',
+      description: 'Learn new skills through online courses',
+      icon: '💻',
+      frequency: Frequency.weekly,
+      goalValue: 3,
+      goalMetric: 'hours',
+      customFields: [
+        { title: 'Course Name', type: FieldType.text, placeholder: 'Which course?', isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    },
+    {
+      name: 'Practice Coding',
+      description: 'Practice programming skills',
+      icon: '⌨️',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'hours',
+      customFields: [
+        { title: 'Language/Topic', type: FieldType.text, placeholder: 'What did you practice?', isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
+      ]
+    }
+  ],
+  'Social': [
+    {
+      name: 'Call Family',
+      description: 'Stay connected with family members',
+      icon: '👨‍👩‍👧‍👦',
+      frequency: Frequency.weekly,
+      goalValue: 2,
+      goalMetric: 'calls',
+      customFields: [
+        { title: 'Who did you call?', type: FieldType.text, placeholder: 'Family member name', isRequired: false },
+        { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Call duration', isRequired: false }
+      ]
+    },
+    {
+      name: 'Meet Friends',
+      description: 'Spend quality time with friends',
+      icon: '👥',
+      frequency: Frequency.weekly,
+      goalValue: 1,
+      goalMetric: 'meetings'
+    },
+    {
+      name: 'Send Appreciation',
+      description: 'Send messages of appreciation',
+      icon: '💌',
+      frequency: Frequency.weekly,
+      goalValue: 3,
+      goalMetric: 'messages'
+    }
+  ],
+  'Personal Care': [
+    {
+      name: 'Skincare Routine',
+      description: 'Follow morning and evening skincare routine',
+      icon: '✨',
+      frequency: Frequency.daily,
+      goalValue: 2,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Time of Day', type: FieldType.select, options: ['Morning', 'Evening', 'Both'], isRequired: false }
+      ]
+    },
+    {
+      name: 'Healthy Meal Prep',
+      description: 'Prepare healthy meals for the week',
+      icon: '🥗',
+      frequency: Frequency.weekly,
+      goalValue: 1,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Meals Prepared', type: FieldType.number, placeholder: 'Number of meals', isRequired: false }
+      ]
+    },
+    {
+      name: 'Quality Sleep',
+      description: 'Get 7-8 hours of quality sleep',
+      icon: '😴',
+      frequency: Frequency.daily,
+      goalValue: 1,
+      goalMetric: 'sessions',
+      customFields: [
+        { title: 'Hours Slept', type: FieldType.number, placeholder: 'Enter hours', isRequired: false },
+        { title: 'Sleep Quality', type: FieldType.select, options: ['Excellent', 'Good', 'Fair', 'Poor'], isRequired: false }
+      ]
+    }
+  ]
+}
+
+async function clearDatabase(userId: string) {
+  console.log(`\n🗑️  Clearing existing data for user: ${userId}...`)
+
+  try {
+    const userHabits = await prisma.habit.findMany({
+      where: { userId },
+      select: { id: true }
+    })
+    const habitIds = userHabits.map(({ id }: { id: string }) => id)
+
+    const deletedLogs = await prisma.habitLogs.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedLogs.count} habit logs`)
+
+    const deletedCustomFields = await prisma.habitCustomField.deleteMany({
+      where: { habitId: { in: habitIds } }
+    })
+    console.log(`  ✓ Deleted ${deletedCustomFields.count} custom fields`)
+
+    const deletedMilestones = await prisma.habitMilestones.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedMilestones.count} milestones`)
+
+    const deletedNotifications = await prisma.notifications.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedNotifications.count} notifications`)
+
+    const deletedHabits = await prisma.habit.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedHabits.count} habits`)
+
+    const deletedCategories = await prisma.category.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedCategories.count} categories`)
+
+    const deletedAchievements = await prisma.achievements.deleteMany({
+      where: { userId }
+    })
+    console.log(`  ✓ Deleted ${deletedAchievements.count} achievements`)
+
+    console.log('  ✅ Database cleared successfully\n')
+  } catch (error) {
+    console.error('  ❌ Error clearing database:', error)
+    throw error
+  }
+}
+
+async function seedData(userId: string) {
+  console.log(`Starting seed for user: ${userId}`)
+
+  await clearDatabase(userId)
+
+  const today = new Date()
+  const threeMonthsAgo = new Date(today)
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+  threeMonthsAgo.setHours(0, 0, 0, 0)
+
+  console.log(`Date range: ${threeMonthsAgo.toISOString()} to ${today.toISOString()}`)
+
+  console.log('\n📁 Creating categories...')
+  const categories: Category[] = []
+  for (const categoryData of DEFAULT_CATEGORIES) {
+    const category = await prisma.category.create({
+      data: {
+        ...categoryData,
+        userId,
+        isActive: true
+      }
+    })
+    categories.push(category)
+    console.log(`  ✓ Created category: ${category.name}`)
+  }
+
+  console.log('\n🎯 Creating habits...')
+  const habits: Habit[] = []
+  for (const category of categories) {
+    const templates = HABIT_TEMPLATES[category.name] || []
+    for (const template of templates) {
+      const habit = await prisma.habit.create({
+        data: {
+          name: template.name,
+          description: template.description,
+          icon: template.icon,
+          frequency: template.frequency,
+          goalValue: template.goalValue,
+          goalMetric: template.goalMetric,
+          timeOfDay: `${randomInt(6, 22)}:00`,
+          initialValue: 0,
+          difficultyRate: randomInt(1, 5),
+          status: 'active',
+          isArchived: false,
+          userId,
+          categoryId: category.id,
+          enableNotifications: Math.random() > 0.3,
+          totalCompletions: 0,
+          totalMissed: 0,
+          totalSkipped: 0,
+          currentStreak: 0,
+          longestStreak: 0
+        }
+      })
+
+      if (template.customFields && template.customFields.length > 0) {
+        for (let i = 0; i < template.customFields.length; i++) {
+          const field = template.customFields[i]
+          await prisma.habitCustomField.create({
+            data: {
+              habitId: habit.id,
+              title: field.title,
+              type: field.type,
+              options: field.options ? field.options : [],
+              placeholder: field.placeholder || null,
+              isRequired: field.isRequired,
+              sortingOrder: i
+            }
+          })
+        }
+      }
+
+      habits.push(habit)
+      console.log(`  ✓ Created habit: ${habit.name} (${category.name})`)
+    }
+  }
+
+  console.log('\n📊 Generating habit logs for past 3 months...')
+  let totalLogs = 0
+
+  for (const habit of habits) {
+    const logs: Array<{
+      habitId: string
+      userId: string
+      completionStatus: CompletionStatus
+      value: number
+      durationMinutes: number | null
+      notes: string | null
+      customFields: any
+      createdAt: Date
+    }> = []
+
+    const startDate = new Date(threeMonthsAgo)
+    const endDate = new Date(today)
+
+    if (habit.frequency === Frequency.daily) {
+      // For daily habits, generate logs for most days (70-90% completion rate)
+      let currentDate = new Date(startDate)
+      let streak = 0
+      let longestStreak = 0
+
+      while (currentDate <= endDate) {
+        const dateStart = startOfDay(currentDate)
+        const shouldComplete = Math.random() > 0.15 // 85% completion rate
+        const isMissed = Math.random() < 0.1 // 10% missed
+        const isSkipped = Math.random() < 0.05 // 5% skipped
+
+        let status: CompletionStatus = CompletionStatus.completed
+        if (isMissed) {
+          status = CompletionStatus.missed
+          streak = 0
+        } else if (isSkipped) {
+          status = CompletionStatus.skipped
+          streak = 0
+        } else if (shouldComplete) {
+          status = Math.random() > 0.1 ? CompletionStatus.completed : CompletionStatus.partial
+          if (status === CompletionStatus.completed) {
+            streak++
+            longestStreak = Math.max(longestStreak, streak)
+          } else {
+            streak = 0
+          }
+        } else {
+          continue
+        }
+
+        // Generate log entry
+        const logTime = randomDate(dateStart, addDays(dateStart, 1))
+        const customFields: any = {}
+
+        // Get custom fields for this habit
+        const customFieldDefs = await prisma.habitCustomField.findMany({
+          where: { habitId: habit.id }
+        })
+
+        for (const fieldDef of customFieldDefs) {
+          if (fieldDef.type === FieldType.number) {
+            customFields[fieldDef.title] = randomInt(1, 100)
+          } else if (fieldDef.type === FieldType.text) {
+            customFields[fieldDef.title] = `Sample ${fieldDef.title.toLowerCase()}`
+          } else if (fieldDef.type === FieldType.select && fieldDef.options) {
+            const options = fieldDef.options as string[]
+            customFields[fieldDef.title] = randomElement(options)
+          } else if (fieldDef.type === FieldType.boolean) {
+            customFields[fieldDef.title] = Math.random() > 0.5
+          }
+        }
+
+        logs.push({
+          habitId: habit.id,
+          userId,
+          completionStatus: status,
+          value: status === CompletionStatus.completed ? habit.goalValue : Math.floor(habit.goalValue * 0.5),
+          durationMinutes: Math.random() > 0.3 ? randomInt(10, 120) : null,
+          notes: Math.random() > 0.7 ? `Log entry for ${dateStart.toLocaleDateString()}` : null,
+          customFields: Object.keys(customFields).length > 0 ? customFields : null,
+          createdAt: logTime
+        })
+
+        currentDate = addDays(currentDate, 1)
+      }
+
+      // Update habit statistics
+      const completions = logs.filter(l => l.completionStatus === CompletionStatus.completed).length
+      const missed = logs.filter(l => l.completionStatus === CompletionStatus.missed).length
+      const skipped = logs.filter(l => l.completionStatus === CompletionStatus.skipped).length
+
+      await prisma.habit.update({
+        where: { id: habit.id },
+        data: {
+          totalCompletions: completions,
+          totalMissed: missed,
+          totalSkipped: skipped,
+          longestStreak: longestStreak,
+          currentStreak: streak
+        }
+      })
+
+    } else if (habit.frequency === Frequency.weekly) {
+      // For weekly habits, generate logs for most weeks
+      let currentDate = new Date(startDate)
+      let streak = 0
+      let longestStreak = 0
+
+      while (currentDate <= endDate) {
+        // Check if we should complete this week (80% completion rate)
+        const shouldComplete = Math.random() > 0.2
+        const isMissed = Math.random() < 0.1
+        const isSkipped = Math.random() < 0.05
+
+        let status: CompletionStatus = CompletionStatus.completed
+        if (isMissed) {
+          status = CompletionStatus.missed
+          streak = 0
+        } else if (isSkipped) {
+          status = CompletionStatus.skipped
+          streak = 0
+        } else if (shouldComplete) {
+          status = Math.random() > 0.1 ? CompletionStatus.completed : CompletionStatus.partial
+          if (status === CompletionStatus.completed) {
+            streak++
+            longestStreak = Math.max(longestStreak, streak)
+          } else {
+            streak = 0
+          }
+        } else {
+          currentDate = addDays(currentDate, 7)
+          continue
+        }
+
+        // Generate 1-3 log entries for this week
+        const numLogs = randomInt(1, Math.min(3, habit.goalValue))
+        for (let i = 0; i < numLogs; i++) {
+          const logDate = randomDate(currentDate, addDays(currentDate, 6))
+          const logTime = randomDate(startOfDay(logDate), addDays(startOfDay(logDate), 1))
+
+          const customFields: any = {}
+          const customFieldDefs = await prisma.habitCustomField.findMany({
+            where: { habitId: habit.id }
+          })
+
+          for (const fieldDef of customFieldDefs) {
+            if (fieldDef.type === FieldType.number) {
+              customFields[fieldDef.title] = randomInt(1, 100)
+            } else if (fieldDef.type === FieldType.text) {
+              customFields[fieldDef.title] = `Sample ${fieldDef.title.toLowerCase()}`
+            } else if (fieldDef.type === FieldType.select && fieldDef.options) {
+              const options = fieldDef.options as string[]
+              customFields[fieldDef.title] = randomElement(options)
+            } else if (fieldDef.type === FieldType.boolean) {
+              customFields[fieldDef.title] = Math.random() > 0.5
+            }
+          }
+
+          logs.push({
+            habitId: habit.id,
+            userId,
+            completionStatus: status,
+            value: status === CompletionStatus.completed ? habit.goalValue : Math.floor(habit.goalValue * 0.5),
+            durationMinutes: Math.random() > 0.3 ? randomInt(15, 180) : null,
+            notes: Math.random() > 0.7 ? `Weekly log entry` : null,
+            customFields: Object.keys(customFields).length > 0 ? customFields : null,
+            createdAt: logTime
+          })
+        }
+
+        currentDate = addDays(currentDate, 7)
+      }
+
+      // Update habit statistics
+      const completions = logs.filter(l => l.completionStatus === CompletionStatus.completed).length
+      const missed = logs.filter(l => l.completionStatus === CompletionStatus.missed).length
+      const skipped = logs.filter(l => l.completionStatus === CompletionStatus.skipped).length
+
+      await prisma.habit.update({
+        where: { id: habit.id },
+        data: {
+          totalCompletions: completions,
+          totalMissed: missed,
+          totalSkipped: skipped,
+          longestStreak: longestStreak,
+          currentStreak: streak
+        }
+      })
+    }
+
+    // Batch insert logs (in chunks of 1000)
+    const chunkSize = 1000
+    for (let i = 0; i < logs.length; i += chunkSize) {
+      const chunk = logs.slice(i, i + chunkSize)
+      await prisma.habitLogs.createMany({
+        data: chunk
+      })
+      totalLogs += chunk.length
+    }
+
+    console.log(`  ✓ Generated ${logs.length} logs for ${habit.name}`)
+  }
+
+  console.log(`\n✅ Seed completed!`)
+  console.log(`   Categories: ${categories.length}`)
+  console.log(`   Habits: ${habits.length}`)
+  console.log(`   Total Logs: ${totalLogs}`)
+}
+
+// Main execution
+async function main() {
+  const userId = process.env.SEED_USER_ID
+
+  if (!userId) {
+    console.error('❌ Error: SEED_USER_ID environment variable is required')
+    console.error('   Usage: SEED_USER_ID=<user-id> pnpm tsx scripts/seed-data.ts')
+    process.exit(1)
+  }
+
+  try {
+    await seedData(userId)
+  } catch (error) {
+    console.error('❌ Error seeding data:', error)
+    process.exit(1)
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
+main()
+
