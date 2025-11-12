@@ -26,28 +26,6 @@ function calculateNextDueDate(frequency: Frequency, currentDate: Date = new Date
 }
 
 /**
- * Check if there are 3 consecutive missed logs
- */
-async function hasThreeConsecutiveMisses(habitId: string): Promise<boolean> {
-  const recentLogs = await prisma.habitLogs.findMany({
-    where: {
-      habitId
-    },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    take: 3
-  })
-
-  if (recentLogs.length < 3) {
-    return false
-  }
-
-  // Check if all 3 most recent logs are missed
-  return recentLogs.every(log => log.completionStatus === CompletionStatus.missed)
-}
-
-/**
  * Update milestone progress and status
  */
 async function updateMilestones(habitId: string, value: number, durationMinutes: number | null) {
@@ -112,8 +90,7 @@ export default defineEventHandler(async (event) => {
       habitId,
       durationMinutes,
       notes,
-      customFields,
-      completionStatus = 'completed' // Allow status to be passed, default to completed
+      customFields
     } = body
 
     // Validate required fields
@@ -123,6 +100,9 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'habitId is required'
       })
     }
+
+    // Only allow completed status - missed logs are created by cron job
+    const completionStatus = 'completed'
 
     // Check if habit exists and belongs to user
     const habit = await prisma.habit.findFirst({
@@ -163,54 +143,29 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    // Update habit statistics based on completion status
+    // Update habit statistics - only for completed status
     const updateData: any = {}
 
-    if (completionStatus === 'completed' || completionStatus === 'partial') {
-      // Increment current streak
-      const newCurrentStreak = habit.currentStreak + 1
-      updateData.currentStreak = newCurrentStreak
-      
-      // Update longest streak if current is greater
-      if (newCurrentStreak > habit.longestStreak) {
-        updateData.longestStreak = newCurrentStreak
-      }
-      
-      // Increment total completions
-      updateData.totalCompletions = { increment: 1 }
-      
-      // Update next due date
-      updateData.nextDueDate = calculateNextDueDate(habit.frequency)
-      
-      // Update milestones (only for completed/partial)
-      await updateMilestones(
-        habitId, 
-        0, 
-        durationMinutes ? parseInt(String(durationMinutes)) : null
-      )
-    } else if (completionStatus === 'missed') {
-      // Reset current streak to 0
-      updateData.currentStreak = 0
-      updateData.totalMissed = { increment: 1 }
-      
-      // Check for 3 consecutive misses and lock milestones
-      const hasThreeMisses = await hasThreeConsecutiveMisses(habitId)
-      if (hasThreeMisses) {
-        await prisma.habitMilestones.updateMany({
-          where: {
-            habitId,
-            status: { in: [MilestoneStatus.inProgress, MilestoneStatus.achieved] }
-          },
-          data: {
-            status: MilestoneStatus.locked
-          }
-        })
-      }
-    } else if (completionStatus === 'skipped') {
-      // Reset current streak to 0
-      updateData.currentStreak = 0
-      updateData.totalSkipped = { increment: 1 }
+    // Increment current streak
+    const newCurrentStreak = habit.currentStreak + 1
+    updateData.currentStreak = newCurrentStreak
+    
+    if (newCurrentStreak > habit.longestStreak) {
+      updateData.longestStreak = newCurrentStreak
     }
+    
+    // Increment total completions
+    updateData.totalCompletions = { increment: 1 }
+    
+    // Update next due date
+    updateData.nextDueDate = calculateNextDueDate(habit.frequency)
+    
+    // Update milestones
+    await updateMilestones(
+      habitId, 
+      0, 
+      durationMinutes ? parseInt(String(durationMinutes)) : null
+    )
 
     // Update habit
     await prisma.habit.update({
