@@ -7,7 +7,7 @@
     </div>
     <div class="space-y-6">
       <!-- Summary Bar -->
-      <SummaryBar :completed-today="9" :total-today="10" :current-streak="25" next-reminder="2:30 PM" />
+      <SummaryBar :completed-today="9" :total-today="10" :current-streak="25" :total-habits="10" :weekly-completion="85" />
 
       <!-- Filters -->
       <Filters :active-filter="'all'" />

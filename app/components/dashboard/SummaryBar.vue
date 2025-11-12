@@ -25,40 +25,45 @@
     </Card>
 
     <Card class="bg-gradient-card">
-      <CardContent class="p-4">
-        <div class="flex items-center space-x-2 mb-2">
-          <IconBell class="w-4 h-4 text-warning" />
-          <span class="text-sm text-muted-foreground">Next Reminder</span>
-        </div>
-        <div class="text-lg font-bold">{{ nextReminder }}</div>
-        <p class="text-xs text-muted-foreground mt-1">Meditation session</p>
-      </CardContent>
-    </Card>
+        <CardContent class="p-4">
+          <div class="flex items-center space-x-2 mb-2">
+            <IconTarget class="w-4 h-4 text-primary" />
+            <span class="text-sm text-muted-foreground">Total Habits</span>
+          </div>
+          <div class="text-2xl font-bold">{{totalHabits}}</div>
+          <p class="text-xs text-muted-foreground mt-1">Active tracking</p>
+        </CardContent>
+      </Card>
 
-    <Card class="bg-gradient-card border-dashed border-2 hover:bg-accent/50 cursor-pointer transition-colors hover:text-gray-300"
-      @click="emit('addHabit')">
-      <CardContent class="p-4 flex flex-col items-center justify-center h-full">
-        <IconPlus class="w-5 h-5 mb-1" />
-        <span class="text-sm font-medium">Add Habit</span>
-      </CardContent>
-    </Card>
+      <Card class="bg-gradient-card">
+        <CardContent class="p-4">
+          <div class="flex items-center space-x-2 mb-2">
+            <IconTrendingUp class="w-4 h-4 text-accent" />
+            <span class="text-sm text-muted-foreground">Weekly Rate</span>
+          </div>
+          <div class="text-2xl font-bold">{{weeklyCompletion}}%</div>
+          <p class="text-xs text-success mt-1">Great progress! 📈</p>
+        </CardContent>
+      </Card>
   </div>
 </template>
 
 <script setup lang="ts">
 
 interface Props {
-  completedToday: number
-  totalToday: number
-  currentStreak: number
-  nextReminder: string
+  completedToday: number;
+  totalToday: number;
+  currentStreak: number;
+  totalHabits: number;
+  weeklyCompletion: number;
 }
 
 withDefaults(defineProps<Props>(), {
-  completedToday: 0,
-  totalToday: 0,
+  completedToday: 0, 
+  totalToday: 0, 
   currentStreak: 0,
-  nextReminder: '',
+  totalHabits: 0,
+  weeklyCompletion: 0
 })
 
 
