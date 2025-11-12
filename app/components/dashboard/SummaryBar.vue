@@ -8,7 +8,7 @@
         </div>
         <div class="text-2xl font-bold">{{ completedToday }}/{{ totalToday }}</div>
         <p class="text-xs text-muted-foreground mt-1">
-          {{ Math.round((completedToday / totalToday) * 100) }}% completed
+          {{ totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0 }}% completed
         </p>
       </CardContent>
     </Card>

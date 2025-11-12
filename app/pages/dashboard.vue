@@ -7,7 +7,13 @@
     </div>
     <div class="space-y-6">
       <!-- Summary Bar -->
-      <SummaryBar :completed-today="9" :total-today="10" :current-streak="25" :total-habits="10" :weekly-completion="85" />
+      <SummaryBar 
+        :completed-today="dashboardData?.todayProgress.completed ?? 0" 
+        :total-today="dashboardData?.todayProgress.total ?? 0" 
+        :current-streak="dashboardData?.activeStreak ?? 0" 
+        :total-habits="dashboardData?.totalHabits ?? 0" 
+        :weekly-completion="dashboardData?.weeklyRate ?? 0" 
+      />
 
       <!-- Filters -->
       <Filters :active-filter="'all'" />
@@ -47,8 +53,13 @@
           </Card>
 
           <!-- Progress Snapshot -->
-          <ProgressSnapshot :weekly-completion="85" :monthly-trend="12" :remaining-sessions="15" :total-sessions="247"
-            :streak-text="'You\'re on a 25-day streak! 🔥'" />
+          <ProgressSnapshot 
+            :weekly-completion="dashboardData?.weeklyRate ?? 0" 
+            :monthly-trend="12" 
+            :remaining-sessions="15" 
+            :total-sessions="247"
+            :streak-text="dashboardData?.activeStreak ? `You're on a ${dashboardData.activeStreak}-day streak! 🔥` : 'Start building your streak!'" 
+          />
 
           <!-- Milestones -->
           <MilestonesPanel :milestones="milestones" />
@@ -60,6 +71,36 @@
 
 <script setup lang="ts">
 
+// Fetch dashboard data
+const { data: dashboardResponse, error: dashboardError } = await useFetch<{
+  success: boolean
+  data: {
+    todayProgress: {
+      completed: number
+      total: number
+    }
+    activeStreak: number
+    totalHabits: number
+    weeklyRate: number
+  }
+}>('/api/dashboard', {
+  default: () => ({
+    success: true,
+    data: {
+      todayProgress: { completed: 0, total: 0 },
+      activeStreak: 0,
+      totalHabits: 0,
+      weeklyRate: 0
+    }
+  }),
+  transform: (data: any) => data
+})
+
+const dashboardData = computed(() => dashboardResponse.value?.data)
+
+if (dashboardError.value) {
+  console.error('Error fetching dashboard data:', dashboardError.value)
+}
 
 // mock data
 const todayHabits: Habit[] = [
