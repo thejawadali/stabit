@@ -89,7 +89,7 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
     totalHabits: number
     weeklyRate: number,
     categories: Partial<Category>[],
-    todayHabits: Partial<Habit>[]
+    todayHabits: TodayHabit[]
   }
 }>('/api/dashboard', {
   default: () => ({

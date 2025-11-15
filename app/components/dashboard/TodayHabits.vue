@@ -30,7 +30,7 @@
               <div class="flex items-center space-x-2 mt-1">
                 <IconClock class="w-3 h-3 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">{{ formatTime(habit.timeOfDay) }}</span>
-                <!-- <Badge variant="outline" class="text-xs">{{ habit.category.name }}</Badge> -->
+                <Badge variant="outline" class="text-xs">{{ habit.category.name }}</Badge>
               </div>
             </div>
           </div>
@@ -60,7 +60,7 @@
 import { formatTime } from '~/lib/utils'
 
 const props = withDefaults(defineProps<{
-  habits: Partial<Habit>[]
+  habits: TodayHabit[]
 }>(), {
   habits: () => [],
 })

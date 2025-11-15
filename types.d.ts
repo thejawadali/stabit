@@ -56,6 +56,14 @@ interface Habit {
   longestStreak: number
 }
 
+interface TodayHabit extends Partial<Habit> {
+  category: {
+    id: string
+    name: string
+    icon: string
+  }
+}
+
 type HabitDetail = Pick<Habit, 'id' | 'name' | 'description' | 'icon' | 'currentStreak' | 'longestStreak' | 'totalCompletions' | 'status' | 'currentGoal' | 'category' | 'frequency' | 'createdAt'>
 
 interface HabitLog {
