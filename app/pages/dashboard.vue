@@ -48,7 +48,7 @@
             :total-sessions="dashboardData.totalSessions" :active-streak-count="dashboardData.activeStreak" />
 
           <!-- Milestones -->
-          <!-- <MilestonesPanel :milestones="milestones" /> -->
+          <MilestonesPanel :milestones="dashboardData.milestones" />
         </div>
       </div>
     </div>
@@ -73,6 +73,7 @@ type DashboardResponse = {
     monthlyTrend: number
     totalSessions: number
     weeklyCompletionPercentage: number
+    milestones: DashboardMilestone[]
   }
 }
 
@@ -149,7 +150,8 @@ const { data: combinedData, error } = await useAsyncData<DashboardAndCalendarDat
         missedHabits: [],
         monthlyTrend: 0,
         totalSessions: 0,
-        weeklyCompletionPercentage: 0
+        weeklyCompletionPercentage: 0,
+        milestones: []
       },
       calendar: {
         completed: [],
@@ -217,25 +219,6 @@ const recentActivities = [
     value: "4 glasses",
     timestamp: "5 hours ago",
     icon: "💧",
-  },
-]
-
-const milestones = [
-  {
-    id: "1",
-    habit: "Meditation",
-    icon: "🧘",
-    nextMilestone: "30-day streak",
-    progress: 83,
-    daysRemaining: 5,
-  },
-  {
-    id: "2",
-    habit: "Running",
-    icon: "🏃",
-    nextMilestone: "100 sessions",
-    progress: 65,
-    daysRemaining: 35,
   },
 ]
 </script>

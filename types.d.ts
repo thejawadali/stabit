@@ -220,6 +220,10 @@ interface Milestone {
   updatedAt: string
 }
 
+interface DashboardMilestone extends Partial<Milestone> {
+  remainingSessions: number
+}
+
 interface MilestoneStats {
   achieved: number
   inProgress: number

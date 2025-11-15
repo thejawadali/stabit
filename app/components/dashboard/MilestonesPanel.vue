@@ -11,15 +11,15 @@
         <div v-for="milestone in milestones" :key="milestone.id" class="space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
-              <span class="text-lg">{{ milestone.icon }}</span>
+              <span class="text-lg">{{ milestone.habitIcon }}</span>
               <div>
-                <p class="font-medium text-sm">{{ milestone.habit }}</p>
-                <p class="text-xs text-muted-foreground">{{ milestone.nextMilestone }}</p>
+                <p class="font-medium text-sm">{{ milestone.habitName }}</p>
+                <p class="text-xs text-muted-foreground">{{ milestone.name }}</p>
               </div>
             </div>
-            <Badge variant="secondary" class="text-xs">{{ milestone.daysRemaining }} days</Badge>
+            <Badge variant="secondary" class="text-xs">{{ milestone.remainingSessions }} {{ milestone.targetMetric }}</Badge>
           </div>
-          <Progress :value="milestone.progress" class="h-2" />
+          <Progress :model-value="milestone.currentProgress" class="h-2" />
         </div>
       </div>
     </CardContent>
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 withDefaults(defineProps<{
-  milestones: Milestone[]
+  milestones: DashboardMilestone[]
 }>(), {
   milestones: () => [],
 })

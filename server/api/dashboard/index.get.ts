@@ -1,6 +1,6 @@
 import prisma from '../../../lib/prisma'
 import { serverSupabaseUser } from '#supabase/server'
-import { HabitStatus, CompletionStatus, Frequency } from '@prisma/client'
+import { HabitStatus, CompletionStatus, Frequency, MilestoneStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -79,7 +79,8 @@ export default defineEventHandler(async (event) => {
       completedLogsLastMonth,
       totalLogsLastMonth,
       categories,
-      recentMissedLogs
+      recentMissedLogs,
+      milestones
     ] = await Promise.all([
       // 2. Get completed count today
       prisma.habitLogs.count({
@@ -219,6 +220,22 @@ export default defineEventHandler(async (event) => {
             }
           }
         }
+      }),
+      // 8. Get milestones for progress calculation (only inProgress to get active milestones)
+      prisma.habitMilestones.findMany({
+        where: {
+          userId: user.sub,
+          status: MilestoneStatus.inProgress
+        },
+        include: {
+          habit: {
+            select: {
+              id: true,
+              name: true,
+              icon: true
+            }
+          }
+        }
       })
     ])
 
@@ -280,6 +297,39 @@ export default defineEventHandler(async (event) => {
     // NEW: Total sessions this month (same as totalLogsThisMonth)
     const totalSessions = totalLogsThisMonth
 
+    // Calculate milestones with highest progress rate
+    const milestonesWithProgress = milestones.map(milestone => {
+      const progressRate = milestone.targetValue > 0
+        ? (milestone.currentProgress / milestone.targetValue) * 100
+        : 0
+      
+      return {
+        ...milestone,
+        progressRate
+      }
+    })
+
+    // Sort by progress rate descending and take top 2
+    const topMilestones = milestonesWithProgress
+      .sort((a, b) => b.progressRate - a.progressRate)
+      .slice(0, 2)
+      .map(milestone => {
+        const remaining = Math.max(0, milestone.targetValue - milestone.currentProgress)
+        const progressPercentage = milestone.targetValue > 0
+          ? (milestone.currentProgress / milestone.targetValue) * 100
+          : 0
+
+        return {
+          id: milestone.id,
+          habitName: milestone.habit.name,
+          habitIcon: milestone.habit.icon,
+          name: milestone.name,
+          targetValue: milestone.targetValue,
+          targetMetric: milestone.targetMetric,
+          currentProgress: Math.round(progressPercentage),
+          remainingSessions: Math.round(remaining)
+        }
+      })
 
     return {
       success: true,
@@ -296,7 +346,8 @@ export default defineEventHandler(async (event) => {
         totalSessions, // NEW: Total logs (sessions) this month
         categories,
         todayHabits: habitsDueToday,
-        missedHabits: recentMissedLogs
+        missedHabits: recentMissedLogs,
+        milestones: topMilestones // NEW: Top 2 milestones with highest progress rate
       }
     }
   } catch (error: any) {
