@@ -16,7 +16,7 @@
               <span class="text-lg">{{ log.habit.icon }}</span>
               <div>
                 <p class="font-medium">{{ log.habit.name }}</p>
-                <p class="text-xs text-muted-foreground">Missed on {{ log.createdAt }}</p>
+                <p class="text-xs text-muted-foreground">Missed {{ getTimeAgo(log.createdAt) }}</p>
               </div>
             </div>
           </div>
@@ -33,5 +33,10 @@ withDefaults(defineProps<{
 }>(), {
   missedHabitLogs: () => [],
 })
+
+const getTimeAgo = (date: string) => {
+  const timeAgo = useTimeAgo(new Date(date))
+  return timeAgo
+}
 
 </script>
