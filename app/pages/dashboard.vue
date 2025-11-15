@@ -28,7 +28,12 @@
           <MissedHabits :missedHabitLogs="missedHabits" />
 
           <!-- Recent Activity -->
-          <RecentActivity :activities="recentActivities" />
+          <RecentActivity 
+            :activities="recentLogsData.logs" 
+            :has-more="recentLogsData.pagination.hasMore"
+            :loading="recentLogsLoading"
+            @load-more="loadMoreRecentLogs"
+          />
         </div>
 
         <!-- Right Column - 1/3 width -->
@@ -86,9 +91,24 @@ type CalendarResponse = {
   }
 }
 
+type RecentLogsResponse = {
+  success: boolean
+  data: {
+    logs: RecentLog[],
+    pagination: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+      hasMore: boolean
+    }
+  }
+}
+
 type DashboardAndCalendarData = {
   dashboard: DashboardResponse['data']
   calendar: CalendarResponse['data']
+  recentLogs: RecentLogsResponse['data']
 }
 
 // Calendar state
@@ -99,6 +119,19 @@ const calendarData = ref<CalendarResponse['data']>({
   partial: [],
   missed: []
 })
+
+// Recent logs state
+const recentLogsData = ref<RecentLogsResponse['data']>({
+  logs: [],
+  pagination: {
+    page: 1,
+    limit: 5,
+    total: 0,
+    totalPages: 0,
+    hasMore: false
+  }
+})
+const recentLogsLoading = ref(false)
 
 // Filter state
 const searchQuery = ref('')
@@ -124,18 +157,67 @@ const fetchCalendarData = async () => {
   }
 }
 
-// Fetch both dashboard and calendar data together using useAsyncData
+// Fetch recent logs
+const fetchRecentLogs = async (page: number = 1, limit: number = 5) => {
+  try {
+    const response = await $fetch<RecentLogsResponse>('/api/dashboard/recent-logs', {
+      query: {
+        page,
+        limit
+      }
+    })
+    recentLogsData.value = response.data
+    return response
+  } catch (error) {
+    console.error('Error fetching recent logs:', error)
+  }
+}
+
+// Load more recent logs (append to existing logs)
+const loadMoreRecentLogs = async () => {
+  if (recentLogsLoading.value || !recentLogsData.value.pagination.hasMore) return
+  
+  recentLogsLoading.value = true
+  try {
+    const nextPage = recentLogsData.value.pagination.page + 1
+    const response = await $fetch<RecentLogsResponse>('/api/dashboard/recent-logs', {
+      query: {
+        page: nextPage,
+        limit: recentLogsData.value.pagination.limit
+      }
+    })
+    
+    // Append new logs to existing logs
+    recentLogsData.value = {
+      logs: [...recentLogsData.value.logs, ...response.data.logs],
+      pagination: response.data.pagination
+    }
+  } catch (error) {
+    console.error('Error loading more recent logs:', error)
+  } finally {
+    recentLogsLoading.value = false
+  }
+}
+
+// Fetch both dashboard, calendar, and recent logs data together using useAsyncData
 const { data: combinedData } = await useAsyncData<DashboardAndCalendarData>(
   'dashboard-and-calendar',
   async () => {
-    const [dashboardRes, _] = await Promise.all([
+    const [dashboardRes, _, recentLogsRes] = await Promise.all([
       $fetch<DashboardResponse>('/api/dashboard'),
-      fetchCalendarData()
+      fetchCalendarData(),
+      fetchRecentLogs(1, 5)
     ])
+
+    // Update recentLogsData with fetched data
+    if (recentLogsRes?.data) {
+      recentLogsData.value = recentLogsRes.data
+    }
 
     return {
       dashboard: dashboardRes.data,
-      calendar: calendarData.value
+      calendar: calendarData.value,
+      recentLogs: recentLogsRes?.data || recentLogsData.value
     }
   },
   {
@@ -157,6 +239,16 @@ const { data: combinedData } = await useAsyncData<DashboardAndCalendarData>(
         completed: [],
         partial: [],
         missed: []
+      },
+      recentLogs: {
+        logs: [],
+        pagination: {
+          page: 1,
+          limit: 5,
+          total: 0,
+          totalPages: 0,
+          hasMore: false
+        }
       }
     })
   }
@@ -164,9 +256,22 @@ const { data: combinedData } = await useAsyncData<DashboardAndCalendarData>(
 
 const dashboardData = computed(() => combinedData.value?.dashboard)
 
-
 const todayHabits = computed(() => dashboardData.value?.todayHabits ?? [])
 const missedHabits = computed(() => dashboardData.value?.missedHabits ?? [])
+
+
+// Transform recent logs to Activity format
+const recentActivities = computed(() => combinedData.value?.recentLogs?.logs ?? [])
+// const recentActivities = computed(() => {
+//   const logs = combinedData.value?.recentLogs?.logs ?? []
+//   return logs.map((log: { id: string; habitName: string; habitIcon: string; value: number; createdAt: string }) => ({
+//     id: log.id,
+//     habit: log.habitName,
+//     value: log.value.toString(),
+//     timestamp: formatTimeAgo(log.createdAt),
+//     icon: log.habitIcon
+//   }))
+// })
 
 // Filter today's habits based on search, status, and category
 const filteredTodayHabits = computed(() => {
@@ -195,32 +300,6 @@ const filteredTodayHabits = computed(() => {
 
   return filtered
 })
-
-
-
-const recentActivities = [
-  {
-    id: "1",
-    habit: "Morning Exercise",
-    value: "15 minutes",
-    timestamp: "2 hours ago",
-    icon: "🏃",
-  },
-  {
-    id: "2",
-    habit: "Meditation",
-    value: "3 minutes",
-    timestamp: "3 hours ago",
-    icon: "🧘",
-  },
-  {
-    id: "3",
-    habit: "Water Intake",
-    value: "4 glasses",
-    timestamp: "5 hours ago",
-    icon: "💧",
-  },
-]
 </script>
 
 <style scoped></style>

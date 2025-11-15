@@ -245,3 +245,17 @@ interface CompletedReward {
   targetValue: number
   targetMetric: string
 }
+
+// Recent Logs Types
+interface RecentLog {
+  id: string
+  habit: {
+    id: string
+    name: string
+    icon: string
+    goalMetric: string
+  }
+  completionStatus: string
+  value: number
+  createdAt: string
+}
