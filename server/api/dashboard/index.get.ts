@@ -24,6 +24,19 @@ export default defineEventHandler(async (event) => {
     weekStart.setDate(weekStart.getDate() - 7)
     weekStart.setHours(0, 0, 0, 0)
 
+    // Calculate month ranges for monthly trend
+    const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+    thisMonthStart.setHours(0, 0, 0, 0)
+    
+    const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    thisMonthEnd.setHours(23, 59, 59, 999)
+    
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    lastMonthStart.setHours(0, 0, 0, 0)
+    
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
+    lastMonthEnd.setHours(23, 59, 59, 999)
+
     // 1. Get total habits that need to be logged today
     // Habits where nextDueDate is today or has passed, and status is active
     const habitsDueToday = await prisma.habit.findMany({
@@ -53,69 +66,166 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    // 2. Get completed count today
-    const completedToday = await prisma.habitLogs.count({
-      where: {
-        userId: user.sub,
-        completionStatus: CompletionStatus.completed,
-        createdAt: {
-          gte: today,
-          lte: todayEnd
+    // Execute parallel queries for better performance
+    const [
+      completedToday,
+      habitsWithStreaks,
+      totalHabits,
+      activeHabits,
+      completedLogsThisWeek,
+      totalLogsThisWeek,
+      completedLogsThisMonth,
+      totalLogsThisMonth,
+      completedLogsLastMonth,
+      totalLogsLastMonth,
+      categories,
+      recentMissedLogs
+    ] = await Promise.all([
+      // 2. Get completed count today
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          completionStatus: CompletionStatus.completed,
+          createdAt: {
+            gte: today,
+            lte: todayEnd
+          }
         }
-      }
-    })
+      }),
+      // 3. Get habits with streaks for highest active streak
+      prisma.habit.findMany({
+        where: {
+          userId: user.sub,
+          status: HabitStatus.active,
+          isArchived: false
+        },
+        select: {
+          currentStreak: true
+        }
+      }),
+      // 4. Get total active habits count
+      prisma.habit.count({
+        where: {
+          userId: user.sub,
+          status: HabitStatus.active,
+          isArchived: false
+        }
+      }),
+      // 5. Get all active habits for weekly rate calculation
+      prisma.habit.findMany({
+        where: {
+          userId: user.sub,
+          status: HabitStatus.active,
+          isArchived: false
+        },
+        select: {
+          id: true,
+          frequency: true,
+          createdAt: true
+        }
+      }),
+      // Count completed logs in the last 7 days
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          completionStatus: CompletionStatus.completed,
+          createdAt: {
+            gte: weekStart,
+            lte: todayEnd
+          }
+        }
+      }),
+      // NEW: Total logs this week (all statuses) for weekly completion percentage
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          createdAt: {
+            gte: weekStart,
+            lte: todayEnd
+          }
+        }
+      }),
+      // NEW: Completed logs this month for monthly trend
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          completionStatus: CompletionStatus.completed,
+          createdAt: {
+            gte: thisMonthStart,
+            lte: thisMonthEnd
+          }
+        }
+      }),
+      // NEW: Total logs this month for monthly trend
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          createdAt: {
+            gte: thisMonthStart,
+            lte: thisMonthEnd
+          }
+        }
+      }),
+      // NEW: Completed logs last month for monthly trend
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          completionStatus: CompletionStatus.completed,
+          createdAt: {
+            gte: lastMonthStart,
+            lte: lastMonthEnd
+          }
+        }
+      }),
+      // NEW: Total logs last month for monthly trend
+      prisma.habitLogs.count({
+        where: {
+          userId: user.sub,
+          createdAt: {
+            gte: lastMonthStart,
+            lte: lastMonthEnd
+          }
+        }
+      }),
+      // 6. Get categories
+      prisma.category.findMany({
+        where: {
+          userId: user.sub
+        },
+        select: {
+          id: true,
+          name: true,
+          icon: true
+        }
+      }),
+      // 7. Get last 5 most recent missed habits
+      prisma.habitLogs.findMany({
+        where: {
+          userId: user.sub,
+          completionStatus: CompletionStatus.missed
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 5,
+        select: {
+          id: true,
+          createdAt: true,
+          habit: {
+            select: {
+              id: true,
+              name: true,
+              icon: true
+            }
+          }
+        }
+      })
+    ])
 
-    // 3. Get longest active streak of all habits
-    const habitsWithStreaks = await prisma.habit.findMany({
-      where: {
-        userId: user.sub,
-        status: HabitStatus.active,
-        isArchived: false
-      },
-      select: {
-        currentStreak: true
-      }
-    })
-
+    // Calculate highest active streak
     const activeStreak = habitsWithStreaks.length > 0
       ? Math.max(...habitsWithStreaks.map(h => h.currentStreak))
       : 0
-
-    // 4. Get total active habits count
-    const totalHabits = await prisma.habit.count({
-      where: {
-        userId: user.sub,
-        status: HabitStatus.active,
-        isArchived: false
-      }
-    })
-
-    // 5. Calculate weekly completion rate
-    // Get all active habits
-    const activeHabits = await prisma.habit.findMany({
-      where: {
-        userId: user.sub,
-        status: HabitStatus.active,
-        isArchived: false
-      },
-      select: {
-        id: true,
-        frequency: true,
-        createdAt: true
-      }
-    })
-
-    // Count completed logs in the last 7 days
-    const completedLogsThisWeek = await prisma.habitLogs.count({
-      where: {
-        userId: user.sub,
-        completionStatus: CompletionStatus.completed,
-        createdAt: {
-          gte: weekStart,
-          lte: todayEnd
-        }
-      }
-    })
 
     // Calculate expected completions based on frequency
     // For each habit, calculate how many times it should have been completed in the last 7 days
@@ -146,45 +256,29 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Calculate weekly completion rate as percentage
+    // Calculate weekly completion rate as percentage (based on expected completions)
     const weeklyRate = expectedCompletions > 0
       ? Math.round((completedLogsThisWeek / expectedCompletions) * 100)
       : 0
 
-    // 6. get categories
-    const categories = await prisma.category.findMany({
-      where: {
-        userId: user.sub
-      },
-      select: {
-        id: true,
-        name: true,
-        icon: true
-      }
-    })
+    // NEW: Calculate weekly completion percentage (completed logs / total logs this week)
+    const weeklyCompletionPercentage = totalLogsThisWeek > 0
+      ? Math.round((completedLogsThisWeek / totalLogsThisWeek) * 100)
+      : 0
 
-    // 7. Get last 5 most recent missed habits
-    const recentMissedLogs = await prisma.habitLogs.findMany({
-      where: {
-        userId: user.sub,
-        completionStatus: CompletionStatus.missed
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: 5,
-      select: {
-        id: true,
-        createdAt: true,
-        habit: {
-          select: {
-            id: true,
-            name: true,
-            icon: true
-          }
-        }
-      }
-    })
+    // NEW: Calculate monthly trend (this month vs last month completion percentage)
+    const thisMonthCompletionPercentage = totalLogsThisMonth > 0
+      ? (completedLogsThisMonth / totalLogsThisMonth) * 100
+      : 0
+    
+    const lastMonthCompletionPercentage = totalLogsLastMonth > 0
+      ? (completedLogsLastMonth / totalLogsLastMonth) * 100
+      : 0
+    
+    const monthlyTrend = Math.round((thisMonthCompletionPercentage - lastMonthCompletionPercentage) * 100) / 100
+
+    // NEW: Total sessions this month (same as totalLogsThisMonth)
+    const totalSessions = totalLogsThisMonth
 
 
     return {
@@ -194,9 +288,12 @@ export default defineEventHandler(async (event) => {
           completed: completedToday,
           total: habitsDueToday.filter(habit => habit.status === HabitStatus.active).length
         },
-        activeStreak,
+        activeStreak, // Highest active streak (already calculated)
         totalHabits,
         weeklyRate: Math.min(weeklyRate, 100), // Cap at 100%
+        weeklyCompletionPercentage, // NEW: Percentage of completed logs this week
+        monthlyTrend, // NEW: Change in completion percentage vs last month (+ve if increased, -ve if decreased)
+        totalSessions, // NEW: Total logs (sessions) this month
         categories,
         todayHabits: habitsDueToday,
         missedHabits: recentMissedLogs

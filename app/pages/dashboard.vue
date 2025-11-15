@@ -44,9 +44,8 @@
           </Card>
 
           <!-- Progress Snapshot -->
-          <ProgressSnapshot :weekly-completion="dashboardData?.weeklyRate ?? 0" :monthly-trend="12"
-            :remaining-sessions="15" :total-sessions="247"
-            :streak-text="dashboardData?.activeStreak ? `You're on a ${dashboardData.activeStreak}-day streak! 🔥` : 'Start building your streak!'" />
+          <ProgressSnapshot :weekly-completion="dashboardData.weeklyCompletionPercentage" :monthly-trend="dashboardData.monthlyTrend"
+            :total-sessions="dashboardData.totalSessions" :active-streak-count="dashboardData.activeStreak" />
 
           <!-- Milestones -->
           <!-- <MilestonesPanel :milestones="milestones" /> -->
@@ -71,6 +70,9 @@ type DashboardResponse = {
     categories: Partial<Category>[]
     todayHabits: TodayHabit[]
     missedHabits: MissedHabitLogs[]
+    monthlyTrend: number
+    totalSessions: number
+    weeklyCompletionPercentage: number
   }
 }
 
@@ -144,7 +146,10 @@ const { data: combinedData, error } = await useAsyncData<DashboardAndCalendarDat
         weeklyRate: 0,
         categories: [],
         todayHabits: [],
-        missedHabits: []
+        missedHabits: [],
+        monthlyTrend: 0,
+        totalSessions: 0,
+        weeklyCompletionPercentage: 0
       },
       calendar: {
         completed: [],
