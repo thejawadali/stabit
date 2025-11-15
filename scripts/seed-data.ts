@@ -568,12 +568,17 @@ async function seedData(userId: string) {
 
   await clearDatabase(userId)
 
-  const today = new Date()
-  const threeMonthsAgo = new Date(today)
+  const now = new Date()
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+  const todayEnd = new Date(now)
+  todayEnd.setHours(23, 59, 59, 999) // End of today
+  
+  const threeMonthsAgo = new Date(now)
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
   threeMonthsAgo.setHours(0, 0, 0, 0)
 
-  console.log(`Date range: ${threeMonthsAgo.toISOString()} to ${today.toISOString()}`)
+  console.log(`Date range: ${threeMonthsAgo.toISOString()} to ${now.toISOString()}`)
 
   console.log('\n📁 Creating categories...')
   const categories: Category[] = []
@@ -654,7 +659,7 @@ async function seedData(userId: string) {
 
   // Generate some "complete miss days" where all habits are missed
   const completeMissDays = new Set<number>()
-  const daysInRange = Math.ceil((today.getTime() - threeMonthsAgo.getTime()) / (1000 * 60 * 60 * 24))
+  const daysInRange = Math.ceil((now.getTime() - threeMonthsAgo.getTime()) / (1000 * 60 * 60 * 24))
   const numCompleteMissDays = Math.floor(daysInRange * 0.05) // ~5% of days are complete miss days
   
   for (let i = 0; i < numCompleteMissDays; i++) {
@@ -674,7 +679,7 @@ async function seedData(userId: string) {
     const recentMisses: Date[] = [] // Track recent misses for milestone locking
 
     const startDate = new Date(threeMonthsAgo)
-    const endDate = new Date(today)
+    const endDate = new Date(now) // Use current time as end date
 
     // Get custom fields for this habit (once)
     const customFieldDefs = await prisma.habitCustomField.findMany({
@@ -748,8 +753,10 @@ async function seedData(userId: string) {
           continue
         }
 
-        // Generate log entry
-        const logTime = randomDate(dateStart, addDays(dateStart, 1))
+        // Generate log entry - ensure it doesn't exceed current time
+        const dateEnd = addDays(dateStart, 1)
+        const maxDate = dateEnd > now ? now : dateEnd
+        const logTime = randomDate(dateStart, maxDate)
         const customFields: any = {}
 
         for (const fieldDef of customFieldDefs) {
@@ -844,8 +851,16 @@ async function seedData(userId: string) {
             // Generate 1-3 log entries for this week
             const numLogs = randomInt(1, Math.min(3, habit.goalValue))
             for (let i = 0; i < numLogs; i++) {
-              const logDate = randomDate(currentDate, addDays(currentDate, 6))
-              const logTime = randomDate(startOfDay(logDate), addDays(startOfDay(logDate), 1))
+              // Ensure log date doesn't exceed current time
+              const weekEnd = addDays(currentDate, 6)
+              const maxLogDate = weekEnd > now ? now : weekEnd
+              const logDate = randomDate(currentDate, maxLogDate)
+              
+              // Ensure log time doesn't exceed current time
+              const dayStart = startOfDay(logDate)
+              const dayEnd = addDays(dayStart, 1)
+              const maxTime = dayEnd > now ? now : dayEnd
+              const logTime = randomDate(dayStart, maxTime)
               const durationMinutes = Math.random() > 0.3 ? randomInt(15, 180) : null
 
               const customFields: any = {}
