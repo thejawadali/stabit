@@ -21,7 +21,7 @@
               <span>Progress</span>
               <span>{{ habit.progress }}%</span>
             </div>
-            <Progress :value="habit.progress" class="h-1.5" />
+            <Progress :model-value="habit.progress" class="h-1.5" />
           </div>
           <div class="text-sm text-center">
             <div class="text-muted-foreground">Goal</div>

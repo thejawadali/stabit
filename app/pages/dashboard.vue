@@ -125,7 +125,7 @@ const fetchCalendarData = async () => {
 }
 
 // Fetch both dashboard and calendar data together using useAsyncData
-const { data: combinedData, error } = await useAsyncData<DashboardAndCalendarData>(
+const { data: combinedData } = await useAsyncData<DashboardAndCalendarData>(
   'dashboard-and-calendar',
   async () => {
     const [dashboardRes, _] = await Promise.all([

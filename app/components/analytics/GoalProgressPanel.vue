@@ -16,7 +16,7 @@
             </span>
           </div>
 
-          <Progress :value="goal.progress" class="h-2.5" />
+          <Progress :model-value="goal.progress" class="h-2.5" />
 
           <div class="flex items-center justify-between text-xs text-muted-foreground">
             <span class="flex items-center gap-1">

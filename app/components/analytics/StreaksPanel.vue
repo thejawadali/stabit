@@ -27,7 +27,7 @@
               <span class="text-muted-foreground">Consistency</span>
               <span class="font-medium text-foreground">{{ habit.consistency }}%</span>
             </div>
-            <Progress :value="habit.consistency" class="h-2" />
+            <Progress :model-value="habit.consistency" class="h-2" />
           </div>
         </div>
       </div>

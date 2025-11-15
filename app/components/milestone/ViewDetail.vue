@@ -27,7 +27,7 @@
               {{ Math.round((viewMilestone.currentProgress / viewMilestone.targetValue) * 100) }}%
             </span>
           </div>
-          <Progress :value="(viewMilestone.currentProgress / viewMilestone.targetValue) * 100" class="h-3" />
+          <Progress :model-value="(viewMilestone.currentProgress / viewMilestone.targetValue) * 100" class="h-3" />
           <div class="flex justify-between text-sm text-muted-foreground">
             <span>{{ viewMilestone.currentProgress }} completed</span>
             <span>{{ viewMilestone.targetValue - viewMilestone.currentProgress }} remaining</span>

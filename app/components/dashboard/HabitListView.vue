@@ -16,7 +16,7 @@
                   <span class="text-muted-foreground">Progress</span>
                   <span class="font-medium">{{ habit.progress }}%</span>
                 </div>
-                <Progress :value="habit.progress" class="h-2" />
+                <Progress :model-value="habit.progress" class="h-2" />
 
                 <div class="flex items-center justify-between pt-2">
                   <div class="flex items-center space-x-2">

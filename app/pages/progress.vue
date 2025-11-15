@@ -21,7 +21,7 @@
         </CardHeader>
         <CardContent>
           <div class="space-y-4">
-            <Progress :value="overallProgress.percentage" class="h-3" />
+            <Progress :model-value="overallProgress.percentage" class="h-3" />
             <div class="flex items-center justify-between">
               <span class="text-sm text-muted-foreground">
                 You're {{ overallProgress.percentage }}% towards your goal

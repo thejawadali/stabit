@@ -14,7 +14,7 @@
             </div>
             <span class="font-bold">{{ weeklyCompletion }}%</span>
           </div>
-          <Progress :value="weeklyCompletion" class="h-2" />
+          <Progress :model-value="weeklyCompletion" class="h-2" />
         </div>
 
         <!-- Monthly Trend -->
@@ -26,7 +26,7 @@
             </div>
             <span class="font-bold text-success">{{ monthlyTrendText }}</span>
           </div>
-          <Progress :value="monthlyTrend" class="h-2" />
+          <Progress :model-value="monthlyTrend" class="h-2" />
         </div>
 
         <!-- Sessions Info -->

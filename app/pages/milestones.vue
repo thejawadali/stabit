@@ -83,7 +83,7 @@
                         {{ Math.round((milestone.currentProgress / milestone.targetValue) * 100) }}%
                       </span>
                     </div>
-                    <Progress :value="(milestone.currentProgress / milestone.targetValue) * 100" class="h-2" />
+                    <Progress :model-value="(milestone.currentProgress / milestone.targetValue) * 100" class="h-2" />
                   </div>
                 </TableCell>
                 <TableCell>
