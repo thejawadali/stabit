@@ -26,13 +26,28 @@ export default defineEventHandler(async (event) => {
 
     // 1. Get total habits that need to be logged today
     // Habits where nextDueDate is today or has passed, and status is active
-    const habitsDueToday = await prisma.habit.count({
+    const habitsDueToday = await prisma.habit.findMany({
       where: {
         userId: user.sub,
-        status: HabitStatus.active,
-        isArchived: false,
+        // status: HabitStatus.active,
+        // isArchived: false,
         nextDueDate: {
-          lte: todayEnd // Less than or equal to end of today
+          lte: todayEnd
+        }
+      },
+      orderBy: {
+        timeOfDay: 'asc'
+      },
+      select: {
+        id: true,
+        name: true,
+        icon: true,
+        timeOfDay: true,
+        status: true,
+        category: {
+          select: {
+            name: true
+          }
         }
       }
     })
@@ -135,16 +150,30 @@ export default defineEventHandler(async (event) => {
       ? Math.round((completedLogsThisWeek / expectedCompletions) * 100)
       : 0
 
+    // 6. get categories
+    const categories = await prisma.category.findMany({
+      where: {
+        userId: user.sub
+      },
+      select: {
+        id: true,
+        name: true,
+        icon: true
+      }
+    })
+
     return {
       success: true,
       data: {
         todayProgress: {
           completed: completedToday,
-          total: habitsDueToday
+          total: habitsDueToday.filter(habit => habit.status === HabitStatus.active).length
         },
         activeStreak,
         totalHabits,
-        weeklyRate: Math.min(weeklyRate, 100) // Cap at 100%
+        weeklyRate: Math.min(weeklyRate, 100), // Cap at 100%
+        categories,
+        todayHabits: habitsDueToday
       }
     }
   } catch (error: any) {

@@ -29,8 +29,8 @@
           <Button variant="outline">Category</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-48">
-          <DropdownMenuItem v-for="category in categories" :key="category">
-            {{ category }}
+          <DropdownMenuItem v-for="category in categories" :key="category.id">
+            {{ category.icon }} {{ category.name }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -42,8 +42,10 @@
 
 withDefaults(defineProps<{
   activeFilter: string
+  categories: Partial<Category>[]
 }>(), {
-  activeFilter: 'all'
+  activeFilter: 'all',
+  categories: () => []
 })
 
 const filters = [
@@ -52,8 +54,6 @@ const filters = [
   { label: 'Inactive', value: 'inactive' },
   { label: 'Active Streaks', value: 'streaks' },
 ]
-
-const categories = ['Health', 'Learning', 'Mindfulness', 'Productivity']
 
 const onSearchChange = (value: string) => {
   console.log(value)

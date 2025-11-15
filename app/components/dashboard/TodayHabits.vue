@@ -3,7 +3,7 @@
     <CardContent class="p-6">
       <!-- Header -->
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold">Today's Habits</h3>
+        <h3 class="text-lg font-semibold">Today's Tasks</h3>
         <Badge variant="secondary">
           {{ doneCount }}/{{ habits.length }} Done
         </Badge>
@@ -14,7 +14,7 @@
         <div v-for="habit in habits" :key="habit.id"
           class="flex items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
           <div class="flex items-center space-x-3 flex-1">
-            <template v-if="habit.status === 'done'">
+            <template v-if="habit.status === 'completed'">
               <IconCheckCircle2 class="w-5 h-5 text-success" />
             </template>
             <template v-else>
@@ -23,21 +23,21 @@
             <div class="flex-1">
               <div class="flex items-center space-x-2">
                 <span class="text-lg">{{ habit.icon }}</span>
-                <span :class="{ 'line-through text-muted-foreground': habit.status === 'done' }" class="font-medium">
+                <span :class="{ 'line-through text-muted-foreground': habit.status === 'completed' }" class="font-medium">
                   {{ habit.name }}
                 </span>
               </div>
               <div class="flex items-center space-x-2 mt-1">
                 <IconClock class="w-3 h-3 text-muted-foreground" />
-                <span class="text-xs text-muted-foreground">{{ habit.time }}</span>
-                <Badge variant="outline" class="text-xs">{{ habit.category }}</Badge>
+                <span class="text-xs text-muted-foreground">{{ formatTime(habit.timeOfDay) }}</span>
+                <!-- <Badge variant="outline" class="text-xs">{{ habit.category.name }}</Badge> -->
               </div>
             </div>
           </div>
 
-          <Button :size="'sm'" :variant="habit.status === 'done' ? 'ghost' : 'default'">
+          <!-- <Button :size="'sm'" :variant="habit.status === 'done' ? 'ghost' : 'default'">
             {{ habit.status === 'done' ? 'View' : 'Log' }}
-          </Button>
+          </Button> -->
         </div>
       </div>
     </CardContent>
@@ -45,14 +45,16 @@
 </template>
 
 <script setup lang="ts">
+import { formatTime } from '~/lib/utils'
+
 const props = withDefaults(defineProps<{
-  habits: Habit[]
+  habits: Partial<Habit>[]
 }>(), {
   habits: () => [],
 })
 
 const doneCount = computed(() => {
-  return props.habits.filter(habit => habit.status === 'done').length;
+  return props.habits.filter(habit => habit.status === 'completed').length;
 })
 </script>
 

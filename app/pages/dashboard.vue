@@ -15,11 +15,11 @@
         :weekly-completion="dashboardData?.weeklyRate ?? 0" 
       />
 
-      <!-- Filters -->
-      <Filters :active-filter="'all'" />
 
+      <!-- Filters -->
+      <Filters :active-filter="'all'" :categories="dashboardData?.categories" />
       <!-- Quick Actions -->
-      <QuickActions @add-habit="undefined" @add-quick-log="undefined" />
+      <!-- <QuickActions @add-habit="undefined" @add-quick-log="undefined" /> -->
 
       <!-- Main Content Grid -->
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -28,12 +28,13 @@
           <!-- Today's Habits -->
           <TodayHabits :habits="todayHabits" />
 
-          <!-- Habit Cards List -->
+          <!-- Habit Cards List
           <div>
             <h3 className="text-lg font-semibold mb-4">All Habits</h3>
             <HabitListView :habits="habitsList" @on-edit="undefined" @on-delete="undefined"
               @on-view-history="undefined" />
           </div>
+           -->
 
           <!-- Missed Habits -->
           <MissedHabits :habits="missedHabits" />
@@ -81,7 +82,9 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
     }
     activeStreak: number
     totalHabits: number
-    weeklyRate: number
+    weeklyRate: number,
+    categories: Partial<Category>[],
+    todayHabits: Partial<Habit>[]
   }
 }>('/api/dashboard', {
   default: () => ({
@@ -90,10 +93,11 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
       todayProgress: { completed: 0, total: 0 },
       activeStreak: 0,
       totalHabits: 0,
-      weeklyRate: 0
+      weeklyRate: 0,
+      categories: [],
+      todayHabits: []
     }
-  }),
-  transform: (data: any) => data
+  })
 })
 
 const dashboardData = computed(() => dashboardResponse.value?.data)
@@ -103,13 +107,7 @@ if (dashboardError.value) {
 }
 
 // mock data
-const todayHabits: Habit[] = [
-  { id: "1", name: "Morning Exercise", icon: "🏃", time: "7:00 AM", status: "done" as const, category: "Health" },
-  { id: "2", name: "Meditation", icon: "🧘", time: "7:30 AM", status: "done" as const, category: "Mindfulness" },
-  { id: "3", name: "Read 30 minutes", icon: "📚", time: "8:00 PM", status: "pending" as const, category: "Learning" },
-  { id: "4", name: "Drink Water", icon: "💧", time: "All day", status: "pending" as const, category: "Health" },
-  { id: "5", name: "Journal", icon: "📝", time: "9:00 PM", status: "pending" as const, category: "Reflection" },
-]
+const todayHabits = computed(() => dashboardData.value?.todayHabits)
 
 const missedHabits = [
   { id: "1", name: "Yoga Session", icon: "🧘", missedDate: "Yesterday" },
