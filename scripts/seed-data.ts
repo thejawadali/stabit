@@ -78,6 +78,141 @@ function calculateNextDueDate(frequency: Frequency, currentDate: Date): Date {
 }
 
 /**
+ * Create milestones for a habit
+ */
+async function createMilestonesForHabit(habit: Habit, userId: string) {
+  const milestones = []
+  const targetMetric = habit.goalMetric
+  
+  // Generate milestone templates based on habit type
+  const milestoneTemplates: Array<{
+    name: string
+    description: string | null
+    targetValue: number
+    rewardName: string | null
+    rewardDescription: string | null
+    rewardIcon: string
+  }> = []
+
+  if (targetMetric === 'sessions') {
+    // Create milestones at 10, 25, 50, 100 sessions
+    milestoneTemplates.push(
+      {
+        name: '10 Sessions',
+        description: 'Complete 10 sessions',
+        targetValue: 10,
+        rewardName: 'Small Win',
+        rewardDescription: 'You\'re building momentum!',
+        rewardIcon: '🎯'
+      },
+      {
+        name: '25 Sessions',
+        description: 'Complete 25 sessions',
+        targetValue: 25,
+        rewardName: 'Progress Maker',
+        rewardDescription: 'You\'re making great progress!',
+        rewardIcon: '⭐'
+      },
+      {
+        name: '50 Sessions',
+        description: 'Complete 50 sessions',
+        targetValue: 50,
+        rewardName: 'Halfway Hero',
+        rewardDescription: 'You\'ve reached the halfway point!',
+        rewardIcon: '🏆'
+      },
+      {
+        name: '100 Sessions',
+        description: 'Complete 100 sessions',
+        targetValue: 100,
+        rewardName: 'Century Club',
+        rewardDescription: 'Amazing dedication!',
+        rewardIcon: '👑'
+      }
+    )
+  } else if (targetMetric === 'minutes' || targetMetric === 'hours') {
+    // Create milestones based on time
+    const baseValue = targetMetric === 'hours' ? habit.goalValue * 60 : habit.goalValue
+    milestoneTemplates.push(
+      {
+        name: `${baseValue * 5} ${targetMetric === 'hours' ? 'Hours' : 'Minutes'}`,
+        description: `Accumulate ${baseValue * 5} ${targetMetric === 'hours' ? 'hours' : 'minutes'}`,
+        targetValue: targetMetric === 'hours' ? baseValue * 5 / 60 : baseValue * 5,
+        rewardName: 'Time Builder',
+        rewardDescription: 'You\'re investing in yourself!',
+        rewardIcon: '⏰'
+      },
+      {
+        name: `${baseValue * 10} ${targetMetric === 'hours' ? 'Hours' : 'Minutes'}`,
+        description: `Accumulate ${baseValue * 10} ${targetMetric === 'hours' ? 'hours' : 'minutes'}`,
+        targetValue: targetMetric === 'hours' ? baseValue * 10 / 60 : baseValue * 10,
+        rewardName: 'Time Master',
+        rewardDescription: 'Consistent time investment!',
+        rewardIcon: '⏳'
+      },
+      {
+        name: `${baseValue * 20} ${targetMetric === 'hours' ? 'Hours' : 'Minutes'}`,
+        description: `Accumulate ${baseValue * 20} ${targetMetric === 'hours' ? 'hours' : 'minutes'}`,
+        targetValue: targetMetric === 'hours' ? baseValue * 20 / 60 : baseValue * 20,
+        rewardName: 'Time Champion',
+        rewardDescription: 'Outstanding dedication!',
+        rewardIcon: '💎'
+      }
+    )
+  } else {
+    // For other metrics (glasses, items, etc.)
+    milestoneTemplates.push(
+      {
+        name: `${habit.goalValue * 10} ${targetMetric}`,
+        description: `Reach ${habit.goalValue * 10} ${targetMetric}`,
+        targetValue: habit.goalValue * 10,
+        rewardName: 'Milestone Achiever',
+        rewardDescription: 'Great progress!',
+        rewardIcon: '🎉'
+      },
+      {
+        name: `${habit.goalValue * 25} ${targetMetric}`,
+        description: `Reach ${habit.goalValue * 25} ${targetMetric}`,
+        targetValue: habit.goalValue * 25,
+        rewardName: 'Progress Star',
+        rewardDescription: 'You\'re on fire!',
+        rewardIcon: '⭐'
+      },
+      {
+        name: `${habit.goalValue * 50} ${targetMetric}`,
+        description: `Reach ${habit.goalValue * 50} ${targetMetric}`,
+        targetValue: habit.goalValue * 50,
+        rewardName: 'Champion',
+        rewardDescription: 'Incredible achievement!',
+        rewardIcon: '🏆'
+      }
+    )
+  }
+
+  // Create milestones
+  for (const template of milestoneTemplates) {
+    const milestone = await prisma.habitMilestones.create({
+      data: {
+        habitId: habit.id,
+        userId,
+        name: template.name,
+        description: template.description,
+        targetValue: template.targetValue,
+        targetMetric,
+        rewardName: template.rewardName,
+        rewardDescription: template.rewardDescription,
+        rewardIcon: template.rewardIcon,
+        status: MilestoneStatus.locked,
+        currentProgress: 0
+      }
+    })
+    milestones.push(milestone)
+  }
+
+  return milestones
+}
+
+/**
  * Update milestone progress (simulating API logic)
  */
 async function updateMilestoneProgress(
@@ -505,8 +640,28 @@ async function seedData(userId: string) {
     }
   }
 
+  console.log('\n🏆 Creating milestones...')
+  let totalMilestones = 0
+  for (const habit of habits) {
+    const milestones = await createMilestonesForHabit(habit, userId)
+    totalMilestones += milestones.length
+    console.log(`  ✓ Created ${milestones.length} milestones for ${habit.name}`)
+  }
+  console.log(`  ✅ Total milestones created: ${totalMilestones}`)
+
   console.log('\n📊 Generating habit logs for past 3 months...')
   let totalLogs = 0
+
+  // Generate some "complete miss days" where all habits are missed
+  const completeMissDays = new Set<number>()
+  const daysInRange = Math.ceil((today.getTime() - threeMonthsAgo.getTime()) / (1000 * 60 * 60 * 24))
+  const numCompleteMissDays = Math.floor(daysInRange * 0.05) // ~5% of days are complete miss days
+  
+  for (let i = 0; i < numCompleteMissDays; i++) {
+    const randomDay = Math.floor(Math.random() * daysInRange)
+    completeMissDays.add(randomDay)
+  }
+  console.log(`  📅 Generated ${completeMissDays.size} complete miss days`)
 
   for (const habit of habits) {
     // Initialize habit statistics
@@ -528,12 +683,18 @@ async function seedData(userId: string) {
 
     if (habit.frequency === Frequency.daily) {
       let currentDate = new Date(startDate)
+      let dayIndex = 0
 
       while (currentDate <= endDate) {
         const dateStart = startOfDay(currentDate)
-        const shouldComplete = Math.random() > 0.15 // 85% completion rate
-        const isMissed = Math.random() < 0.1 // 10% missed
-        const isSkipped = Math.random() < 0.05 // 5% skipped
+        
+        // Check if this is a complete miss day
+        const isCompleteMissDay = completeMissDays.has(dayIndex)
+        
+        // On complete miss days, all habits are missed
+        const shouldComplete = isCompleteMissDay ? false : Math.random() > 0.15 // 85% completion rate
+        const isMissed = isCompleteMissDay ? true : Math.random() < 0.1 // 10% missed
+        const isSkipped = isCompleteMissDay ? false : Math.random() < 0.05 // 5% skipped
 
         let status: CompletionStatus = CompletionStatus.completed
         if (isMissed) {
@@ -622,15 +783,21 @@ async function seedData(userId: string) {
         totalLogs++
 
         currentDate = addDays(currentDate, 1)
+        dayIndex++
       }
 
     } else if (habit.frequency === Frequency.weekly) {
       let currentDate = new Date(startDate)
 
       while (currentDate <= endDate) {
-        const shouldComplete = Math.random() > 0.2 // 80% completion rate
-        const isMissed = Math.random() < 0.1
-        const isSkipped = Math.random() < 0.05
+        // For weekly habits, check if any day in this week is a complete miss day
+        const weekStartDay = Math.floor((currentDate.getTime() - threeMonthsAgo.getTime()) / (1000 * 60 * 60 * 24))
+        const hasCompleteMissDay = Array.from({ length: 7 }, (_, i) => weekStartDay + i)
+          .some(day => completeMissDays.has(day))
+        
+        const shouldComplete = hasCompleteMissDay ? false : Math.random() > 0.2 // 80% completion rate
+        const isMissed = hasCompleteMissDay ? true : Math.random() < 0.1
+        const isSkipped = hasCompleteMissDay ? false : Math.random() < 0.05
 
         let status: CompletionStatus = CompletionStatus.completed
         if (isMissed) {
@@ -738,7 +905,9 @@ async function seedData(userId: string) {
   console.log(`\n✅ Seed completed!`)
   console.log(`   Categories: ${categories.length}`)
   console.log(`   Habits: ${habits.length}`)
+  console.log(`   Milestones: ${totalMilestones}`)
   console.log(`   Total Logs: ${totalLogs}`)
+  console.log(`   Complete Miss Days: ${completeMissDays.size}`)
 }
 
 // Main execution
