@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-64 mx-auto space-y-2">
-    <!-- calendar widget header -->
     <div class="flex items-center justify-between">
       <Button variant="ghost" size="icon" class="h-8 w-8" @click="previousMonth">
         <IconChevronLeft class="h-4 w-4" />
@@ -21,20 +20,8 @@
       </div>
 
       <!-- All calendar days -->
-      <Button 
-        v-for="(dayObj, index) in calendarDays" 
-        :key="index" 
-        variant="ghost" 
-        class="h-8 w-8 p-0 text-sm relative" 
-        :class="{
-          'bg-primary text-primary-foreground': dayObj.isCurrentMonth && isToday(dayObj.day),
-          'bg-success/10 hover:bg-success/20': dayObj.isCurrentMonth && isCompleted(dayObj.day),
-          'bg-[hsl(var(--warning)/0.2)] hover:bg-[hsl(var(--warning)/0.3)] text-[hsl(var(--warning))] hover:text-[hsl(var(--warning))]': dayObj.isCurrentMonth && isPartiallyCompleted(dayObj.day),
-          'hover:bg-muted': dayObj.isCurrentMonth && !isToday(dayObj.day) && !isCompleted(dayObj.day) && !isPartiallyCompleted(dayObj.day),
-          'text-muted-foreground/50 cursor-not-allowed': !dayObj.isCurrentMonth
-        }"
-        :disabled="!dayObj.isCurrentMonth"
-      >
+      <Button v-for="(dayObj, index) in calendarDays" :key="index" variant="ghost" class="h-8 w-8 p-0 text-sm relative"
+        :class="dayClass(dayObj)" :disabled="!dayObj.isCurrentMonth">
         <template v-if="dayObj.isCurrentMonth && isCompleted(dayObj.day)">
           <IconCheck class="h-4 w-4 text-success" />
         </template>
@@ -50,7 +37,23 @@
 </template>
 
 <script setup lang="ts">
-const currentDate = ref(new Date())
+
+const props = withDefaults(defineProps<{
+  completedDays: number[]
+  partiallyCompleted: number[]
+  missedDays: number[],
+}>(), {
+  completedDays: () => [],
+  partiallyCompleted: () => [],
+  missedDays: () => [],
+})
+
+const emit = defineEmits<{
+  (e: 'onDateChange'): void
+}>()
+
+
+const currentDate = defineModel<Date>('currentDate', { default: new Date() })
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
@@ -62,19 +65,18 @@ const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const calendarDays = computed(() => {
   const year = currentDate.value.getFullYear()
   const month = currentDate.value.getMonth()
-  
-  // Get first day of month (0 = Sunday, 1 = Monday, etc.)
+
+
   const firstDay = new Date(year, month, 1).getDay()
-  
-  // Get number of days in current month
+
+
   const daysInCurrentMonth = new Date(year, month + 1, 0).getDate()
-  
-  // Get number of days in previous month
+
+
   const daysInPrevMonth = new Date(year, month, 0).getDate()
-  
+
   const days = []
-  
-  // Add previous month days
+
   for (let i = firstDay - 1; i >= 0; i--) {
     days.push({
       day: daysInPrevMonth - i,
@@ -82,8 +84,7 @@ const calendarDays = computed(() => {
       isPreviousMonth: true
     })
   }
-  
-  // Add current month days
+
   for (let i = 1; i <= daysInCurrentMonth; i++) {
     days.push({
       day: i,
@@ -91,11 +92,10 @@ const calendarDays = computed(() => {
       isPreviousMonth: false
     })
   }
-  
-  // Add next month days to fill remaining cells
+
   const totalCells = Math.ceil(days.length / 7) * 7
   const remainingCells = totalCells - days.length
-  
+
   for (let i = 1; i <= remainingCells; i++) {
     days.push({
       day: i,
@@ -103,33 +103,38 @@ const calendarDays = computed(() => {
       isPreviousMonth: false
     })
   }
-  
-  // console.log(`Calendar days for ${month + 1}/${year}:`, days)
   return days
 })
 
-// Mock completed days
-const completedDays = ref([1, 3, 5, 7, 8, 10, 12, 15, 17, 20, 21])
-
-// Mock partially completed days
-const partiallyCompletedDays = ref([2, 4])
-
-const previousMonth = () => {
-  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
-}
-
-const nextMonth = () => {
-  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
-}
-
-const isCompleted = (day: number) => completedDays.value.includes(day)
-const isPartiallyCompleted = (day: number) => partiallyCompletedDays.value.includes(day)
+const isCompleted = (day: number) => props.completedDays.includes(day)
+const isPartiallyCompleted = (day: number) => props.partiallyCompleted.includes(day)
+const isMissed = (day: number) => props.missedDays.includes(day)
 const isToday = (day: number) => {
   const today = new Date()
   return day === today.getDate() &&
     currentDate.value.getMonth() === today.getMonth() &&
     currentDate.value.getFullYear() === today.getFullYear()
 }
-</script>
 
-<style scoped></style>
+
+const dayClass = (dayObj: { day: number, isCurrentMonth: boolean, isPreviousMonth: boolean }) => {
+  return {
+    'bg-primary text-primary-foreground': dayObj.isCurrentMonth && isToday(dayObj.day),
+    'bg-success/10 hover:bg-success/20': dayObj.isCurrentMonth && isCompleted(dayObj.day),
+    'bg-[hsl(var(--warning)/0.2)] hover:bg-[hsl(var(--warning)/0.3)] text-[hsl(var(--warning))] hover:text-[hsl(var(--warning))]': dayObj.isCurrentMonth && isPartiallyCompleted(dayObj.day),
+    'bg-destructive/10 hover:bg-destructive/20 text-destructive': dayObj.isCurrentMonth && isMissed(dayObj.day) && !isToday(dayObj.day),
+    'hover:bg-muted': dayObj.isCurrentMonth && !isToday(dayObj.day) && !isCompleted(dayObj.day) && !isPartiallyCompleted(dayObj.day) && !isMissed(dayObj.day),
+    'text-muted-foreground/50 cursor-not-allowed': !dayObj.isCurrentMonth
+  }
+}
+
+const previousMonth = () => {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
+  emit('onDateChange')
+}
+
+const nextMonth = () => {
+  currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
+  emit('onDateChange')
+}
+</script>

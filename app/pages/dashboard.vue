@@ -7,22 +7,14 @@
     </div>
     <div class="space-y-6">
       <!-- Summary Bar -->
-      <SummaryBar 
-        :completed-today="dashboardData?.todayProgress.completed ?? 0" 
-        :total-today="dashboardData?.todayProgress.total ?? 0" 
-        :current-streak="dashboardData?.activeStreak ?? 0" 
-        :total-habits="dashboardData?.totalHabits ?? 0" 
-        :weekly-completion="dashboardData?.weeklyRate ?? 0" 
-      />
+      <SummaryBar :completed-today="dashboardData?.todayProgress.completed ?? 0"
+        :total-today="dashboardData?.todayProgress.total ?? 0" :current-streak="dashboardData?.activeStreak ?? 0"
+        :total-habits="dashboardData?.totalHabits ?? 0" :weekly-completion="dashboardData?.weeklyRate ?? 0" />
 
 
       <!-- Filters -->
-      <Filters 
-        v-model:search="searchQuery"
-        v-model:status="statusFilter"
-        v-model:category="categoryFilter"
-        :categories="dashboardData?.categories ?? []" 
-      />
+      <Filters v-model:search="searchQuery" v-model:status="statusFilter" v-model:category="categoryFilter"
+        :categories="dashboardData?.categories ?? []" />
 
       <!-- Main Content Grid -->
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -30,7 +22,7 @@
         <div className="lg:col-span-2 space-y-6">
           <!-- Today's Habits -->
           <TodayHabits :habits="filteredTodayHabits" />
-          
+
 
           <!-- Missed Habits -->
           <MissedHabits :missedHabitLogs="missedHabits" />
@@ -42,21 +34,19 @@
         <!-- Right Column - 1/3 width -->
         <div className="space-y-6">
           <!-- Calendar Widget -->
-          <Card class="bg-gradient-card shadow-card">
+          <Card class="bg-gradient-card shadow-card" v-loading="calendarLoading">
             <CardHeader class="pb-1" />
             <CardContent>
-              <CalendarWidget />
+              <CalendarWidget :completed-days="calendarData.completed" :partially-completed="calendarData.partial"
+                :missed-days="calendarData.missed" v-model:currentDate="calendarDate"
+                @onDateChange="fetchCalendarData" />
             </CardContent>
           </Card>
 
           <!-- Progress Snapshot -->
-          <ProgressSnapshot 
-            :weekly-completion="dashboardData?.weeklyRate ?? 0" 
-            :monthly-trend="12" 
-            :remaining-sessions="15" 
-            :total-sessions="247"
-            :streak-text="dashboardData?.activeStreak ? `You're on a ${dashboardData.activeStreak}-day streak! 🔥` : 'Start building your streak!'" 
-          />
+          <ProgressSnapshot :weekly-completion="dashboardData?.weeklyRate ?? 0" :monthly-trend="12"
+            :remaining-sessions="15" :total-sessions="247"
+            :streak-text="dashboardData?.activeStreak ? `You're on a ${dashboardData.activeStreak}-day streak! 🔥` : 'Start building your streak!'" />
 
           <!-- Milestones -->
           <!-- <MilestonesPanel :milestones="milestones" /> -->
@@ -67,9 +57,8 @@
 </template>
 
 <script setup lang="ts">
-
-// Fetch dashboard data
-const { data: dashboardResponse, error: dashboardError } = await useFetch<{
+// Types for API responses
+type DashboardResponse = {
   success: boolean
   data: {
     todayProgress: {
@@ -78,39 +67,99 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
     }
     activeStreak: number
     totalHabits: number
-    weeklyRate: number,
-    categories: Partial<Category>[],
-    todayHabits: TodayHabit[],
+    weeklyRate: number
+    categories: Partial<Category>[]
+    todayHabits: TodayHabit[]
     missedHabits: MissedHabitLogs[]
   }
-}>('/api/dashboard', {
-  default: () => ({
-    success: true,
-    data: {
-      todayProgress: { completed: 0, total: 0 },
-      activeStreak: 0,
-      totalHabits: 0,
-      weeklyRate: 0,
-      categories: [],
-      todayHabits: [],
-      missedHabits: []
-    }
-  })
-})
-
-const dashboardData = computed(() => dashboardResponse.value?.data)
-
-if (dashboardError.value) {
-  console.error('Error fetching dashboard data:', dashboardError.value)
 }
+
+type CalendarResponse = {
+  success: boolean
+  data: {
+    completed: number[]
+    partial: number[]
+    missed: number[]
+  }
+}
+
+type DashboardAndCalendarData = {
+  dashboard: DashboardResponse['data']
+  calendar: CalendarResponse['data']
+}
+
+// Calendar state
+const calendarDate = ref<Date>(new Date())
+const calendarLoading = ref(false)
+const calendarData = ref<CalendarResponse['data']>({
+  completed: [],
+  partial: [],
+  missed: []
+})
 
 // Filter state
 const searchQuery = ref('')
 const statusFilter = ref<HabitStatus | 'all'>('all')
 const categoryFilter = ref<string | null>(null)
 
-// Get today's habits
+// Fetch calendar data
+const fetchCalendarData = async () => {
+  calendarLoading.value = true
+  try {
+    const response = await $fetch<CalendarResponse>('/api/dashboard/calendar', {
+      query: {
+        month: calendarDate.value.getMonth() + 1,
+        year: calendarDate.value.getFullYear()
+      }
+    })
+    calendarData.value = response.data
+    return response
+  } catch (error) {
+    console.error('Error fetching calendar data:', error)
+  } finally {
+    calendarLoading.value = false
+  }
+}
+
+// Fetch both dashboard and calendar data together using useAsyncData
+const { data: combinedData, error } = await useAsyncData<DashboardAndCalendarData>(
+  'dashboard-and-calendar',
+  async () => {
+    const [dashboardRes, _] = await Promise.all([
+      $fetch<DashboardResponse>('/api/dashboard'),
+      fetchCalendarData()
+    ])
+
+    return {
+      dashboard: dashboardRes.data,
+      calendar: calendarData.value
+    }
+  },
+  {
+    default: () => ({
+      dashboard: {
+        todayProgress: { completed: 0, total: 0 },
+        activeStreak: 0,
+        totalHabits: 0,
+        weeklyRate: 0,
+        categories: [],
+        todayHabits: [],
+        missedHabits: []
+      },
+      calendar: {
+        completed: [],
+        partial: [],
+        missed: []
+      }
+    })
+  }
+)
+
+const dashboardData = computed(() => combinedData.value?.dashboard)
+
+
 const todayHabits = computed(() => dashboardData.value?.todayHabits ?? [])
+const missedHabits = computed(() => dashboardData.value?.missedHabits ?? [])
 
 // Filter today's habits based on search, status, and category
 const filteredTodayHabits = computed(() => {
@@ -119,7 +168,7 @@ const filteredTodayHabits = computed(() => {
   // Filter by search query (name)
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim()
-    filtered = filtered.filter(habit => 
+    filtered = filtered.filter(habit =>
       habit.name?.toLowerCase().includes(query)
     )
   }
@@ -140,56 +189,7 @@ const filteredTodayHabits = computed(() => {
   return filtered
 })
 
-// Get missed habits from API
-const missedHabits = computed(() => dashboardData.value?.missedHabits ?? [])
 
-const habitsList = [
-  {
-    id: "1",
-    icon: "🏃",
-    name: "Morning Exercise",
-    category: "Health",
-    progress: 100,
-    streak: 8,
-    trend: [10, 15, 12, 18, 14, 20, 16],
-  },
-  {
-    id: "2",
-    icon: "🧘",
-    name: "Meditation",
-    category: "Mindfulness",
-    progress: 100,
-    streak: 25,
-    trend: [12, 14, 16, 15, 18, 20, 19],
-  },
-  {
-    id: "3",
-    icon: "📚",
-    name: "Daily Reading",
-    category: "Learning",
-    progress: 80,
-    streak: 12,
-    trend: [8, 12, 10, 14, 12, 16, 18],
-  },
-  {
-    id: "4",
-    icon: "💧",
-    name: "Drink Water",
-    category: "Health",
-    progress: 50,
-    streak: 15,
-    trend: [10, 12, 11, 13, 12, 14, 13],
-  },
-  {
-    id: "5",
-    icon: "📝",
-    name: "Journal Writing",
-    category: "Reflection",
-    progress: 0,
-    streak: 5,
-    trend: [6, 8, 10, 9, 11, 10, 12],
-  },
-]
 
 const recentActivities = [
   {
@@ -214,7 +214,6 @@ const recentActivities = [
     icon: "💧",
   },
 ]
-
 
 const milestones = [
   {
