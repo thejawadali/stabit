@@ -17,7 +17,12 @@
 
 
       <!-- Filters -->
-      <Filters :active-filter="'all'" :categories="dashboardData?.categories" />
+      <Filters 
+        v-model:search="searchQuery"
+        v-model:status="statusFilter"
+        v-model:category="categoryFilter"
+        :categories="dashboardData?.categories ?? []" 
+      />
       <!-- Quick Actions -->
       <!-- <QuickActions @add-habit="undefined" @add-quick-log="undefined" /> -->
 
@@ -26,7 +31,7 @@
         <!-- Left Column - 2/3 width -->
         <div className="lg:col-span-2 space-y-6">
           <!-- Today's Habits -->
-          <TodayHabits :habits="todayHabits" />
+          <TodayHabits :habits="filteredTodayHabits" />
 
           <!-- Habit Cards List
           <div>
@@ -106,8 +111,41 @@ if (dashboardError.value) {
   console.error('Error fetching dashboard data:', dashboardError.value)
 }
 
-// mock data
-const todayHabits = computed(() => dashboardData.value?.todayHabits)
+// Filter state
+const searchQuery = ref('')
+const statusFilter = ref<HabitStatus | 'all'>('all')
+const categoryFilter = ref<string | null>(null)
+
+// Get today's habits
+const todayHabits = computed(() => dashboardData.value?.todayHabits ?? [])
+
+// Filter today's habits based on search, status, and category
+const filteredTodayHabits = computed(() => {
+  let filtered = [...todayHabits.value]
+
+  // Filter by search query (name)
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    filtered = filtered.filter(habit => 
+      habit.name?.toLowerCase().includes(query)
+    )
+  }
+
+  // Filter by status
+  if (statusFilter.value !== 'all') {
+    filtered = filtered.filter(habit => habit.status === statusFilter.value)
+  }
+
+  // Filter by category
+  if (categoryFilter.value) {
+    filtered = filtered.filter(habit => {
+      const category = (habit as any).category as { id?: string; name?: string } | undefined
+      return category?.id === categoryFilter.value
+    })
+  }
+
+  return filtered
+})
 
 const missedHabits = [
   { id: "1", name: "Yoga Session", icon: "🧘", missedDate: "Yesterday" },

@@ -10,7 +10,7 @@
       </div>
 
       <!-- Habits List -->
-      <div class="space-y-3">
+      <div v-if="habits.length > 0" class="space-y-3">
         <div v-for="habit in habits" :key="habit.id"
           class="flex items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
           <div class="flex items-center space-x-3 flex-1">
@@ -39,6 +39,18 @@
             {{ habit.status === 'done' ? 'View' : 'Log' }}
           </Button> -->
         </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="py-12 text-center">
+        <div class="w-20 h-20 mx-auto mb-4 bg-accent/50 rounded-full flex items-center justify-center">
+          <IconCheckCircle2 class="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 class="text-lg font-semibold mb-2">No tasks for today</h3>
+        <p class="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+          You're all caught up! No habits scheduled for today, or try adjusting your filters.
+        </p>
+        
       </div>
     </CardContent>
   </Card>

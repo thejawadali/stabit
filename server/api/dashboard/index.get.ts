@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
         status: true,
         category: {
           select: {
+            id: true,
             name: true
           }
         }
