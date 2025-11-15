@@ -64,6 +64,16 @@ interface TodayHabit extends Partial<Habit> {
   }
 }
 
+interface MissedHabitLogs extends Partial<Habit> {
+  id: string,
+  createdAt: string,
+  habit: {
+    id: string
+    name: string
+    icon: string
+  }
+}
+
 type HabitDetail = Pick<Habit, 'id' | 'name' | 'description' | 'icon' | 'currentStreak' | 'longestStreak' | 'totalCompletions' | 'status' | 'currentGoal' | 'category' | 'frequency' | 'createdAt'>
 
 interface HabitLog {
@@ -74,7 +84,7 @@ interface HabitLog {
   notes?: string
 }
 
-type HabitListItem = Pick<Habit, 'id' | 'name' | 'icon' >
+type HabitListItem = Pick<Habit, 'id' | 'name' | 'icon'>
 
 
 type HabitFormData = {

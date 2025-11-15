@@ -163,6 +163,30 @@ export default defineEventHandler(async (event) => {
       }
     })
 
+    // 7. Get last 5 most recent missed habits
+    const recentMissedLogs = await prisma.habitLogs.findMany({
+      where: {
+        userId: user.sub,
+        completionStatus: CompletionStatus.missed
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 5,
+      select: {
+        id: true,
+        createdAt: true,
+        habit: {
+          select: {
+            id: true,
+            name: true,
+            icon: true
+          }
+        }
+      }
+    })
+
+
     return {
       success: true,
       data: {
@@ -174,7 +198,8 @@ export default defineEventHandler(async (event) => {
         totalHabits,
         weeklyRate: Math.min(weeklyRate, 100), // Cap at 100%
         categories,
-        todayHabits: habitsDueToday
+        todayHabits: habitsDueToday,
+        missedHabits: recentMissedLogs
       }
     }
   } catch (error: any) {

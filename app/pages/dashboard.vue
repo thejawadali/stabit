@@ -23,8 +23,6 @@
         v-model:category="categoryFilter"
         :categories="dashboardData?.categories ?? []" 
       />
-      <!-- Quick Actions -->
-      <!-- <QuickActions @add-habit="undefined" @add-quick-log="undefined" /> -->
 
       <!-- Main Content Grid -->
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -32,17 +30,10 @@
         <div className="lg:col-span-2 space-y-6">
           <!-- Today's Habits -->
           <TodayHabits :habits="filteredTodayHabits" />
-
-          <!-- Habit Cards List
-          <div>
-            <h3 className="text-lg font-semibold mb-4">All Habits</h3>
-            <HabitListView :habits="habitsList" @on-edit="undefined" @on-delete="undefined"
-              @on-view-history="undefined" />
-          </div>
-           -->
+          
 
           <!-- Missed Habits -->
-          <MissedHabits :habits="missedHabits" />
+          <MissedHabits :missedHabitLogs="missedHabits" />
 
           <!-- Recent Activity -->
           <RecentActivity :activities="recentActivities" />
@@ -68,7 +59,7 @@
           />
 
           <!-- Milestones -->
-          <MilestonesPanel :milestones="milestones" />
+          <!-- <MilestonesPanel :milestones="milestones" /> -->
         </div>
       </div>
     </div>
@@ -89,7 +80,8 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
     totalHabits: number
     weeklyRate: number,
     categories: Partial<Category>[],
-    todayHabits: TodayHabit[]
+    todayHabits: TodayHabit[],
+    missedHabits: MissedHabitLogs[]
   }
 }>('/api/dashboard', {
   default: () => ({
@@ -100,7 +92,8 @@ const { data: dashboardResponse, error: dashboardError } = await useFetch<{
       totalHabits: 0,
       weeklyRate: 0,
       categories: [],
-      todayHabits: []
+      todayHabits: [],
+      missedHabits: []
     }
   })
 })
@@ -147,9 +140,8 @@ const filteredTodayHabits = computed(() => {
   return filtered
 })
 
-const missedHabits = [
-  { id: "1", name: "Yoga Session", icon: "🧘", missedDate: "Yesterday" },
-]
+// Get missed habits from API
+const missedHabits = computed(() => dashboardData.value?.missedHabits ?? [])
 
 const habitsList = [
   {
