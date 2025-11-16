@@ -285,7 +285,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Run for at least 30 minutes every morning',
       icon: '🏃',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 100,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Distance (km)', type: FieldType.number, placeholder: 'Enter distance', isRequired: false },
@@ -297,7 +297,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Hit the gym for strength training',
       icon: '💪',
       frequency: Frequency.weekly,
-      goalValue: 3,
+      goalValue: 50,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Workout Type', type: FieldType.select, options: ['Upper Body', 'Lower Body', 'Full Body', 'Cardio'], isRequired: false },
@@ -309,7 +309,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Drink 8 glasses of water daily',
       icon: '💧',
       frequency: Frequency.daily,
-      goalValue: 8,
+      goalValue: 1000,
       goalMetric: 'glasses',
       customFields: [
         { title: 'Amount (ml)', type: FieldType.number, placeholder: 'Enter amount', isRequired: false }
@@ -320,7 +320,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Practice yoga for flexibility and mindfulness',
       icon: '🧘',
       frequency: Frequency.weekly,
-      goalValue: 4,
+      goalValue: 50,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Style', type: FieldType.select, options: ['Hatha', 'Vinyasa', 'Yin', 'Power'], isRequired: false },
@@ -334,7 +334,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Focus on important tasks without distractions',
       icon: '🎯',
       frequency: Frequency.daily,
-      goalValue: 2,
+      goalValue: 150,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Task Focus', type: FieldType.text, placeholder: 'What did you work on?', isRequired: false },
@@ -346,7 +346,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Review and plan daily goals',
       icon: '📋',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 100,
       goalMetric: 'sessions'
     },
     {
@@ -354,7 +354,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Process and organize emails',
       icon: '📧',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 100,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Emails Processed', type: FieldType.number, placeholder: 'Number of emails', isRequired: false }
@@ -365,7 +365,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Plan the week ahead',
       icon: '📅',
       frequency: Frequency.weekly,
-      goalValue: 1,
+      goalValue: 50,
       goalMetric: 'sessions'
     }
   ],
@@ -375,7 +375,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Daily meditation practice',
       icon: '🧘‍♀️',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 100,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false },
@@ -387,7 +387,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Write down things you are grateful for',
       icon: '🙏',
       frequency: Frequency.daily,
-      goalValue: 3,
+      goalValue: 300,
       goalMetric: 'items',
       customFields: [
         { title: 'Gratitude Items', type: FieldType.text, placeholder: 'What are you grateful for?', isRequired: false }
@@ -398,7 +398,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Practice breathing exercises for relaxation',
       icon: '🌬️',
       frequency: Frequency.daily,
-      goalValue: 2,
+      goalValue: 150,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Duration (minutes)', type: FieldType.number, placeholder: 'Enter duration', isRequired: false }
@@ -411,7 +411,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Read for personal growth',
       icon: '📚',
       frequency: Frequency.daily,
-      goalValue: 30,
+      goalValue: 5000,
       goalMetric: 'minutes',
       customFields: [
         { title: 'Book Title', type: FieldType.text, placeholder: 'What are you reading?', isRequired: false },
@@ -423,7 +423,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Learn new skills through online courses',
       icon: '💻',
       frequency: Frequency.weekly,
-      goalValue: 3,
+      goalValue: 100,
       goalMetric: 'hours',
       customFields: [
         { title: 'Course Name', type: FieldType.text, placeholder: 'Which course?', isRequired: false },
@@ -435,7 +435,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Practice programming skills',
       icon: '⌨️',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 200,
       goalMetric: 'hours',
       customFields: [
         { title: 'Language/Topic', type: FieldType.text, placeholder: 'What did you practice?', isRequired: false },
@@ -449,7 +449,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Stay connected with family members',
       icon: '👨‍👩‍👧‍👦',
       frequency: Frequency.weekly,
-      goalValue: 2,
+      goalValue: 50,
       goalMetric: 'calls',
       customFields: [
         { title: 'Who did you call?', type: FieldType.text, placeholder: 'Family member name', isRequired: false },
@@ -461,7 +461,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Spend quality time with friends',
       icon: '👥',
       frequency: Frequency.weekly,
-      goalValue: 1,
+      goalValue: 50,
       goalMetric: 'meetings'
     },
     {
@@ -469,7 +469,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Send messages of appreciation',
       icon: '💌',
       frequency: Frequency.weekly,
-      goalValue: 3,
+      goalValue: 100,
       goalMetric: 'messages'
     }
   ],
@@ -479,7 +479,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Follow morning and evening skincare routine',
       icon: '✨',
       frequency: Frequency.daily,
-      goalValue: 2,
+      goalValue: 200,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Time of Day', type: FieldType.select, options: ['Morning', 'Evening', 'Both'], isRequired: false }
@@ -490,7 +490,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Prepare healthy meals for the week',
       icon: '🥗',
       frequency: Frequency.weekly,
-      goalValue: 1,
+      goalValue: 50,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Meals Prepared', type: FieldType.number, placeholder: 'Number of meals', isRequired: false }
@@ -501,7 +501,7 @@ const HABIT_TEMPLATES: Record<string, HabitTemplate[]> = {
       description: 'Get 7-8 hours of quality sleep',
       icon: '😴',
       frequency: Frequency.daily,
-      goalValue: 1,
+      goalValue: 100,
       goalMetric: 'sessions',
       customFields: [
         { title: 'Hours Slept', type: FieldType.number, placeholder: 'Enter hours', isRequired: false },
@@ -741,7 +741,10 @@ async function seedData(userId: string) {
           if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
             currentStreak++
             longestStreak = Math.max(longestStreak, currentStreak)
-            totalCompletions++
+            // Only increment totalCompletions when status is completed
+            if (status === CompletionStatus.completed) {
+              totalCompletions++
+            }
             nextDueDate = calculateNextDueDate(habit.frequency, currentDate)
             
             // Update milestones
@@ -845,7 +848,10 @@ async function seedData(userId: string) {
           if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
             currentStreak++
             longestStreak = Math.max(longestStreak, currentStreak)
-            totalCompletions++
+            // Only increment totalCompletions when status is completed
+            if (status === CompletionStatus.completed) {
+              totalCompletions++
+            }
             nextDueDate = calculateNextDueDate(habit.frequency, currentDate)
             
             // Generate 1-3 log entries for this week
