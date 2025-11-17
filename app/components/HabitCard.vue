@@ -12,20 +12,8 @@
             <Badge variant="secondary" class="mt-1">{{ habit.category.name }}</Badge>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" class="h-8 w-8">
-              <IconMoreVertical class="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem v-for="option in dropdownOptions" :key="option.id" @click="handleAction(option.action)">
-              <component :is="option.icon" class="w-4 h-4 mr-2" />
-              {{ option.label }}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
+        <HabitActionsDropdown :habit @handleAction="handleAction" />
       </div>
     </CardHeader>
     <CardContent class="space-y-4">
@@ -87,5 +75,7 @@ const handleAction = (action: string) => {
   emit('handleAction', action)
 }
 
-const { dropdownOptions, progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
+
+
+const { progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
 </script>

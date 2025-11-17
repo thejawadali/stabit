@@ -8,6 +8,7 @@ type CustomFieldPayload = {
   type: 'text' | 'number' | 'select' | 'boolean'
   options?: string[]
   isRequired?: boolean
+  placeholder?: string
   required?: boolean
   sortingOrder?: number
 }

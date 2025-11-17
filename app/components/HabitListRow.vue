@@ -27,23 +27,7 @@
             <div class="font-medium">{{ totalCompletions }}/{{ goalValue }}</div>
           </div>
           <div class="flex items-center justify-end gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" class="h-8 w-8">
-                  <IconMoreVertical class="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              
-              <DropdownMenuContent align="end">
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem v-for="option in dropdownOptions" :key="option.id"
-                    @click="handleAction(option.action)">
-                    <component :is="option.icon" class="w-4 h-4 mr-2" />
-                    {{ option.label }}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <HabitActionsDropdown :habit @handleAction="handleAction" />
           </div>
         </div>
       </div>
@@ -63,5 +47,5 @@ const handleAction = (action: string) => {
   emit('handleAction', action)
 }
 
-const { dropdownOptions, progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
+const { progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
 </script>

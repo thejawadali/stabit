@@ -239,12 +239,35 @@ const addRecord = (habitId: string) => {
   isLogHabitDialogOpen.value = true
 }
 
-const toggleStatus = (habitId: string) => {
-  // habits.value = habits.value.map(habit => habit.id === habitId ? { ...habit, status: habit.status === 'active' ? 'inactive' : 'active' } : habit)
-  toast({
-    title: 'Status toggled',
-    description: 'The status has been toggled successfully.',
-  })
+const toggleStatus = async (habitId: string) => {
+  try {
+    await $fetch(`/api/habits/${habitId}/toggle-status`, {
+      method: 'POST'
+    })
+    let archivedStatus = false
+    const index = habitData.value.habits.findIndex(habit => habit.id === habitId)
+    const updatedHabits = [...habitData.value.habits];
+    if (index !== -1 && updatedHabits[index]) {
+updatedHabits[index].isArchived = !updatedHabits[index].isArchived;
+habitData.value.habits = updatedHabits;
+
+      // habitData.value.habits[index].isArchived = !habitData.value.habits[index].isArchived
+      // archivedStatus = habitData.value.habits[index]?.isArchived || false
+      // console.log('archivedStatus', habitData.value.habits[index])
+    }
+
+    toast({
+      title: 'Status toggled',
+      description: `The habit has been ${archivedStatus ? 'archived' : 'activated'} successfully.`,
+    })
+  } catch (error) {
+    console.error('Error toggling status:', error)
+    toast({
+      title: 'Error',
+      description: 'Failed to toggle status. Please try again.',
+      variant: 'destructive',
+    })
+  }
 }
 
 
@@ -264,8 +287,7 @@ const deleteHabit = async (habitId: string) => {
       method: 'DELETE'
     })
 
-    // habits.value = habits.value.filter(habit => habit.id !== habitId)
-    // selectedHabits.value = selectedHabits.value.filter(id => id !== habitId)
+    habitData.value.habits = habitData.value.habits.filter(habit => habit.id !== habitId)
 
     toast({
       title: 'Habit deleted',
