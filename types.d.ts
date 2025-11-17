@@ -9,7 +9,6 @@ type Frequency = 'daily' | 'weekly' | 'monthly'
 type DashboardView = 'overview' | 'analytics' | 'calendar' | 'progress'
 type ReminderTone = 'gentle' | 'motivational' | 'energetic' | 'calm' | 'custom'
 type SnoozeDuration = 'fifteenMinutes' | 'oneHour' | 'twoHours' | 'fourHours' | 'eightHours' | 'twentyFourHours'
-type HabitStatus = 'active' | 'inactive' | 'completed' | 'paused'
 type FieldType = 'text' | 'number' | 'select' | 'boolean'
 type MilestoneStatus = 'locked' | 'inProgress' | 'achieved'
 type CompletionStatus = 'completed' | 'partial' | 'missed' | 'skipped'
@@ -41,7 +40,7 @@ interface Habit {
   goalMetric: string
   estimatedCompletionDate: Date | null
   nextDueDate: Date | null
-  status: HabitStatus
+  isCompleted: boolean
   isArchived: boolean
   userId: string
   categoryId: string

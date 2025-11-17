@@ -1,5 +1,5 @@
 import prisma from '../../lib/prisma'
-import { CompletionStatus, MilestoneStatus, HabitStatus } from '@prisma/client'
+import { CompletionStatus, MilestoneStatus } from '@prisma/client'
 
 /**
  * Check if there are 3 consecutive missed logs
@@ -34,7 +34,6 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
     // Find all active habits where nextDueDate has passed
     const habitsWithMissedDueDate = await prisma.habit.findMany({
       where: {
-        status: HabitStatus.active,
         isArchived: false,
         nextDueDate: {
           lt: today // Less than today (passed)
@@ -72,7 +71,7 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
           value: 0,
           durationMinutes: null,
           notes: null,
-          customFields: null
+          customFields: {}
         }
       })
 

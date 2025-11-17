@@ -50,19 +50,6 @@
             </SelectContent>
           </Select>
 
-          <Select v-model="statusFilter">
-            <SelectTrigger class="w-[130px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="paused">Paused</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Select v-model="goalFilter">
             <SelectTrigger class="w-[150px]">
               <SelectValue placeholder="Goal %" />
@@ -185,7 +172,7 @@ const stats = computed(() => {
 
   return {
     totalHabits: habits.length,
-    activeHabits: habits.filter(h => h.status === "active").length,
+    activeHabits: habits.filter(h => !h.isArchived && !h.isCompleted).length,
     completedToday: habitData.value.completedToday,
     avgProgress: Math.round(avgProgress)
   }
@@ -200,7 +187,6 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const searchQuery = ref('')
 const categoryFilter = ref('all')
 const frequencyFilter = ref<Frequency | 'all'>('all')
-const statusFilter = ref<HabitStatus | 'all'>('all')
 const goalFilter = ref('all')
 
 const filteredHabits = computed(() => {
@@ -209,14 +195,13 @@ const filteredHabits = computed(() => {
       habit.category.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesCategory = categoryFilter.value === 'all' || habit.categoryId === categoryFilter.value
     const matchesRecurrence = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
-    const matchesStatus = statusFilter.value === 'all' || habit.status === statusFilter.value
     const progress = habit.goalValue > 0 ? (habit.totalCompletions / habit.goalValue) * 100 : 0
     const matchesGoal = goalFilter.value === 'all' ||
       (goalFilter.value === 'high' && progress >= 75) ||
       (goalFilter.value === 'medium' && progress >= 50 && progress < 75) ||
       (goalFilter.value === 'low' && progress < 50)
 
-    return matchesSearch && matchesCategory && matchesRecurrence && matchesStatus && matchesGoal
+    return matchesSearch && matchesCategory && matchesRecurrence && matchesGoal
   })
 })
 

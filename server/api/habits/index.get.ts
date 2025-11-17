@@ -30,7 +30,6 @@ export default defineEventHandler(async (event) => {
             name: true,
           },
         },
-        status: true,
         currentStreak: true,
         longestStreak: true,
         totalCompletions: true,

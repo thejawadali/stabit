@@ -12,26 +12,6 @@
 
     <!-- Filters and Categories -->
     <div class="flex gap-2">
-      <!-- Status Filter Dropdown -->
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button variant="outline">
-            <IconFilter class="w-4 h-4 mr-2" />
-            {{ statusFilterLabel }}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" class="w-48">
-          <DropdownMenuItem 
-            v-for="filter in statusFilters" 
-            :key="filter.value" 
-            @click="onStatusFilterChange(filter.value)"
-            :class="{ 'bg-accent': selectedStatusFilter === filter.value }"
-          >
-            {{ filter.label }}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       <!-- Category Dropdown -->
       <DropdownMenu>
         <DropdownMenuTrigger>
@@ -68,21 +48,9 @@ const props = withDefaults(defineProps<{
 })
 
 const searchQuery = defineModel<string>('search', { default: '' })
-const selectedStatusFilter = defineModel<HabitStatus | 'all'>('status', { default: 'all' })
 const selectedCategoryId = defineModel<string | null>('category', { default: null })
 
-const statusFilters = [
-  { label: 'All Habits', value: 'all' as const },
-  { label: 'Active', value: 'active' as const },
-  { label: 'Inactive', value: 'inactive' as const },
-  { label: 'Completed', value: 'completed' as const },
-  { label: 'Paused', value: 'paused' as const },
-]
 
-const statusFilterLabel = computed(() => {
-  const filter = statusFilters.find(f => f.value === selectedStatusFilter.value)
-  return filter?.label || 'All Habits'
-})
 
 const selectedCategoryLabel = computed(() => {
   if (!selectedCategoryId.value) return 'Category'
@@ -90,9 +58,7 @@ const selectedCategoryLabel = computed(() => {
   return category ? `${category.icon} ${category.name}` : 'Category'
 })
 
-const onStatusFilterChange = (value: HabitStatus | 'all') => {
-  selectedStatusFilter.value = value
-}
+
 
 const onCategoryFilterChange = (categoryId: string | null) => {
   selectedCategoryId.value = categoryId

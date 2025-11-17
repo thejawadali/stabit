@@ -13,7 +13,7 @@
 
 
       <!-- Filters -->
-      <Filters v-model:search="searchQuery" v-model:status="statusFilter" v-model:category="categoryFilter"
+      <Filters v-model:search="searchQuery" v-model:category="categoryFilter"
         :categories="dashboardData?.categories ?? []" />
 
       <!-- Main Content Grid -->
@@ -28,12 +28,8 @@
           <MissedHabits :missedHabitLogs="missedHabits" />
 
           <!-- Recent Activity -->
-          <RecentActivity 
-            :activities="recentLogsData.logs" 
-            :has-more="recentLogsData.pagination.hasMore"
-            :loading="recentLogsLoading"
-            @load-more="loadMoreRecentLogs"
-          />
+          <RecentActivity :activities="recentLogsData.logs" :has-more="recentLogsData.pagination.hasMore"
+            :loading="recentLogsLoading" @load-more="loadMoreRecentLogs" />
         </div>
 
         <!-- Right Column - 1/3 width -->
@@ -49,8 +45,9 @@
           </Card>
 
           <!-- Progress Snapshot -->
-          <ProgressSnapshot :weekly-completion="dashboardData.weeklyCompletionPercentage" :monthly-trend="dashboardData.monthlyTrend"
-            :total-sessions="dashboardData.totalSessions" :active-streak-count="dashboardData.activeStreak" />
+          <ProgressSnapshot :weekly-completion="dashboardData.weeklyCompletionPercentage"
+            :monthly-trend="dashboardData.monthlyTrend" :total-sessions="dashboardData.totalSessions"
+            :active-streak-count="dashboardData.activeStreak" />
 
           <!-- Milestones -->
           <MilestonesPanel :milestones="dashboardData.milestones" />
@@ -135,7 +132,6 @@ const recentLogsLoading = ref(false)
 
 // Filter state
 const searchQuery = ref('')
-const statusFilter = ref<HabitStatus | 'all'>('all')
 const categoryFilter = ref<string | null>(null)
 
 // Fetch calendar data
@@ -176,7 +172,7 @@ const fetchRecentLogs = async (page: number = 1, limit: number = 5) => {
 // Load more recent logs (append to existing logs)
 const loadMoreRecentLogs = async () => {
   if (recentLogsLoading.value || !recentLogsData.value.pagination.hasMore) return
-  
+
   recentLogsLoading.value = true
   try {
     const nextPage = recentLogsData.value.pagination.page + 1
@@ -186,7 +182,7 @@ const loadMoreRecentLogs = async () => {
         limit: recentLogsData.value.pagination.limit
       }
     })
-    
+
     // Append new logs to existing logs
     recentLogsData.value = {
       logs: [...recentLogsData.value.logs, ...response.data.logs],
@@ -285,10 +281,6 @@ const filteredTodayHabits = computed(() => {
     )
   }
 
-  // Filter by status
-  if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(habit => habit.status === statusFilter.value)
-  }
 
   // Filter by category
   if (categoryFilter.value) {

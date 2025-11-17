@@ -1,6 +1,6 @@
 import prisma from '../../../lib/prisma'
 import { serverSupabaseUser } from '#supabase/server'
-import { HabitStatus, CompletionStatus, Frequency, MilestoneStatus } from '@prisma/client'
+import { CompletionStatus, Frequency, MilestoneStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -42,8 +42,7 @@ export default defineEventHandler(async (event) => {
     const habitsDueToday = await prisma.habit.findMany({
       where: {
         userId: user.sub,
-        // status: HabitStatus.active,
-        // isArchived: false,
+        isArchived: false,
         nextDueDate: {
           lte: todayEnd
         }
@@ -56,7 +55,8 @@ export default defineEventHandler(async (event) => {
         name: true,
         icon: true,
         timeOfDay: true,
-        status: true,
+        isCompleted: true,
+        isArchived: false,
         category: {
           select: {
             id: true,
@@ -97,7 +97,6 @@ export default defineEventHandler(async (event) => {
       prisma.habit.findMany({
         where: {
           userId: user.sub,
-          status: HabitStatus.active,
           isArchived: false
         },
         select: {
@@ -108,7 +107,6 @@ export default defineEventHandler(async (event) => {
       prisma.habit.count({
         where: {
           userId: user.sub,
-          status: HabitStatus.active,
           isArchived: false
         }
       }),
@@ -116,7 +114,6 @@ export default defineEventHandler(async (event) => {
       prisma.habit.findMany({
         where: {
           userId: user.sub,
-          status: HabitStatus.active,
           isArchived: false
         },
         select: {
@@ -336,7 +333,7 @@ export default defineEventHandler(async (event) => {
       data: {
         todayProgress: {
           completed: completedToday,
-          total: habitsDueToday.filter(habit => habit.status === HabitStatus.active).length
+          total: habitsDueToday.filter(habit => !habit.isArchived && !habit.isCompleted).length
         },
         activeStreak, // Highest active streak (already calculated)
         totalHabits,

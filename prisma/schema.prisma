@@ -93,7 +93,7 @@ model Habit {
   goalMetric            String           @default("sessions") @db.VarChar(50)
   estimatedCompletionDate DateTime?       @db.Date
   nextDueDate           DateTime?       @db.Date
-  status                HabitStatus       @default(active)
+  isCompleted            Boolean           @default(false)
   isArchived            Boolean           @default(false)
   userId                String            @db.VarChar(36)
   categoryId            String            @db.VarChar(36)
@@ -309,12 +309,6 @@ enum Frequency {
   monthly
 }
 
-enum HabitStatus {
-  active
-  inactive
-  completed
-  paused
-}
 
 enum FieldType {
   text
