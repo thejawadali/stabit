@@ -2,15 +2,14 @@
   <Card :class="`relative ${habit.status === 'inactive' ? 'opacity-60' : ''}`">
     <CardHeader class="pb-3">
       <div class="flex items-start justify-between">
-        <div class="flex items-center space-x-3">
-          <Checkbox :checked="selectedHabits.includes(habit.id)" @update:checked="handleSelectHabit" />
+        <div class="flex items-start space-x-3">
           <div class="text-3xl">{{ habit.icon }}</div>
           <div>
             <CardTitle class="text-lg flex items-center gap-2">
               {{ habit.name }}
-              <IconCheckCircle2 v-if="habit.completedToday" class="h-4 w-4 text-success" />
+              <IconCheckCircle2 v-if="isCompletedToday" class="h-4 w-4 text-success" />
             </CardTitle>
-            <Badge variant="secondary" class="mt-1">{{ habit.category }}</Badge>
+            <Badge variant="secondary" class="mt-1">{{ habit.category.name }}</Badge>
           </div>
         </div>
         <DropdownMenu>
@@ -19,76 +18,56 @@
               <IconMoreVertical class="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="handleMarkComplete">
-              Add Log / Session
-            </DropdownMenuItem>
-            <DropdownMenuItem @click="handleViewDetails">
-              <IconBarChart3 class="h-4 w-4 mr-2" />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuItem @click="handleEdit">
-              <IconEdit class="h-4 w-4 mr-2" />
-              Edit Habit
-            </DropdownMenuItem>
-            <DropdownMenuItem @click="handleToggleStatus">
-              <template v-if="habit.status === 'active'">
-                <IconPause class="h-4 w-4 mr-2" />
-                Pause Habit
-              </template>
-              <template v-else>
-                <IconPlay class="h-4 w-4 mr-2" />
-                Activate Habit
-              </template>
-            </DropdownMenuItem>
-            <DropdownMenuItem @click="handleDeleteHabit" class="text-destructive">
-              <IconTrash2 class="h-4 w-4 mr-2" />
-              Delete Habit
+            <DropdownMenuItem v-for="option in dropdownOptions" :key="option.id" @click="handleAction(option.action)">
+              <component :is="option.icon" class="w-4 h-4 mr-2" />
+              {{ option.label }}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </CardHeader>
     <CardContent class="space-y-4">
-      <div class="flex items-center justify-between text-sm">
+      <div class="flex items-center justify-between text-sm"
+        :class="`${habit.currentStreak > 0 ? 'opacity-100' : 'opacity-0'}`">
         <div class="flex items-center gap-2 text-muted-foreground">
           <IconFlame class="h-4 w-4 text-primary" />
-          <span class="font-medium">{{ habit.streak }} day streak</span>
+          <span class="font-medium">{{ habit.currentStreak }} day streak</span>
         </div>
-        <IconGift v-if="habit.hasMilestone" class="h-4 w-4 text-warning" />
       </div>
 
       <div class="space-y-2">
         <div class="flex justify-between text-sm">
           <span class="text-muted-foreground">Progress</span>
-          <span class="font-medium">{{ habit.progress }}%</span>
+          <span class="font-medium">{{ progress }}%</span>
         </div>
-        <Progress :model-value="habit.progress" class="h-2" />
+        <Progress :model-value="progress" class="h-2" />
       </div>
 
       <div class="space-y-2 text-sm">
         <div class="flex items-center justify-between">
-          <span class="text-muted-foreground">Recurrence</span>
-          <span class="font-medium">{{ habit.recurrence }}</span>
+          <span class="text-muted-foreground">Frequency</span>
+          <span class="font-medium capitalize">{{ habit.frequency }}</span>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-muted-foreground flex items-center gap-1">
             <IconClock class="h-3 w-3" />
             Next Due
           </span>
-          <span class="font-medium">{{ habit.nextDue }}</span>
+          <span class="font-medium">{{ nextDueDate }}</span>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-muted-foreground flex items-center gap-1">
             <IconTarget class="h-3 w-3" />
             Goal Progress
           </span>
-          <span class="font-medium">{{ habit.goalProgress.current }} / {{ habit.goalProgress.target }}</span>
+          <span class="font-medium">{{ totalCompletions }} / {{ goalValue }}</span>
         </div>
       </div>
 
-      <Button v-if="!habit.completedToday && habit.status === 'active'" @click="handleMarkComplete"
-        class="w-full" size="sm">
+      <Button v-if="!isCompletedToday && habit.status === 'active'" @click="handleAction('recordLog')" class="w-full"
+        size="sm">
         Mark as Complete
       </Button>
     </CardContent>
@@ -96,44 +75,17 @@
 </template>
 
 <script setup lang="ts">
-// import { toast } from 'vue-sonner'
-// Props
-const props = defineProps<{ habit: Habit, selectedHabits: string[] }>()
+
+const props = defineProps<{ habit: HabitWithCategory }>()
 
 const emit = defineEmits<{
-  (e: 'selectHabit'): void
-  (e: 'markComplete'): void
-  (e: 'toggleStatus'): void
-  (e: 'deleteHabit'): void
-  (e: 'edit'): void
-  (e: 'viewDetails'): void
+  (e: 'handleAction', action: string): void
 }>()
 
 
-// Methods
-const handleSelectHabit = () => {
-  emit('selectHabit')
+const handleAction = (action: string) => {
+  emit('handleAction', action)
 }
 
-const handleMarkComplete = () => {
-  emit('markComplete')
-}
-
-const handleViewDetails = () => {
-  emit('viewDetails')
-}
-
-const handleEdit = () => {
-  emit('edit')
-}
-
-const handleToggleStatus = () => {
-  emit('toggleStatus')
-}
-
-const handleDeleteHabit = () => {
-  emit('deleteHabit')
-}
-
-
+const { dropdownOptions, progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
 </script>

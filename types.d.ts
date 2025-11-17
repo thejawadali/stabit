@@ -64,6 +64,14 @@ interface TodayHabit extends Partial<Habit> {
   }
 }
 
+interface HabitWithCategory extends Habit {
+  category: {
+    id: string
+    name: string
+    icon: string
+  }
+}
+
 interface MissedHabitLogs extends Partial<Habit> {
   id: string,
   createdAt: string,
