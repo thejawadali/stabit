@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
         longestStreak: true,
         totalCompletions: true,
         goalValue: true,
+        isArchived: true,
         goalMetric: true,
         nextDueDate: true,
       },
