@@ -78,6 +78,28 @@ function calculateNextDueDate(frequency: Frequency, currentDate: Date): Date {
 }
 
 /**
+ * Ensure nextDueDate is in the future or present (at midnight of today)
+ * If it's in the past or null, set it to today at midnight (worst case)
+ * Otherwise, ensure it's normalized to start of day
+ */
+function ensureNextDueDateIsValid(nextDueDate: Date | null, frequency: Frequency, todayStart: Date): Date {
+  if (!nextDueDate) {
+    // If no nextDueDate, set it to today at midnight (worst case)
+    return new Date(todayStart)
+  }
+  
+  const nextDueDateStart = startOfDay(nextDueDate)
+  
+  // If nextDueDate is before today, set it to today at midnight (worst case)
+  if (nextDueDateStart < todayStart) {
+    return new Date(todayStart)
+  }
+  
+  // If nextDueDate is today or in the future, return it normalized to start of day
+  return nextDueDateStart
+}
+
+/**
  * Create milestones for a habit
  */
 async function createMilestonesForHabit(habit: Habit, userId: string) {
@@ -706,6 +728,8 @@ async function seedData(userId: string) {
           status = CompletionStatus.missed
           currentStreak = 0
           totalMissed++
+          // Update nextDueDate when missed - set to next occurrence from the missed date
+          nextDueDate = calculateNextDueDate(habit.frequency, currentDate)
           recentMisses.push(new Date(currentDate))
           // Keep only last 3 misses
           if (recentMisses.length > 3) {
@@ -814,6 +838,8 @@ async function seedData(userId: string) {
           status = CompletionStatus.missed
           currentStreak = 0
           totalMissed++
+          // Update nextDueDate when missed - set to next occurrence from the missed date
+          nextDueDate = calculateNextDueDate(habit.frequency, currentDate)
           recentMisses.push(new Date(currentDate))
           if (recentMisses.length > 3) {
             recentMisses.shift()
@@ -907,6 +933,9 @@ async function seedData(userId: string) {
       }
     }
 
+    // Ensure nextDueDate is in the future or present (at midnight of today)
+    const validNextDueDate = ensureNextDueDateIsValid(nextDueDate, habit.frequency, todayStart)
+
     // Update habit with final statistics
     await prisma.habit.update({
       where: { id: habit.id },
@@ -916,7 +945,7 @@ async function seedData(userId: string) {
         totalSkipped,
         longestStreak,
         currentStreak,
-        nextDueDate
+        nextDueDate: validNextDueDate
       }
     })
 
