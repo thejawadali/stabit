@@ -50,18 +50,6 @@
             </SelectContent>
           </Select>
 
-          <Select v-model="goalFilter">
-            <SelectTrigger class="w-[150px]">
-              <SelectValue placeholder="Goal %" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Progress</SelectItem>
-              <SelectItem value="high">75-100%</SelectItem>
-              <SelectItem value="medium">50-74%</SelectItem>
-              <SelectItem value="low">0-49%</SelectItem>
-            </SelectContent>
-          </Select>
-
           <!-- view mode buttons -->
           <div class="flex gap-2 ml-auto">
             <Button :variant="viewMode === 'grid' ? 'default' : 'outline'" size="icon" @click="viewMode = 'grid'">
@@ -187,7 +175,6 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const searchQuery = ref('')
 const categoryFilter = ref('all')
 const frequencyFilter = ref<Frequency | 'all'>('all')
-const goalFilter = ref('all')
 
 const filteredHabits = computed(() => {
   return habitData.value.habits.filter((habit: HabitWithCategory) => {
@@ -195,13 +182,8 @@ const filteredHabits = computed(() => {
       habit.category.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesCategory = categoryFilter.value === 'all' || habit.categoryId === categoryFilter.value
     const matchesRecurrence = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
-    const progress = habit.goalValue > 0 ? (habit.totalCompletions / habit.goalValue) * 100 : 0
-    const matchesGoal = goalFilter.value === 'all' ||
-      (goalFilter.value === 'high' && progress >= 75) ||
-      (goalFilter.value === 'medium' && progress >= 50 && progress < 75) ||
-      (goalFilter.value === 'low' && progress < 50)
 
-    return matchesSearch && matchesCategory && matchesRecurrence && matchesGoal
+    return matchesSearch && matchesCategory && matchesRecurrence
   })
 })
 
