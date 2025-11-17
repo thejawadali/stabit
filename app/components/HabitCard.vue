@@ -1,5 +1,5 @@
 <template>
-  <Card :class="`relative ${habit.status === 'inactive' ? 'opacity-60' : ''}`">
+  <Card :class="`relative ${habit.isArchived ? 'opacity-60' : ''}`">
     <CardHeader class="pb-3">
       <div class="flex items-start justify-between">
         <div class="flex items-start space-x-3">
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <Button v-if="!isCompletedToday && habit.status === 'active'" @click="handleAction('recordLog')" class="w-full"
+      <Button v-if="!isCompletedToday && !habit.isArchived" @click="handleAction('recordLog')" class="w-full"
         size="sm">
         Mark as Complete
       </Button>

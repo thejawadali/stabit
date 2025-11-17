@@ -25,8 +25,8 @@ export const useHabitItem = (habit: HabitWithCategory) => {
     },
     {
       id: 4,
-      label: habit.status === 'active' ? 'Pause Habit' : 'Activate Habit',
-      icon: habit.status === 'active' ? IconPause : IconPlay,
+      label: habit.isArchived ? 'Activate Habit' : 'Archive Habit',
+      icon: habit.isArchived ? IconPlay : IconPause,
       action: 'toggleStatus'
     },
     {

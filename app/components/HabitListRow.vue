@@ -1,5 +1,5 @@
 <template>
-  <Card :key="habit.id" :class="habit.status === 'inactive' ? 'opacity-60' : ''">
+  <Card :key="habit.id" :class="habit.isArchived ? 'opacity-60' : ''">
     <CardContent class="p-4">
       <div class="flex items-center gap-4">
         <div class="text-2xl">{{ habit.icon }}</div>
