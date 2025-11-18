@@ -33,12 +33,12 @@ syncRefs(modelValue, value)
 
 let resetHasDone = ref(false)
 onMounted(() => {
-  if (!modelValue.value) {
-    setTimeout(() => {
+  setTimeout(() => {
+    if (!modelValue.value) {
       handleReset()
       resetHasDone.value = true
-    })
-  }
+    }
+  })
 })
 
 const showError = computed(() => {
