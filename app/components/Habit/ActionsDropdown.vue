@@ -7,7 +7,7 @@
     </DropdownMenuTrigger>
 
     <DropdownMenuContent align="end">
-      <DropdownMenuItem v-for="option in dropdownOptions" :key="option.id" @click="handleAction(option.action)">
+      <DropdownMenuItem v-for="option in filteredDropdownOptions" :key="option.id" @click="handleAction(option.action)">
         <component :is="option.icon" class="w-4 h-4 mr-2" />
         {{ option.label }}
       </DropdownMenuItem>
@@ -19,7 +19,9 @@
 import { IconPlus, IconBarChart3, IconEdit, IconPause, IconPlay, IconTrash2 } from '#components'
 
 const props = defineProps<{
-  habit: HabitWithCategory
+  habit: HabitWithCategory,
+  isArchived: boolean,
+  isTaskCompleted: boolean,
 }>()
 
 const emit = defineEmits<{
@@ -35,33 +37,40 @@ const dropdownOptions = computed(() => [
     id: 1,
     label: 'View Details',
     icon: IconBarChart3,
-    action: 'viewDetails'
+    action: 'viewDetails',
+    disabled: false
   },
   {
     id: 2,
     label: 'Record Progress',
     icon: IconPlus,
-    action: 'recordLog'
+    action: 'recordLog',
+    disabled: props.isArchived || props.isTaskCompleted
   },
   {
     id: 3,
     label: 'Edit Habit',
     icon: IconEdit,
-    action: 'edit'
+    action: 'edit',
+    disabled: false
   },
   {
     id: 4,
     label: props.habit.isArchived ? 'Activate Habit' : 'Archive Habit',
     icon: props.habit.isArchived ? IconPlay : IconPause,
-    action: 'toggleStatus'
+    action: 'toggleStatus',
+    disabled: false
   },
   {
     id: 5,
     label: 'Delete Habit',
     icon: IconTrash2,
-    action: 'delete'
+    action: 'delete',
+    disabled: false
   },
 ])
+
+const filteredDropdownOptions = computed(() => dropdownOptions.value.filter(option => !option.disabled))
 </script>
 
 <style scoped></style>

@@ -13,7 +13,7 @@
           </div>
         </div>
         
-        <HabitActionsDropdown :habit @handleAction="handleAction" />
+        <HabitActionsDropdown :habit :isArchived="habit.isArchived" :isTaskCompleted @handleAction="handleAction" />
       </div>
     </CardHeader>
     <CardContent class="space-y-4">
