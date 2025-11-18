@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, CompletionStatus } from '@prisma/client'
 import { serverSupabaseUser } from '#supabase/server'
 
 const prisma = new PrismaClient()
@@ -22,6 +22,9 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Habit ID is required'
       })
     }
+
+    const query = getQuery(event)
+    const includeDetail = query.detail === 'true'
 
     const habit = await prisma.habit.findFirst({
       where: {
@@ -55,6 +58,74 @@ export default defineEventHandler(async (event) => {
         statusCode: 404,
         statusMessage: 'Habit not found'
       })
+    }
+
+    // If detail is requested, calculate additional stats
+    if (includeDetail) {
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      thirtyDaysAgo.setHours(0, 0, 0, 0)
+
+      // Get logs from the last 30 days
+      const last30DaysLogs = await prisma.habitLogs.findMany({
+        where: {
+          habitId: habitId,
+          userId: user.sub,
+          createdAt: {
+            gte: thirtyDaysAgo
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
+
+      // Calculate stats
+      const completedLogs = last30DaysLogs.filter(log => log.completionStatus === CompletionStatus.completed)
+      const missedLogs = last30DaysLogs.filter(log => log.completionStatus === CompletionStatus.missed)
+      const totalRelevantLogs = completedLogs.length + missedLogs.length
+
+      // Completion rate: percentage of completed vs missed in last 30 days
+      const completionRate = totalRelevantLogs > 0 
+        ? Math.round((completedLogs.length / totalRelevantLogs) * 100)
+        : 0
+
+      // Total completions: count of completed logs
+      const totalCompletions = completedLogs.length
+
+      // Average duration: average of durationMinutes for completed logs that have duration
+      const logsWithDuration = completedLogs.filter(log => log.durationMinutes !== null)
+      const avgDuration = logsWithDuration.length > 0
+        ? Math.round(
+            logsWithDuration.reduce((sum, log) => sum + (log.durationMinutes || 0), 0) / logsWithDuration.length
+          )
+        : 0
+
+      // Current streak: use habit's currentStreak field
+      const currentStreak = habit.currentStreak
+
+      return {
+        success: true,
+        data: {
+          id: habit.id,
+          name: habit.name,
+          icon: habit.icon,
+          description: habit.description,
+          stats: {
+            currentStreak,
+            completionRate,
+            totalCompletions,
+            avgDuration
+          },
+          logs: last30DaysLogs.map(log => ({
+            id: log.id,
+            completionStatus: log.completionStatus,
+            durationMinutes: log.durationMinutes,
+            notes: log.notes,
+            createdAt: log.createdAt
+          }))
+        }
+      }
     }
 
     return {

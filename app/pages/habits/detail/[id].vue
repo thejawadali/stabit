@@ -90,35 +90,81 @@ const router = useRouter()
 const { toast } = useToast()
 const id = String(route.params.id || '')
 
-const habit = ref<HabitDetail | null>(null)
-const logs = ref<HabitLog[]>([])
-const isLoading = ref(true)
 
-// const stats = reactive({
-//   completionRate: 0,
-//   avgDuration: 0,
-//   totalDays: 0,
-//   consecutiveDays: 0
-// })
-const stats = reactive({
-  completionRate: 75,
-  avgDuration: 17,
-  totalDays: 87,
-  consecutiveDays: 12
+// Type definitions
+type HabitDetailsResponse = {
+  success: boolean
+  data: {
+    id: string
+    name: string
+    icon: string
+    description: string
+    stats: {
+      currentStreak: number
+      completionRate: number
+      totalCompletions: number
+      avgDuration: number
+    }
+    logs: HabitLog[]
+  } | null
+}
+
+
+const { data: habitDetailsResponse } = await useFetch<HabitDetailsResponse>(`/api/habits/${id}`, {
+  query: {
+    detail: 'true'
+  },
+  default: () => ({ success: false, data: null })
+})
+
+const habitDetails = computed(() => {
+  if (!habitDetailsResponse.value?.success || !habitDetailsResponse.value?.data) {
+    return null
+  }
+  return habitDetailsResponse.value.data
+})
+
+const habit = computed(() => {
+  if (!habitDetails.value) return null
+  const { stats: apiStats, logs: apiLogs, ...habitData } = habitDetails.value
+  return {
+    id: habitData.id,
+    name: habitData.name,
+    icon: habitData.icon,
+    description: habitData.description,
+    currentStreak: apiStats.currentStreak,
+    totalCompletions: apiStats.totalCompletions
+  }
+})
+
+const logs = computed(() => {
+  if (!habitDetails.value) return []
+  return habitDetails.value.logs.map((log: HabitLog) => ({
+    id: log.id,
+    createdAt: typeof log.createdAt === 'string' ? log.createdAt : new Date(log.createdAt).toISOString(),
+    completionStatus: log.completionStatus,
+    durationMinutes: log.durationMinutes || undefined,
+    notes: log.notes || undefined
+  }))
+})
+
+const stats = computed(() => {
+  if (!habitDetails.value) return null
+  return habitDetails.value.stats
 })
 
 
-const habitStats = [
+const habitStats = computed(() => [
   {
     title: "Current Streak",
-    value: habit.value?.currentStreak || 0,
+    value: stats.value?.currentStreak || 0,
     subtitle: "days",
     icon: IconFlame,
     iconColor: "text-primary",
   },
   {
     title: "Completion Rate",
-    value: stats.completionRate,
+    value: stats.value?.completionRate || 0,
     suffix: "%",
     subtitle: "last 30 days",
     icon: IconTarget,
@@ -126,107 +172,20 @@ const habitStats = [
   },
   {
     title: "Total Completions",
-    value: habit.value?.totalCompletions || 0,
-    subtitle: "all time",
+    value: stats.value?.totalCompletions || 0,
+    subtitle: "last 30 days",
     icon: IconTrophy,
     iconColor: "text-warning",
   },
   {
     title: "Avg Duration",
-    value: stats.avgDuration,
+    value: stats.value?.avgDuration || 0,
     subtitle: "minutes",
     icon: IconClock,
     iconColor: "text-primary",
   },
-]
+])
 
-
-
-onMounted(() => {
-  if (id) fetchHabitDetails()
-})
-
-async function fetchHabitDetails() {
-  habit.value = {
-    id: id || "1",
-    name: "Morning Meditation",
-    description: "Start the day with 15 minutes of mindfulness meditation",
-    category: "Health",
-    frequency: "daily",
-    icon: "🧘",
-    currentStreak: 12,
-    longestStreak: 25,
-    totalCompletions: 87,
-    currentGoal: 100,
-    status: "active",
-    createdAt: new Date("2024-01-15")
-  }
-
-  logs.value = [
-    { id: "1", createdAt: dayjs().format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 15, notes: "Great session!" },
-    { id: "2", createdAt: dayjs().subtract(1, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 20 },
-    { id: "3", createdAt: dayjs().subtract(2, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 15 },
-    { id: "4", createdAt: dayjs().subtract(3, "day").format("YYYY-MM-DD"), completionStatus: "skipped", notes: "Overslept" },
-    { id: "5", createdAt: dayjs().subtract(4, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 18 },
-    { id: "6", createdAt: dayjs().subtract(5, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 15 },
-    { id: "7", createdAt: dayjs().subtract(6, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 20 },
-    { id: "8", createdAt: dayjs().subtract(8, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 15 },
-    { id: "9", createdAt: dayjs().subtract(10, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 22 },
-    { id: "10", createdAt: dayjs().subtract(12, "day").format("YYYY-MM-DD"), completionStatus: "completed", durationMinutes: 15 },
-  ]
-
-  return
-  try {
-    // TODO: don't fetch habit and logs diffently, fetch both together in a single api
-    isLoading.value = true
-
-    // Fetch habit
-    const habitResponse = await $fetch<{ success: boolean; data: any }>(`/api/habits/${id}`)
-    if (!habitResponse.success || !habitResponse.data) {
-      throw new Error('Failed to fetch habit')
-    }
-    habit.value = habitResponse.data as Habit
-
-    // Fetch logs (last 30 days)
-    const thirtyDaysAgo = dayjs().subtract(30, 'day')
-    const logsResponse = await $fetch<{ success: boolean; data: any[] }>('/api/habit-logs', {
-      query: {
-        habitId: id,
-        createdAtStart: thirtyDaysAgo.format('YYYY-MM-DD')
-      }
-    })
-
-    if (!logsResponse.success || !logsResponse.data) {
-      throw new Error('Failed to fetch logs')
-    }
-    logs.value = logsResponse.data as HabitLog[]
-
-    calculateStats(logs.value, habit.value as Habit)
-  } catch (err: any) {
-    console.error('Error fetching habit details:', err)
-    toast({
-      title: 'Error',
-      description: err?.data?.message || err?.message || 'Failed to load habit details',
-      variant: 'destructive'
-    })
-  } finally {
-    isLoading.value = false
-  }
-}
-
-function calculateStats(logsData: HabitLog[], habitData: HabitDetail) {
-  const last30Days = 30
-  const completedLogs = logsData.filter((l) => l.completionStatus === 'completed')
-  const completionRate = (completedLogs.length / last30Days) * 100
-  const avgDuration = completedLogs.length > 0
-    ? Math.round(completedLogs.reduce((s, l) => s + (l.durationMinutes || 0), 0) / completedLogs.length)
-    : 0
-
-  stats.completionRate = Math.round(completionRate)
-  stats.avgDuration = avgDuration
-  stats.totalDays = completedLogs.length
-  stats.consecutiveDays = habitData.currentStreak || 0
-}
 
 function formatDate(dateStr: string) {
   try { return dayjs(dateStr).format('MMMM DD, YYYY') } catch { return dateStr }
