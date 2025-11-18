@@ -69,6 +69,11 @@ interface HabitWithCategory extends Habit {
     name: string
     icon: string
   }
+  mostRecentLog?: {
+    id: string
+    completionStatus: string
+    createdAt: string
+  } | null
 }
 
 interface MissedHabitLogs extends Partial<Habit> {

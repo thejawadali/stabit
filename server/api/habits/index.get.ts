@@ -27,7 +27,9 @@ export default defineEventHandler(async (event) => {
         categoryId: true,
         category: {
           select: {
+            id: true,
             name: true,
+            icon: true,
           },
         },
         currentStreak: true,
@@ -37,9 +39,29 @@ export default defineEventHandler(async (event) => {
         isArchived: true,
         goalMetric: true,
         nextDueDate: true,
+        habitLogs: {
+          take: 1,
+          orderBy: {
+            createdAt: 'desc'
+          },
+          select: {
+            id: true,
+            completionStatus: true,
+            createdAt: true,
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc'
+      }
+    })
+
+    // Map habits to include mostRecentLog and remove habitLogs array
+    const habitsWithLogs = habits.map(habit => {
+      const { habitLogs, ...habitWithoutLogs } = habit
+      return {
+        ...habitWithoutLogs,
+        mostRecentLog: habitLogs.length > 0 ? habitLogs[0] : null
       }
     })
 
@@ -65,7 +87,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       data: {
-        habits,
+        habits: habitsWithLogs,
         completedToday: todaysLogsCount
       }
     }
