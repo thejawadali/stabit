@@ -1,5 +1,6 @@
 import prisma from '../../lib/prisma'
 import { CompletionStatus, MilestoneStatus } from '@prisma/client'
+import calculateNextDueDate from './getNextDueDate'
 
 /**
  * Check if there are 3 consecutive missed logs
@@ -29,14 +30,14 @@ async function hasThreeConsecutiveMisses(habitId: string): Promise<boolean> {
 export async function checkAndCreateMissedHabits(): Promise<void> {
   try {
     const today = new Date()
-    today.setHours(0, 0, 0, 0) // Set to start of day
+    today.setHours(0, 0, 0, 0)
 
     // Find all active habits where nextDueDate has passed
     const habitsWithMissedDueDate = await prisma.habit.findMany({
       where: {
         isArchived: false,
         nextDueDate: {
-          lt: today // Less than today (passed)
+          lt: today
         }
       },
       include: {
@@ -44,7 +45,7 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
           orderBy: {
             createdAt: 'desc'
           },
-          take: 1 // Get the most recent log
+          take: 1
         }
       }
     })
@@ -78,6 +79,7 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
       // Update habit statistics
       const updateData: any = {
         currentStreak: 0,
+        nextDueDate: calculateNextDueDate(habit.frequency, today),
         totalMissed: { increment: 1 }
       }
 
@@ -87,7 +89,7 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
         await prisma.habitMilestones.updateMany({
           where: {
             habitId: habit.id,
-            status: { in: [MilestoneStatus.inProgress, MilestoneStatus.achieved] }
+            status: { in: [MilestoneStatus.inProgress] }
           },
           data: {
             status: MilestoneStatus.locked
@@ -108,5 +110,9 @@ export async function checkAndCreateMissedHabits(): Promise<void> {
     console.error('Error checking for missed habits:', error)
     throw error
   }
+}
+
+export function doIt(){
+  console.log('doIt')
 }
 
