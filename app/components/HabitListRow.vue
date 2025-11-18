@@ -27,7 +27,7 @@
             <div class="font-medium">{{ totalCompletions }}/{{ goalValue }}</div>
           </div>
           <div class="flex items-center justify-end gap-1">
-            <HabitActionsDropdown :habit @handleAction="handleAction" />
+            <HabitActionsDropdown :habit :isArchived="habit.isArchived" :isTaskCompleted @handleAction="handleAction" />
           </div>
         </div>
       </div>
