@@ -32,7 +32,7 @@
           <h4 class="font-semibold mb-2">Schedule</h4>
           <div class="space-y-1 text-sm">
             <div class="flex justify-between">
-              <span class="text-muted-foreground">Recurrence:</span>
+              <span class="text-muted-foreground">Frequency:</span>
               <span class="capitalize">{{ formData.frequency }}</span>
             </div>
             <div class="flex justify-between">

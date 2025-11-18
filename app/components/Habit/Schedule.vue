@@ -3,7 +3,7 @@
     <CardHeader>
       <CardTitle class="flex items-center gap-2">
         <IconCalendar class="w-5 h-5" />
-        Recurrence & Schedule
+        Frequency & Schedule
       </CardTitle>
     </CardHeader>
     <CardContent class="space-y-4">

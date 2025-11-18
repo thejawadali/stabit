@@ -4,7 +4,7 @@
     :habit="habit"
     :categories="categories || []"
     :is-edit-mode="true"
-    :loading="false"
+    :loading
     @update="handleUpdate" 
   />
 </template>

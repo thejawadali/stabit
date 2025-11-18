@@ -181,9 +181,9 @@ const filteredHabits = computed(() => {
     const matchesSearch = habit.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       habit.category.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesCategory = categoryFilter.value === 'all' || habit.categoryId === categoryFilter.value
-    const matchesRecurrence = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
+    const matchesFrequency = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
 
-    return matchesSearch && matchesCategory && matchesRecurrence
+    return matchesSearch && matchesCategory && matchesFrequency
   })
 })
 

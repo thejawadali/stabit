@@ -26,7 +26,7 @@
           :categories="categories" />
       </TabsContent>
 
-      <!-- Schedule & Recurrence  -->
+      <!-- Schedule & Frequency  -->
       <TabsContent value="schedule" class="space-y-4">
         <HabitSchedule v-model:frequency="formData.frequency" v-model:timeOfDay="formData.timeOfDay"
           v-model:notificationsEnabled="formData.enableNotifications" v-model:reminderTimes="formData.reminderTimes" />
