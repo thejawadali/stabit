@@ -7,7 +7,7 @@
           <div>
             <CardTitle class="text-lg flex items-center gap-2">
               {{ habit.name }}
-              <IconCheckCircle2 v-if="isCompletedToday" class="h-4 w-4 text-success" />
+              <IconCheckCircle2 v-if="isTaskCompleted" class="h-4 w-4 text-success" />
             </CardTitle>
             <Badge variant="secondary" class="mt-1">{{ habit.category.name }}</Badge>
           </div>
@@ -43,7 +43,7 @@
             <IconClock class="h-3 w-3" />
             Next Due
           </span>
-          <span class="font-medium">{{ nextDueDate }}</span>
+          <span class="font-medium">{{ formattedNextDueDate }}</span>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-muted-foreground flex items-center gap-1">
@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <Button v-if="!isCompletedToday && !habit.isArchived" @click="handleAction('recordLog')" class="w-full"
+      <Button v-if="showLogButton && !habit.isArchived" @click="handleAction('recordLog')" class="w-full"
         size="sm">
         Mark as Complete
       </Button>
@@ -77,5 +77,5 @@ const handleAction = (action: string) => {
 
 
 
-const { progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
+const { progress, showLogButton, isTaskCompleted, formattedNextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
 </script>

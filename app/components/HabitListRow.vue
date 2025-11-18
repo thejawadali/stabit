@@ -7,7 +7,7 @@
           <div class="col-span-2">
             <div class="font-semibold flex items-center gap-2">
               {{ habit.name }}
-              <IconCheckCircle2 v-if="isCompletedToday" class="h-4 w-4 text-success" />
+              <IconCheckCircle2 v-if="isTaskCompleted" class="h-4 w-4 text-success" />
             </div>
             <Badge variant="secondary" class="mt-1">{{ habit.category.name }}</Badge>
           </div>
@@ -47,5 +47,5 @@ const handleAction = (action: string) => {
   emit('handleAction', action)
 }
 
-const { progress, isCompletedToday, nextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
+const { progress, isTaskCompleted, totalCompletions, goalValue } = useHabitItem(props.habit)
 </script>
