@@ -43,7 +43,7 @@ async function updateMilestones(habitId: string, value: number, durationMinutes:
     if (milestone.targetMetric === 'sessions') {
       progressIncrement = 1
     } else if (milestone.targetMetric === 'minutes' || milestone.targetMetric === 'hours') {
-      progressIncrement = durationMinutes ? durationMinutes : 0
+      progressIncrement = durationMinutes ?? 0
       if (milestone.targetMetric === 'hours') {
         progressIncrement = progressIncrement / 60
       }
@@ -108,7 +108,8 @@ export default defineEventHandler(async (event) => {
     const habit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.sub
+        userId: user.sub,
+        isArchived: false
       }
     })
 
