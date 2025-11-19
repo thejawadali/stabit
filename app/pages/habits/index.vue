@@ -50,6 +50,18 @@
             </SelectContent>
           </Select>
 
+          <Select v-model="dueDateFilter">
+            <SelectTrigger class="w-[150px]">
+              <SelectValue placeholder="Due Date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Dates</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="tomorrow">Tomorrow</SelectItem>
+              <SelectItem value="thisWeek">This Week</SelectItem>
+            </SelectContent>
+          </Select>
+
           <!-- view mode buttons -->
           <div class="flex gap-2 ml-auto">
             <Button :variant="viewMode === 'grid' ? 'default' : 'outline'" size="icon" @click="viewMode = 'grid'">
@@ -94,6 +106,8 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs'
+
 const { toast } = useToast()
 const { confirm } = useConfirm()
 const router = useRouter()
@@ -175,6 +189,7 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const searchQuery = ref('')
 const categoryFilter = ref('all')
 const frequencyFilter = ref<Frequency | 'all'>('all')
+const dueDateFilter = ref<'all' | 'today' | 'tomorrow' | 'thisWeek'>('all')
 
 const filteredHabits = computed(() => {
   return habitData.value.habits.filter((habit: HabitWithCategory) => {
@@ -182,8 +197,34 @@ const filteredHabits = computed(() => {
       habit.category.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesCategory = categoryFilter.value === 'all' || habit.categoryId === categoryFilter.value
     const matchesFrequency = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
+    
+    // Due date filter logic
+    let matchesDueDate = true
+    if (dueDateFilter.value !== 'all' && habit.nextDueDate) {
+      const now = dayjs()
+      const dueDate = dayjs(habit.nextDueDate)
+      const today = now.startOf('day')
+      const tomorrow = now.add(1, 'day').startOf('day')
+      const endOfWeek = now.endOf('week')
+      
+      switch (dueDateFilter.value) {
+        case 'today':
+          matchesDueDate = dueDate.isSame(today, 'day')
+          break
+        case 'tomorrow':
+          matchesDueDate = dueDate.isSame(tomorrow, 'day')
+          break
+        case 'thisWeek':
+          matchesDueDate = dueDate.isSame(today, 'day') || 
+            (dueDate.isAfter(today) && (dueDate.isBefore(endOfWeek) || dueDate.isSame(endOfWeek, 'day')))
+          break
+      }
+    } else if (dueDateFilter.value !== 'all' && !habit.nextDueDate) {
+      // If filter is set but habit has no due date, exclude it (except for 'all')
+      matchesDueDate = false
+    }
 
-    return matchesSearch && matchesCategory && matchesFrequency
+    return matchesSearch && matchesCategory && matchesFrequency && matchesDueDate
   })
 })
 

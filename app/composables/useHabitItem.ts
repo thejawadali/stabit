@@ -34,7 +34,7 @@ export const useHabitItem = (habit: HabitWithCategory) => {
     }
   })
 
-  const showLogButton = computed(() => !isTaskCompleted.value || (habit.nextDueDate && dayjs(habit.nextDueDate).isSame(dayjs(), 'day')))
+  const showLogButton = computed(() => !isTaskCompleted.value && (habit.nextDueDate && dayjs(habit.nextDueDate).isSame(dayjs(), 'day')))
 
   const formattedNextDueDate = computed(() => formatSmartDate(habit.nextDueDate ?? new Date()))
 
