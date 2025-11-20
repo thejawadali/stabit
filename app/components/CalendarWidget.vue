@@ -48,9 +48,6 @@ const props = withDefaults(defineProps<{
   missedDays: () => [],
 })
 
-const emit = defineEmits<{
-  (e: 'onDateChange'): void
-}>()
 
 
 const currentDate = defineModel<Date>('currentDate', { default: new Date() })
@@ -130,11 +127,9 @@ const dayClass = (dayObj: { day: number, isCurrentMonth: boolean, isPreviousMont
 
 const previousMonth = () => {
   currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() - 1, 1)
-  emit('onDateChange')
 }
 
 const nextMonth = () => {
   currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
-  emit('onDateChange')
 }
 </script>
