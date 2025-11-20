@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
           select: {
             id: true,
             name: true,
-            isActive: true
+            isArchived: true
           }
         }
       }
