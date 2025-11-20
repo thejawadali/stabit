@@ -184,8 +184,12 @@ const viewMilestone = ref<Milestone | null>(null)
 
 // Fetch habits for filter dropdown
 const { data: habitsData } = await useFetch('/api/habits', {
-  default: () => ({ success: true, data: [] }),
-  transform: (data: any) => data.data || []
+  default: () => ({ success: true, data: { habits: [], completedToday: 0 } }),
+  transform: (data: any) => (data.data?.habits || []).map((habit: any) => ({
+    id: habit.id,
+    name: habit.name,
+    icon: habit.icon
+  }))
 })
 
 const habits = computed(() => habitsData.value || [])
