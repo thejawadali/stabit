@@ -210,4 +210,10 @@ const filteredTodayHabits = computed(() => {
   return filtered
 })
 
+// Set page title - dashboard should show just "Stabit" (no page name)
+useHead({
+  title: 'Stabit',
+  titleTemplate: ''
+})
+
 </script>

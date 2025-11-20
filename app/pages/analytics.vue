@@ -119,6 +119,11 @@ const weeklyData = [
   { day: "Sat", completed: 8 },
   { day: "Sun", completed: 5 },
 ]
+
+// Set page title
+useHead({
+  title: 'Analytics'
+})
 </script>
 
 <style scoped></style>

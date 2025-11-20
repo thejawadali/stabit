@@ -130,7 +130,7 @@ const updateProfile = async () => {
 
 // Set page title
 useHead({
-  title: 'Settings - Stabit'
+  title: 'Settings'
 })
 </script>
 

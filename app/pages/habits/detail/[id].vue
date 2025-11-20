@@ -148,6 +148,11 @@ const logs = computed(() => {
   }))
 })
 
+// Set page title with habit name
+useHead({
+  title: computed(() => habit.value?.name || 'Habit')
+})
+
 const stats = computed(() => {
   if (!habitDetails.value) return null
   return habitDetails.value.stats

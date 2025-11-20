@@ -333,4 +333,9 @@ const navigateToCreateHabit = () => {
   router.push('/habits/create')
 }
 
+// Set page title
+useHead({
+  title: 'Habits'
+})
+
 </script>

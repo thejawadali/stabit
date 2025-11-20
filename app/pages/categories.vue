@@ -247,5 +247,10 @@ const formatDate = (dateString: Date) => {
   return dayjs(dateString).format('DD/MM/YYYY')
 }
 
+// Set page title
+useHead({
+  title: 'Categories'
+})
+
 
 </script>

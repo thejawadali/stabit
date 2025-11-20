@@ -42,6 +42,11 @@ const handleSave = async (data: HabitFormData) => {
     loading.value = false
   }
 }
+
+// Set page title
+useHead({
+  title: 'Create Habit'
+})
 </script>
 
 <style scoped></style>

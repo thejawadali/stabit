@@ -344,6 +344,10 @@ const getStatusIcon = (status: string) => {
   }
 }
 
+// Set page title
+useHead({
+  title: 'Milestones'
+})
 
 </script>
 

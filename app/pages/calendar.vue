@@ -177,6 +177,11 @@ const streakData = {
   longest: 45,
   thisMonth: 28,
 }
+
+// Set page title
+useHead({
+  title: 'Calendar'
+})
 </script>
 
 <style scoped></style>

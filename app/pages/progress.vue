@@ -269,6 +269,11 @@ const weeklyProgress = [
   { week: "Week 4", percentage: 85 },
 ];
 
+// Set page title
+useHead({
+  title: 'Progress'
+})
+
 </script>
 
 <style scoped></style>

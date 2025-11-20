@@ -43,7 +43,7 @@ const habit = computed(() => combinedData.value.habit)
 const categories = computed(() => combinedData.value.categories)
 
 useHead({
-  title: habit.value?.name || 'Habit'
+  title: computed(() => habit.value?.name || 'Habit')
 })
 
 
