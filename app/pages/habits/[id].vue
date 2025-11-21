@@ -1,12 +1,13 @@
 <template>
   <HabitForm 
     v-if="!pending"
-    :habit="habit"
+    :habit="habitData.data"
     :categories="categories || []"
     :is-edit-mode="true"
     :loading
     @update="handleUpdate" 
   />
+  
 </template>
 
 <script setup lang="ts">
@@ -17,33 +18,20 @@ const habitId = route.params.id as string
 const loading = ref(false)
 
 
-const { data: combinedData, pending } = await useAsyncData<CombinedData>(
-  'habit-and-categories',
-  async () => {
-    const [habitRes, categoriesRes] = await Promise.all([
-      $fetch<{ success: boolean; data: Habit }>(`/api/habits/${habitId}`),
-      $fetch<{ id: string; name: string; icon: string }[]>('/api/categories')
-    ]);
+const {data: habitData, pending } = useFetch<{success: boolean, data: Habit | null}>(`/api/habits/${habitId}`, {
+  default: () => ({ success: false, data: {} as Habit })
+})
+const {data: categories} = useFetch<{ id: string; name: string; icon: string }[]>('/api/categories', {
+  transform: (data: any) => data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    icon: item.icon
+  }))
+})
 
-    return {
-      habit: habitRes.data,
-      categories: categoriesRes.map(item => ({
-        id: item.id,
-        name: item.name,
-        icon: item.icon
-      }))
-    };
-  },
-  {
-    default: () => ({ habit: null, categories: [] })
-  }
-);
-
-const habit = computed(() => combinedData.value.habit)
-const categories = computed(() => combinedData.value.categories)
 
 useHead({
-  title: computed(() => habit.value?.name || 'Habit')
+  title: computed(() => habitData.value?.data?.name || 'Habit')
 })
 
 
@@ -70,5 +58,3 @@ async function handleUpdate(data: HabitFormData) {
   }
 }
 </script>
-
-<style scoped></style>

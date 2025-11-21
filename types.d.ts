@@ -201,17 +201,6 @@ type NotificationSettingsType = Pick<UserProfile, 'enableReminders' | 'enableMil
 
 
 
-
-
-
-// Component Props Types
-interface CombinedData {
-  habit: Habit | null
-  categories: { id: string; name: string; icon: string }[]
-}
-
-
-
 // Milestone Types
 interface Milestone {
   id: string

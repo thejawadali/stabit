@@ -112,10 +112,6 @@ const { toast } = useToast()
 const { confirm } = useConfirm()
 const router = useRouter()
 
-type HabitsAndCategoriesResponse = {
-  habitData: { habits: HabitWithCategory[], completedToday: number },
-  categories: { id: string; name: string; icon: string }[]
-}
 
 interface HabitWithCategory extends Habit {
   category: {
@@ -125,31 +121,21 @@ interface HabitWithCategory extends Habit {
   }
 }
 
-// fetch habits and categories
-const { data } = await useAsyncData<HabitsAndCategoriesResponse>(
-  'habits-and-categories',
-  async () => {
-    const [habitsRes, categoriesRes] = await Promise.all([
-      $fetch<{ success: boolean; data: { habits: HabitWithCategory[], completedToday: number } }>(`/api/habits`),
-      $fetch<{ id: string; name: string; icon: string }[]>('/api/categories')
-    ])
+// fetch categories
+const {data: categories} = useFetch<{ id: string; name: string; icon: string }[]>('/api/categories', {
+  transform: (data: any) => data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    icon: item.icon
+  }))
+})
 
-    return {
-      habitData: habitsRes.data,
-      categories: categoriesRes.map(item => ({
-        id: item.id,
-        name: item.name,
-        icon: item.icon
-      }))
-    }
-  },
-  {
-    default: () => ({ habitData: { habits: [], completedToday: 0 }, categories: [] })
-  }
-)
+// fetch habits
+const {data: habitData} = useFetch<{ habits: HabitWithCategory[], completedToday: number }>('/api/habits', {
+  transform: (data: any) => data.data,
+  default: () => ({ habits: [], completedToday: 0 })
+})
 
-const habitData = computed(() => data.value.habitData)
-const categories = computed(() => data.value.categories)
 
 const stats = computed(() => {
   const habits = habitData.value.habits
