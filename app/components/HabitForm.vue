@@ -1,6 +1,9 @@
 <template>
   <main class="container mx-auto p-6 w-full max-w-5xl">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-start gap-x-4 mb-6">
+      <Button v-if="isEditMode" variant="ghost" size="icon" @click="router.push('/habits')">
+        <IconArrowLeft class="h-5 w-5" />
+      </Button>
       <div>
         <h1 class="text-3xl font-bold">
           {{ isEditMode ? "Edit Habit" : "Create New Habit" }}
@@ -67,6 +70,8 @@
 </template>
 
 <script setup lang="ts">
+
+const router = useRouter()
 
 const { validate } = useForm()
 const INITIAL_FORM_DATA: HabitFormData = {
