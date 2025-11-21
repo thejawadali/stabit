@@ -39,13 +39,40 @@
 const props = defineProps<{ habit: HabitWithCategory }>()
 
 const emit = defineEmits<{
-  (e: 'handleAction', action: string): void
+  (e: 'addRecord'): void,
+  (e: 'refresh'): void
 }>()
 
 
 const handleAction = (action: string) => {
-  emit('handleAction', action)
+  switch (action) {
+    case 'viewDetails':
+      viewDetails()
+      break
+    case 'recordLog':
+      emit('addRecord')
+      break
+    case 'edit':
+      editHabit()
+      break
+    case 'toggleStatus':
+      toggleStatus()
+      break
+    case 'delete':
+      deleteHabit()
+      break
+
+    default:
+      break
+  }
 }
 
-const { progress, isTaskCompleted, totalCompletions, goalValue } = useHabitItem(props.habit)
+const {
+  progress, isTaskCompleted, totalCompletions, goalValue,
+  toggleStatus,
+  editHabit,
+  viewDetails,
+  deleteHabit,
+} =
+  useHabitItem({ habit: props.habit, refresh: () => emit('refresh') })
 </script>

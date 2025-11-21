@@ -91,25 +91,23 @@
         <template v-else>
           <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit"
-              @handleAction="handleAction($event, habit.id)" />
+              @addRecord="addRecord(habit.id)" @refresh="refreshHabits" />
           </div>
           <div v-else class="space-y-3">
             <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit"
-              @handleAction="handleAction($event, habit.id)" />
+              @addRecord="addRecord(habit.id)" @refresh="refreshHabits" />
           </div>
         </template>
       </div>
     </main>
     <HabitLogDialog :habit-id="selectedHabitToLog?.id" :habit-name="selectedHabitToLog?.name"
-      v-model:is-dialog-open="isLogHabitDialogOpen" />
+      v-model:is-dialog-open="isLogHabitDialogOpen" @refresh="refreshHabits" />
   </div>
 </template>
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
-const { toast } = useToast()
-const { confirm } = useConfirm()
 const router = useRouter()
 
 
@@ -131,7 +129,7 @@ const {data: categories} = useFetch<{ id: string; name: string; icon: string }[]
 })
 
 // fetch habits
-const {data: habitData} = useFetch<{ habits: HabitWithCategory[], completedToday: number }>('/api/habits', {
+const {data: habitData, refresh: refreshHabits} = useFetch<{ habits: HabitWithCategory[], completedToday: number }>('/api/habits', {
   transform: (data: any) => data.data,
   default: () => ({ habits: [], completedToday: 0 })
 })
@@ -220,98 +218,12 @@ const isLogHabitDialogOpen = ref(false)
 const selectedHabitToLog = ref<{ id: string, name: string } | null>(null)
 
 
-const handleAction = (action: string, habitId: string) => {
-  switch (action) {
-    case 'viewDetails':
-      router.push(`/habits/detail/${habitId}`)
-      break
-    case 'recordLog':
-      addRecord(habitId)
-      break
-    case 'edit':
-      router.push(`/habits/${habitId}`)
-      break
-    case 'toggleStatus':
-      toggleStatus(habitId)
-      break
-    case 'delete':
-      deleteHabit(habitId)
-      break
-
-    default:
-      break
-  }
-}
-
 const addRecord = (habitId: string) => {
   selectedHabitToLog.value = { id: habitId, name: filteredHabits.value.find(habit => habit.id === habitId)?.name || '' }
   isLogHabitDialogOpen.value = true
 }
 
-const toggleStatus = async (habitId: string) => {
-  try {
-    await $fetch(`/api/habits/${habitId}/toggle-status`, {
-      method: 'POST'
-    })
-    let archivedStatus = false
-    const index = habitData.value.habits.findIndex(habit => habit.id === habitId)
-    const updatedHabits = [...habitData.value.habits];
-    if (index !== -1 && updatedHabits[index]) {
-updatedHabits[index].isArchived = !updatedHabits[index].isArchived;
-habitData.value.habits = updatedHabits;
 
-      // habitData.value.habits[index].isArchived = !habitData.value.habits[index].isArchived
-      // archivedStatus = habitData.value.habits[index]?.isArchived || false
-      // console.log('archivedStatus', habitData.value.habits[index])
-    }
-
-    toast({
-      title: 'Status toggled',
-      description: `The habit has been ${archivedStatus ? 'archived' : 'activated'} successfully.`,
-    })
-  } catch (error) {
-    console.error('Error toggling status:', error)
-    toast({
-      title: 'Error',
-      description: 'Failed to toggle status. Please try again.',
-      variant: 'destructive',
-    })
-  }
-}
-
-
-
-const deleteHabit = async (habitId: string) => {
-  const confirmed = await confirm({
-    title: 'Delete Habit?',
-    description: 'This action cannot be undone. This will permanently delete the habit and all its data.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    variant: 'destructive',
-  })
-  if (!confirmed) return
-  try {
-
-    await $fetch(`/api/habits/${habitId}`, {
-      method: 'DELETE'
-    })
-
-    habitData.value.habits = habitData.value.habits.filter(habit => habit.id !== habitId)
-
-    toast({
-      title: 'Habit deleted',
-      description: 'The habit has been deleted successfully.',
-    })
-  } catch (error: any) {
-    console.error('Error deleting habit:', error)
-    const errorMessage = error?.data?.message || error?.message || 'Failed to delete habit. Please try again.'
-    toast({
-      title: 'Error',
-      description: errorMessage,
-      variant: 'destructive',
-    })
-  }
-}
 
 
 // routing methods

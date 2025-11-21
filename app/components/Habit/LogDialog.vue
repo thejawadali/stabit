@@ -1,9 +1,8 @@
 <template>
-  
   <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
     <DialogContent class="max-w-md max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Record Progress</DialogTitle>
+        <DialogTitle>{{habitName || 'Record Progress'}}</DialogTitle>
         <DialogDescription>
           {{ habitName ? `Track your progress for ${habitName}` : "Record your habit completion" }}
         </DialogDescription>
@@ -86,6 +85,10 @@ const props = defineProps<{
   habitName?: string
 }>()
 
+const emit = defineEmits<{
+  (e: 'refresh'): void
+}>()
+
 const isDialogOpen = defineModel<boolean>('isDialogOpen', { default: false })
 
 const { toast } = useToast()
@@ -129,6 +132,7 @@ async function fetchCustomFields() {
         customFieldsValues[field.id] = ""
       })
     }
+
   } catch (err) {
     console.error("Error fetching custom fields:", err)
     toast({
@@ -161,7 +165,7 @@ async function handleSubmit() {
     if (!response.success) {
       throw new Error(response.message || "Failed to create habit log")
     }
-
+    emit('refresh')
     toast({
       title: "Success",
       description: response.message || "Progress recorded successfully",
@@ -172,6 +176,7 @@ async function handleSubmit() {
     notes.value = ""
     Object.keys(customFieldsValues).forEach((key) => (customFieldsValues[key] = ""))
 
+    
     isDialogOpen.value = false
   } catch (err: any) {
     console.error("Error logging habit:", err)

@@ -1,5 +1,5 @@
 <template>
-  <Card :class="`relative ${habit.isArchived ? 'opacity-60' : ''}`">
+  <Card :class="`relative ${habit.isArchived ? 'opacity-60' : ''}`" v-loading="loading">
     <CardHeader class="pb-3">
       <div class="flex items-start justify-between">
         <div class="flex items-start space-x-3">
@@ -12,7 +12,7 @@
             <Badge variant="secondary" class="mt-1">{{ habit.category.name }}</Badge>
           </div>
         </div>
-        
+
         <HabitActionsDropdown :habit :isArchived="habit.isArchived" :isTaskCompleted @handleAction="handleAction" />
       </div>
     </CardHeader>
@@ -54,8 +54,7 @@
         </div>
       </div>
 
-      <Button v-if="showLogButton && !habit.isArchived" @click="handleAction('recordLog')" class="w-full"
-        size="sm">
+      <Button v-if="showLogButton && !habit.isArchived" @click="handleAction('recordLog')" class="w-full" size="sm">
         Mark as Complete
       </Button>
     </CardContent>
@@ -67,15 +66,42 @@
 const props = defineProps<{ habit: HabitWithCategory }>()
 
 const emit = defineEmits<{
-  (e: 'handleAction', action: string): void
+  (e: 'addRecord'): void,
+  (e: 'refresh'): void
 }>()
 
 
 const handleAction = (action: string) => {
-  emit('handleAction', action)
+  switch (action) {
+    case 'viewDetails':
+      viewDetails()
+      break
+    case 'recordLog':
+      emit('addRecord')
+      break
+    case 'edit':
+      editHabit()
+      break
+    case 'toggleStatus':
+      toggleStatus()
+      break
+    case 'delete':
+      deleteHabit()
+      break
+
+    default:
+      break
+  }
 }
 
 
 
-const { progress, showLogButton, isTaskCompleted, formattedNextDueDate, totalCompletions, goalValue } = useHabitItem(props.habit)
+const {
+  progress, showLogButton, isTaskCompleted, formattedNextDueDate, totalCompletions, goalValue, loading,
+  toggleStatus,
+  editHabit,
+  viewDetails,
+  deleteHabit,
+} =
+  useHabitItem({ habit: props.habit, refresh: () => emit('refresh') })
 </script>
