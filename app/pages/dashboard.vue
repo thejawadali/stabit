@@ -21,7 +21,7 @@
         <!-- Left Column - 2/3 width -->
         <div className="lg:col-span-2 space-y-6">
           <!-- Today's Habits -->
-          <TodayHabits :habits="filteredTodayHabits" />
+          <TodayHabits :habits="filteredTodayHabits" @refresh="handleRefresh" />
 
 
           <!-- Missed Habits -->
@@ -104,7 +104,7 @@ const categoryFilter = ref<string | null>(null)
 
 
 // Fetch dashboard data
-const { data: dashboardData } = await useFetch<DashboardData>('/api/dashboard', {
+const { data: dashboardData, refresh: refreshDashboard } = await useFetch<DashboardData>('/api/dashboard', {
   transform: (data: any) => data.data,
   default: () => ({
     todayProgress: { completed: 0, total: 0 },
@@ -122,7 +122,7 @@ const { data: dashboardData } = await useFetch<DashboardData>('/api/dashboard', 
 })
 
 // Fetch calendar data
-const { data: calendarData, pending: calendarLoading } = await useFetch<CalendarData>('/api/dashboard/calendar', {
+const { data: calendarData, pending: calendarLoading, refresh: refreshCalendar } = await useFetch<CalendarData>('/api/dashboard/calendar', {
   query: computed(() => ({
     month: calendarDate.value.getMonth() + 1,
     year: calendarDate.value.getFullYear()
@@ -150,8 +150,11 @@ const recentLogsLoading = ref(false)
 
 
 // fetch recent logs
-const loadRecentLogs = async () => {
+const loadRecentLogs = async (refresh = false) => {
   if (recentLogsLoading.value || !recentLogsData.value.pagination.hasMore) return
+  if (refresh) {
+    recentLogsData.value.pagination.page = 1 
+  }
 
   recentLogsLoading.value = true
   try {
@@ -166,7 +169,7 @@ const loadRecentLogs = async () => {
 
     // Append new logs to existing logs
     recentLogsData.value = {
-      logs: [...recentLogsData.value.logs, ...data.logs],
+      logs: [...recentLogsData.value.logs, ...data.logs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()), // sort by createdAt descending
       pagination: {
         ...data.pagination,
         page: data.pagination.page + 1
@@ -181,6 +184,12 @@ const loadRecentLogs = async () => {
 
 
 loadRecentLogs()
+
+const handleRefresh = () => {
+  refreshDashboard()
+  refreshCalendar()
+  loadRecentLogs(true)
+}
 
 const todayHabits = computed(() => dashboardData.value.todayHabits)
 const missedHabits = computed(() => dashboardData.value.missedHabits)

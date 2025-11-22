@@ -4,9 +4,6 @@
       <!-- Header -->
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold">Today's Tasks</h3>
-        <Badge variant="secondary">
-          {{ doneCount }}/{{ habits.length }} Done
-        </Badge>
       </div>
 
       <!-- Habits List -->
@@ -14,16 +11,10 @@
         <div v-for="habit in habits" :key="habit.id"
           class="flex items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
           <div class="flex items-center space-x-3 flex-1">
-            <template v-if="habit.status === 'completed'">
-              <IconCheckCircle2 class="w-5 h-5 text-success" />
-            </template>
-            <template v-else>
-              <IconCircle class="w-5 h-5 text-muted-foreground" />
-            </template>
             <div class="flex-1">
               <div class="flex items-center space-x-2">
                 <span class="text-lg">{{ habit.icon }}</span>
-                <span :class="{ 'line-through text-muted-foreground': habit.status === 'completed' }" class="font-medium">
+                <span :class="{ 'line-through text-muted-foreground': isHabitCompleted(habit.id) }" class="font-medium">
                   {{ habit.name }}
                 </span>
               </div>
@@ -35,9 +26,14 @@
             </div>
           </div>
 
-          <!-- <Button :size="'sm'" :variant="habit.status === 'done' ? 'ghost' : 'default'">
-            {{ habit.status === 'done' ? 'View' : 'Log' }}
-          </Button> -->
+          <Button 
+            :size="'sm'" 
+            :variant="isHabitCompleted(habit.id) ? 'outline' : 'default'"
+            @click="addRecord(habit.id, habit.name)"
+            :disabled="isHabitCompleted(habit.id)"
+          >
+            {{ isHabitCompleted(habit.id) ? 'Completed' : 'Complete' }}
+          </Button>
         </div>
       </div>
 
@@ -50,10 +46,15 @@
         <p class="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
           You're all caught up! No habits scheduled for today, or try adjusting your filters.
         </p>
-        
       </div>
     </CardContent>
   </Card>
+  <HabitLogDialog 
+    :habit-id="selectedHabitToLog?.id" 
+    :habit-name="selectedHabitToLog?.name"
+    v-model:is-dialog-open="isLogHabitDialogOpen" 
+    @refresh="handleRefresh" 
+  />
 </template>
 
 <script setup lang="ts">
@@ -65,9 +66,31 @@ const props = withDefaults(defineProps<{
   habits: () => [],
 })
 
-const doneCount = computed(() => {
-  return props.habits.filter(habit => habit.status === 'completed').length;
-})
-</script>
+const emit = defineEmits<{
+  (e: 'refresh'): void
+}>()
 
-<style scoped></style>
+const isLogHabitDialogOpen = ref(false)
+const selectedHabitToLog = ref<{ id: string, name: string } | null>(null)
+const completedHabitIds = ref<Set<string>>(new Set())
+
+const addRecord = (habitId: string | undefined, habitName: string | undefined) => {
+  if (!habitId || !habitName) return
+  selectedHabitToLog.value = { id: habitId, name: habitName }
+  isLogHabitDialogOpen.value = true
+}
+
+const handleRefresh = () => {
+  emit('refresh')
+  if (selectedHabitToLog.value) {
+    completedHabitIds.value.add(selectedHabitToLog.value.id)
+  }
+}
+
+const isHabitCompleted = (habitId: string | undefined) => {
+  if (!habitId) return false
+  const habit = props.habits.find(h => h.id === habitId)
+  return completedHabitIds.value.has(habitId) || (habit as any)?.hasCompletedToday || habit?.isCompleted
+}
+
+</script>
