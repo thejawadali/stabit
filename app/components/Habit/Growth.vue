@@ -16,19 +16,18 @@
 
       <!-- goal metric -->
       <div class="space-y-2">
-        <Select name="goalMetric" v-model="selectValue" label="Goal Metric">
+        <Select name="goalMetric" v-model="goalMetric" label="Goal Metric">
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem v-for="metric in predefinedMetrics" :key="metric" :value="metric" class="capitalize">{{ metric }}</SelectItem>
-            <SelectItem value="custom">Custom</SelectItem>
+            <SelectItem v-for="metric in predefinedMetrics" :key="metric.value" :value="metric.value">{{ metric.label }}</SelectItem>
           </SelectContent>
         </Select>
         
         <!-- Custom goal metric input -->
         <Input 
-          v-if="showCustomInput"
+          v-show="goalMetric === 'custom'"
           v-model="customGoalMetric"
           name="customGoalMetric"
           label="Custom Goal Metric"
@@ -80,56 +79,29 @@ const estimatedDate = defineModel<Date>('estimatedDate', {
   default: new Date()
 })
 
-const predefinedMetrics = ['sessions', 'days', 'hours', 'repetitions', 'pages', 'miles']
+const predefinedMetrics = [
+  {value: 'sessions', label: 'Sessions'},
+  {value: 'days', label: 'Days'},
+  {value: 'hours', label: 'Hours'},
+  {value: 'minutes', label: 'Minutes'},
+  {value: 'repetitions', label: 'Repetitions'},
+  {value: 'pages', label: 'Pages'},
+  {value: 'miles', label: 'Miles'},
+  {value: 'custom', label: 'Custom'}
+]
 const customGoalMetric = ref('')
-
-// Computed property to determine what to show in the select
-const selectValue = computed({
-  get: () => {
-    if (!goalMetric.value) return 'sessions'
-    return predefinedMetrics.includes(goalMetric.value) ? goalMetric.value : 'custom'
-  },
-  set: (value: string) => {
-    handleSelectChange(value)
-  }
-})
-
-// Computed property to determine if custom input should be shown
-const showCustomInput = computed(() => {
-  return selectValue.value === 'custom' || (goalMetric.value && !predefinedMetrics.includes(goalMetric.value))
-})
-
-// Handle select dropdown changes
-function handleSelectChange(value: string) {
-  if (value === 'custom') {
-    // If switching to custom, preserve existing custom value if it exists
-    if (goalMetric.value && !predefinedMetrics.includes(goalMetric.value)) {
-      customGoalMetric.value = goalMetric.value
-    } else {
-      customGoalMetric.value = ''
-      goalMetric.value = 'custom'
-    }
-  } else {
-    // Predefined value selected, update goalMetric directly
-    customGoalMetric.value = ''
-    goalMetric.value = value
-  }
-}
 
 // Handle custom metric input changes
 function handleCustomMetricChange(value: string) {
-  customGoalMetric.value = value
-  if (value.trim()) {
-    goalMetric.value = value.trim().toLowerCase()
-  } else {
-    // If cleared, keep as 'custom' placeholder
-    goalMetric.value = 'custom'
+  const trimmedValue = value.trim().toLowerCase()
+  if (predefinedMetrics.some(metric => metric.value === trimmedValue)) {
+    goalMetric.value = trimmedValue
   }
 }
 
 // Initialize customGoalMetric if goalMetric is already a custom value
 onMounted(() => {
-  if (goalMetric.value && !predefinedMetrics.includes(goalMetric.value)) {
+  if (goalMetric.value && !predefinedMetrics.some(metric => metric.value === goalMetric.value)) {
     customGoalMetric.value = goalMetric.value
   }
 })
