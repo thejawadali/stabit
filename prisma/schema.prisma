@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model UserProfile {
@@ -15,9 +17,9 @@ model UserProfile {
   language             String        @default("en") @db.VarChar(10)
   dateFormat           String        @default("MM/DD/YYYY") @db.VarChar(20)
   theme                Theme         @default(system)
-  age                  Int           @default(0) @db.Int
+  age                  Int           @default(0)
   gender               Gender        @default(male)
-  height               Int           @default(0) @db.Int
+  height               Int           @default(0)
   isActive             Boolean       @default(true)
   personalGoals        String        @default("") @db.Text
   preferredTimeUnits   TimeUnit      @default(minutes)
@@ -28,39 +30,38 @@ model UserProfile {
   lastSyncTime         DateTime?     @db.Timestamp
   defaultDashboardView DashboardView @default(overview)
   showWelcomeMessage   Boolean       @default(true)
-  
-  notificationsEnabled Boolean       @default(false)
+
+  notificationsEnabled Boolean @default(false)
 
   // Notification Types
-  enableReminders      Boolean       @default(true)
-  enableMilestones     Boolean       @default(true)
-  enableStreaks        Boolean       @default(true)
-  
+  enableReminders  Boolean @default(true)
+  enableMilestones Boolean @default(true)
+  enableStreaks    Boolean @default(true)
+
   // Reminder Settings
-  defaultReminderTime  String?       @db.VarChar(20) @default("23:00 PM")
-  reminderTone         ReminderTone  @default(gentle)
-  smartReminders       Boolean       @default(true)
-  
+  defaultReminderTime String?      @default("23:00 PM") @db.VarChar(20)
+  reminderTone        ReminderTone @default(gentle)
+  smartReminders      Boolean      @default(true)
+
   // Delivery Channels
-  inAppNotifications   Boolean       @default(true)
-  emailNotifications   Boolean       @default(true)
-  pushNotifications    Boolean       @default(true)
-  
+  inAppNotifications Boolean @default(true)
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+
   // Quiet Hours
-  quietHoursEnabled    Boolean       @default(false)
-  quietHoursStart      String?       @db.VarChar(10)
-  quietHoursEnd        String?       @db.VarChar(10)
-  quietHoursDays       Json?         // Array of day strings: ["monday", "tuesday", ...]
-  
+  quietHoursEnabled Boolean @default(false)
+  quietHoursStart   String? @db.VarChar(10)
+  quietHoursEnd     String? @db.VarChar(10)
+  quietHoursDays    Json? // Array of day strings: ["monday", "tuesday", ...]
+
   // Snooze Settings
-  snoozeDuration       SnoozeDuration @default(oneHour)
-  isSnoozed            Boolean       @default(false)
-  snoozeUntil          DateTime?     @db.Timestamp
+  snoozeDuration SnoozeDuration @default(oneHour)
+  isSnoozed      Boolean        @default(false)
+  snoozeUntil    DateTime?      @db.Timestamp
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 model Category {
   id          String   @id @default(uuid())
@@ -74,79 +75,79 @@ model Category {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  habits      Habit[]
+  habits Habit[]
 
   @@map("categories")
 }
 
 model Habit {
-  id                    String            @id @default(uuid())
-  name                  String            @db.VarChar(255)
-  description           String            @default("") @db.Text
-  icon                  String            @default("🎯") @db.VarChar(50)
-  frequency             Frequency         @default(daily)
-  timeOfDay             String            @default("19:00") @db.VarChar(10)
-  initialValue          Int          @default(0)
-  difficultyRate        Int          @default(1)
-  goalValue             Int          @default(0)
-  goalMetric            String           @default("sessions") @db.VarChar(50)
-  estimatedCompletionDate DateTime?       @db.Date
-  nextDueDate           DateTime?       @db.Date
-  isCompleted            Boolean           @default(false)
-  isArchived            Boolean           @default(false)
-  userId                String            @db.VarChar(36)
-  categoryId            String            @db.VarChar(36)
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  id                      String    @id @default(uuid())
+  name                    String    @db.VarChar(255)
+  description             String    @default("") @db.Text
+  icon                    String    @default("🎯") @db.VarChar(50)
+  frequency               Frequency @default(daily)
+  timeOfDay               String    @default("19:00") @db.VarChar(10)
+  initialValue            Int       @default(0)
+  difficultyRate          Int       @default(1)
+  goalValue               Int       @default(0)
+  goalMetric              String    @default("sessions") @db.VarChar(50)
+  estimatedCompletionDate DateTime? @db.Date
+  nextDueDate             DateTime? @db.Date
+  isCompleted             Boolean   @default(false)
+  isArchived              Boolean   @default(false)
+  userId                  String    @db.VarChar(36)
+  categoryId              String    @db.VarChar(36)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
-  enableNotifications     Boolean           @default(true)
-  reminderTimes          Json?
+  enableNotifications Boolean @default(true)
+  reminderTimes       Json?
 
   // Statistics
-  totalCompletions      Int               @default(0)
-  totalMissed           Int               @default(0)
-  totalSkipped          Int               @default(0)
-  currentStreak         Int               @default(0)
-  longestStreak         Int               @default(0)
+  totalCompletions Int @default(0)
+  totalMissed      Int @default(0)
+  totalSkipped     Int @default(0)
+  currentStreak    Int @default(0)
+  longestStreak    Int @default(0)
 
   // Relationships
-  category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  customFields          HabitCustomField[]
-  habitLogs             HabitLogs[]
-  habitMilestones       HabitMilestones[]
-  notifications         Notifications[]
+  category        Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  customFields    HabitCustomField[]
+  habitLogs       HabitLogs[]
+  habitMilestones HabitMilestones[]
+  notifications   Notifications[]
+
   @@unique([name, userId])
   @@map("habits")
 }
 
-
 model HabitCustomField {
-  id            String        @id @default(uuid())
-  habitId       String        @db.VarChar(36)
-  title         String        @db.VarChar(255)
-  type     FieldType
-  options       Json?         // For select fields: ["Option1", "Option2"]
-  placeholder   String?       @db.VarChar(255)
-  isRequired    Boolean       @default(false)
-  sortingOrder  Int           @default(0)
-  createdAt     DateTime      @default(now())
+  id           String    @id @default(uuid())
+  habitId      String    @db.VarChar(36)
+  title        String    @db.VarChar(255)
+  type         FieldType
+  options      Json? // For select fields: ["Option1", "Option2"]
+  placeholder  String?   @db.VarChar(255)
+  isRequired   Boolean   @default(false)
+  sortingOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
 
   // Relationships
-  habit         Habit         @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
   @@map("habit_custom_fields")
 }
 
 model HabitLogs {
-  id String @id @default(uuid())
-  habitId String @db.VarChar(36)
-  userId String @db.VarChar(36)
+  id               String           @id @default(uuid())
+  habitId          String           @db.VarChar(36)
+  userId           String           @db.VarChar(36)
   completionStatus CompletionStatus @default(completed)
-  value Int @db.Int
-  durationMinutes Int? @db.Int
-  notes String? @db.Text
-  customFields Json? // Store custom field values as JSON
-  createdAt DateTime @default(now())
+  value            Int
+  durationMinutes  Int?
+  notes            String?          @db.Text
+  customFields     Json? // Store custom field values as JSON
+  createdAt        DateTime         @default(now())
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
@@ -154,23 +155,22 @@ model HabitLogs {
   @@map("habit_logs")
 }
 
-
 model HabitMilestones {
-  id String @id @default(uuid())
-  habitId String @db.VarChar(36)
-  userId String @db.VarChar(36)
-  name String @db.VarChar(255)
-  description String? @db.Text
-  targetValue Float @db.Float
-  targetMetric String @default("sessions") @db.VarChar(50)
-  rewardName String? @db.VarChar(255)
-  rewardDescription String? @db.Text
-  rewardIcon String @default("🎉") @db.VarChar(50)
-  status MilestoneStatus @default(locked)
-  currentProgress Float @default(0)
-  achievedDate DateTime? @db.Date
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String          @id @default(uuid())
+  habitId           String          @db.VarChar(36)
+  userId            String          @db.VarChar(36)
+  name              String          @db.VarChar(255)
+  description       String?         @db.Text
+  targetValue       Float           @db.DoublePrecision
+  targetMetric      String          @default("sessions") @db.VarChar(50)
+  rewardName        String?         @db.VarChar(255)
+  rewardDescription String?         @db.Text
+  rewardIcon        String          @default("🎉") @db.VarChar(50)
+  status            MilestoneStatus @default(locked)
+  currentProgress   Float           @default(0)
+  achievedDate      DateTime?       @db.Date
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
@@ -180,17 +180,17 @@ model HabitMilestones {
 }
 
 model Notifications {
-  id String @id @default(uuid())
-  habitId String @db.VarChar(36)
-  userId String @db.VarChar(36)
-  type NotificationType @default(reminder)
-  title String @db.VarChar(255)
-  message String @db.Text
-  isRead Boolean @default(false)
-  sentAt DateTime @db.Timestamp
-  readAt DateTime? @db.Timestamp
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String           @id @default(uuid())
+  habitId   String           @db.VarChar(36)
+  userId    String           @db.VarChar(36)
+  type      NotificationType @default(reminder)
+  title     String           @db.VarChar(255)
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  sentAt    DateTime         @db.Timestamp
+  readAt    DateTime?        @db.Timestamp
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   // Relationships
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
@@ -199,20 +199,20 @@ model Notifications {
 }
 
 model Achievements {
-  id String @id @default(uuid())
-  userId String @db.VarChar(36)
-  name String @db.VarChar(255)
-  description String? @db.Text
-  icon String @default("🏆") @db.VarChar(50)
-  category AchievementCategory @default(streak)
-  criteria Json? // {"type": "streak", "value": 30, "habit_type": "any"}
-  isActive Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id          String              @id @default(uuid())
+  userId      String              @db.VarChar(36)
+  name        String              @db.VarChar(255)
+  description String?             @db.Text
+  icon        String              @default("🏆") @db.VarChar(50)
+  category    AchievementCategory @default(streak)
+  criteria    Json? // {"type": "streak", "value": 30, "habit_type": "any"}
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
   @@map("achievements")
 }
+
 enum AchievementCategory {
   streak
   completion
@@ -307,7 +307,6 @@ enum Frequency {
   weekly
   monthly
 }
-
 
 enum FieldType {
   text
