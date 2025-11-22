@@ -1,11 +1,11 @@
 <template>
   <SidebarProvider>
-    <Navigation>
+    <!-- <Navigation>
       <AppNavConent />
-    </Navigation>
+    </Navigation> -->
     <AppSidebar />
     <SidebarInset>
-      <main class="mt-16 w-full min-h-screen">
+      <main class="w-full min-h-screen sm:p-6 lg:p-8 pt-24 pb-12 mx-auto">
         <slot />
       </main>
     </SidebarInset>

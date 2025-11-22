@@ -1,5 +1,5 @@
 <template>
-  <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 max-w-7xl mx-auto w-full">
+  <div>
     <!-- Header -->
     <div class="mb-6">
       <h1 class="text-3xl font-bold text-foreground mb-2">Dashboard 👋</h1>
@@ -53,7 +53,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">

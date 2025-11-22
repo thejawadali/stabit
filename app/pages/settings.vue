@@ -42,7 +42,11 @@
     </Tabs>
 
     <!-- Save Button -->
-    <div class="flex justify-end mt-6">
+    <div class="flex justify-between items-center mt-6">
+      <Button variant="destructive" @click="handleLogout">
+        <IconLogOut class="w-4 h-4 mr-2" />
+        Logout
+      </Button>
       <Button @click="updateProfile" :is-loading="saving">
         <IconSave class="w-4 h-4 mr-2" />
         Save Changes
@@ -54,6 +58,11 @@
 <script setup lang="ts">
 
 const saving = ref(false)
+const { signOut } = useAuth()
+
+const handleLogout = async () => {
+  await signOut()
+}
 const { data: profile } = await useFetch('/api/profile')
 
 const profileInfo = reactive<ProfileInfoType>({

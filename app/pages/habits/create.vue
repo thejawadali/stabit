@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import type HabitForm from "~/components/HabitForm.vue"
-import type { HabitFormData } from "~~/types"
 
 const { toast } = useToast()
 

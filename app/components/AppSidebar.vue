@@ -1,5 +1,13 @@
 <template>
-  <Sidebar class="w-56 transition-all duration-300 bg-red-800 border-r border-border mt-16" collapsible="icon">
+  <Sidebar class="w-56 transition-all duration-300 bg-red-800 border-r border-border t-16" collapsible="icon">
+    <SidebarHeader>
+      <NuxtLink to="/" class="flex items-center space-x-2 px-2 py-4">
+        <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+          <IconTrendingUp class="w-5 h-5 text-primary-foreground" />
+        </div>
+        <span class="text-2xl font-bold text-foreground">Stabit</span>
+      </NuxtLink>
+    </SidebarHeader>
     <SidebarContent class="px-2">
       <!-- Main Navigation -->
       <SidebarGroup>
@@ -13,10 +21,6 @@
                 <NuxtLink :to="item.url" :class="getNavClasses(item.url)">
                   <component :is="item.icon" class="h-4 w-4" />
                   <span>{{ item.title }}</span>
-                  <Badge v-if="item.badge" :variant="(item.badge.variant as any) || 'secondary'"
-                    class="ml-auto text-xs">
-                    {{ item.badge.text }}
-                  </Badge>
                 </NuxtLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -52,7 +56,6 @@ const navigationItems = [
     title: "Dashboard",
     url: "/dashboard",
     icon: IconHome,
-    badge: { text: "5", variant: "secondary" }
   },
   { title: "My Habits", url: "/habits", icon: IconTarget },
   { title: "Categories", url: "/categories", icon: IconTags },
