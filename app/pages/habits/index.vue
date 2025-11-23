@@ -90,18 +90,18 @@
         <!-- habits listing -->
         <template v-else>
           <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit"
-              @addRecord="addRecord(habit.id)" @refresh="refreshHabits" />
+            <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit" @addRecord="addRecord(habit)"
+              @refresh="refreshHabits" />
           </div>
           <div v-else class="space-y-3">
             <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit"
-              @addRecord="addRecord(habit.id)" @refresh="refreshHabits" />
+              @addRecord="addRecord(habit)" @refresh="refreshHabits" />
           </div>
         </template>
       </div>
     </main>
-    <HabitLogDialog :habit-id="selectedHabitToLog?.id" :habit-name="selectedHabitToLog?.name"
-      v-model:is-dialog-open="isLogHabitDialogOpen" @refresh="refreshHabits" />
+    <HabitLogDialog :habit="selectedHabitToLog" v-model:is-dialog-open="isLogHabitDialogOpen"
+      @refresh="refreshHabits" />
   </div>
 </template>
 
@@ -120,7 +120,7 @@ interface HabitWithCategory extends Habit {
 }
 
 // fetch categories
-const {data: categories} = useFetch<{ id: string; name: string; icon: string }[]>('/api/categories', {
+const { data: categories } = useFetch<{ id: string; name: string; icon: string }[]>('/api/categories', {
   transform: (data: any) => data.map((item: any) => ({
     id: item.id,
     name: item.name,
@@ -129,7 +129,7 @@ const {data: categories} = useFetch<{ id: string; name: string; icon: string }[]
 })
 
 // fetch habits
-const {data: habitData, refresh: refreshHabits} = useFetch<{ habits: HabitWithCategory[], completedToday: number }>('/api/habits', {
+const { data: habitData, refresh: refreshHabits } = useFetch<{ habits: HabitWithCategory[], completedToday: number }>('/api/habits', {
   transform: (data: any) => data.data,
   default: () => ({ habits: [], completedToday: 0 })
 })
@@ -181,7 +181,7 @@ const filteredHabits = computed(() => {
       habit.category.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesCategory = categoryFilter.value === 'all' || habit.categoryId === categoryFilter.value
     const matchesFrequency = frequencyFilter.value === 'all' || habit.frequency.toLowerCase() === frequencyFilter.value.toLowerCase()
-    
+
     // Due date filter logic
     let matchesDueDate = true
     if (dueDateFilter.value !== 'all' && habit.nextDueDate) {
@@ -190,7 +190,7 @@ const filteredHabits = computed(() => {
       const today = now.startOf('day')
       const tomorrow = now.add(1, 'day').startOf('day')
       const endOfWeek = now.endOf('week')
-      
+
       switch (dueDateFilter.value) {
         case 'today':
           matchesDueDate = dueDate.isSame(today, 'day')
@@ -199,7 +199,7 @@ const filteredHabits = computed(() => {
           matchesDueDate = dueDate.isSame(tomorrow, 'day')
           break
         case 'thisWeek':
-          matchesDueDate = dueDate.isSame(today, 'day') || 
+          matchesDueDate = dueDate.isSame(today, 'day') ||
             (dueDate.isAfter(today) && (dueDate.isBefore(endOfWeek) || dueDate.isSame(endOfWeek, 'day')))
           break
       }
@@ -215,11 +215,11 @@ const filteredHabits = computed(() => {
 
 // habit logging
 const isLogHabitDialogOpen = ref(false)
-const selectedHabitToLog = ref<{ id: string, name: string } | null>(null)
+const selectedHabitToLog = ref<{ id: string, name: string, goalMetric: string, currentTargetValue: number } | null>(null)
 
-
-const addRecord = (habitId: string) => {
-  selectedHabitToLog.value = { id: habitId, name: filteredHabits.value.find(habit => habit.id === habitId)?.name || '' }
+const addRecord = (habit: TodayHabit) => {
+  if (!habit) return
+  selectedHabitToLog.value = { id: habit.id || '', name: habit.name || '', goalMetric: habit.goalMetric || '', currentTargetValue: habit.currentTargetValue || 0 }
   isLogHabitDialogOpen.value = true
 }
 
