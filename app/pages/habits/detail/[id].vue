@@ -58,9 +58,22 @@
           <div v-if="logs.length === 0" class="text-center text-muted-foreground py-8">No activity recorded yet</div>
 
           <div v-for="log in logs.slice(0, 10)" :key="log.id"
-            class="flex items-center justify-between p-3 rounded-lg bg-background/50">
+            :class="[
+              'flex items-center justify-between p-3 rounded-lg transition-colors',
+              log.completionStatus === 'completed' ? 'bg-success/10 border border-success/20' :
+              log.completionStatus === 'partial' ? 'bg-warning/10 border border-warning/20' :
+              log.completionStatus === 'missed' ? 'bg-destructive/10 border border-destructive/20' :
+              'bg-background/50'
+            ]">
             <div class="flex items-center space-x-4">
-              <IconCalendar class="h-5 w-5 text-muted-foreground" />
+              <IconCalendar 
+                :class="[
+                  'h-5 w-5',
+                  log.completionStatus === 'completed' ? 'text-success' :
+                  log.completionStatus === 'partial' ? 'text-warning' :
+                  log.completionStatus === 'missed' ? 'text-destructive' :
+                  'text-muted-foreground'
+                ]" />
               <div>
                 <p class="font-medium text-foreground">{{ formatDate(log.createdAt) }}</p>
                 <p v-if="log.notes" class="text-sm text-muted-foreground">{{ log.notes }}</p>
@@ -69,7 +82,11 @@
             <div class="flex items-center space-x-3">
               <span v-if="log.durationMinutes" class="text-sm text-muted-foreground">{{ log.durationMinutes }}
                 min</span>
-              <Badge :variant="log.completionStatus === 'completed' ? 'default' : 'secondary'" class="capitalize">
+              <Badge 
+                :variant="log.completionStatus === 'completed' ? 'success' : 
+                          log.completionStatus === 'partial' ? 'warning' : 
+                          log.completionStatus === 'missed' ? 'destructive' : 'secondary'"
+                class="capitalize">
                 {{ log.completionStatus }}
               </Badge>
             </div>

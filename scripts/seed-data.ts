@@ -736,6 +736,7 @@ async function seedData(userId: string) {
     let totalSkipped = 0
     let nextDueDate: Date | null = null
     const recentMisses: Date[] = [] // Track recent misses for milestone locking
+    let currentValue = habit.initialValue // Track current value for completion status
 
     const startDate = new Date(threeMonthsAgo)
     const endDate = new Date(now) // Use current time as end date
@@ -761,8 +762,11 @@ async function seedData(userId: string) {
         const isSkipped = isCompleteMissDay ? false : Math.random() < 0.05 // 5% skipped
 
         let status: CompletionStatus = CompletionStatus.completed
+        let logValue = 0
+        
         if (isMissed) {
           status = CompletionStatus.missed
+          logValue = Math.floor(habit.goalValue * 0.5)
           currentStreak = 0
           totalMissed++
           // Update nextDueDate when missed - set to next occurrence from the missed date
@@ -795,10 +799,20 @@ async function seedData(userId: string) {
           }
         } else if (isSkipped) {
           status = CompletionStatus.skipped
+          logValue = Math.floor(habit.goalValue * 0.5)
           currentStreak = 0
           totalSkipped++
         } else if (shouldComplete) {
-          status = Math.random() > 0.1 ? CompletionStatus.completed : CompletionStatus.partial
+          // Determine log value first
+          logValue = habit.goalValue
+          
+          // Check if currentValue + logValue >= currentTargetValue to determine status
+          if (currentValue + logValue >= habit.currentTargetValue) {
+            status = CompletionStatus.completed
+          } else {
+            status = CompletionStatus.partial
+          }
+          
           if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
             currentStreak++
             longestStreak = Math.max(longestStreak, currentStreak)
@@ -844,13 +858,19 @@ async function seedData(userId: string) {
             habitId: habit.id,
             userId,
             completionStatus: status,
-            value: status === CompletionStatus.completed || status === CompletionStatus.partial ? habit.goalValue : Math.floor(habit.goalValue * 0.5),
+            value: logValue,
             durationMinutes,
             notes: Math.random() > 0.7 ? `Log entry for ${dateStart.toLocaleDateString()}` : null,
             customFields: Object.keys(customFields).length > 0 ? customFields : null,
             createdAt: logTime
           }
         })
+        
+        // Update currentValue after creating log (only for completed/partial status)
+        if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
+          currentValue += logValue
+        }
+        
         totalLogs++
 
         currentDate = addDays(currentDate, 1)
@@ -871,8 +891,11 @@ async function seedData(userId: string) {
         const isSkipped = hasCompleteMissDay ? false : Math.random() < 0.05
 
         let status: CompletionStatus = CompletionStatus.completed
+        let logValue = 0
+        
         if (isMissed) {
           status = CompletionStatus.missed
+          logValue = Math.floor(habit.goalValue * 0.5)
           currentStreak = 0
           totalMissed++
           // Update nextDueDate when missed - set to next occurrence from the missed date
@@ -904,65 +927,84 @@ async function seedData(userId: string) {
           }
         } else if (isSkipped) {
           status = CompletionStatus.skipped
+          logValue = Math.floor(habit.goalValue * 0.5)
           currentStreak = 0
           totalSkipped++
         } else if (shouldComplete) {
-          status = Math.random() > 0.1 ? CompletionStatus.completed : CompletionStatus.partial
-          if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
+          // Generate 1-3 log entries for this week
+          const numLogs = randomInt(1, Math.min(3, habit.goalValue))
+          let hasCompletedLog = false
+          
+          for (let i = 0; i < numLogs; i++) {
+            // Determine log value for this entry
+            logValue = habit.goalValue
+            
+            // Check if currentValue + logValue >= currentTargetValue to determine status
+            if (currentValue + logValue >= habit.currentTargetValue) {
+              status = CompletionStatus.completed
+              hasCompletedLog = true
+            } else {
+              status = CompletionStatus.partial
+            }
+            
+            // Ensure log date doesn't exceed current time
+            const weekEnd = addDays(currentDate, 6)
+            const maxLogDate = weekEnd > now ? now : weekEnd
+            const logDate = randomDate(currentDate, maxLogDate)
+            
+            // Ensure log time doesn't exceed current time
+            const dayStart = startOfDay(logDate)
+            const dayEnd = addDays(dayStart, 1)
+            const maxTime = dayEnd > now ? now : dayEnd
+            const logTime = randomDate(dayStart, maxTime)
+            const durationMinutes = Math.random() > 0.3 ? randomInt(15, 180) : null
+
+            const customFields: any = {}
+            for (const fieldDef of customFieldDefs) {
+              if (fieldDef.type === FieldType.number) {
+                customFields[fieldDef.title] = randomInt(1, 100)
+              } else if (fieldDef.type === FieldType.text) {
+                customFields[fieldDef.title] = `Sample ${fieldDef.title.toLowerCase()}`
+              } else if (fieldDef.type === FieldType.select && fieldDef.options) {
+                const options = fieldDef.options as string[]
+                customFields[fieldDef.title] = randomElement(options)
+              } else if (fieldDef.type === FieldType.boolean) {
+                customFields[fieldDef.title] = Math.random() > 0.5
+              }
+            }
+
+            await prisma.habitLogs.create({
+              data: {
+                habitId: habit.id,
+                userId,
+                completionStatus: status,
+                value: logValue,
+                durationMinutes,
+                notes: Math.random() > 0.7 ? `Weekly log entry` : null,
+                customFields: Object.keys(customFields).length > 0 ? customFields : null,
+                createdAt: logTime
+              }
+            })
+            totalLogs++
+
+            // Update currentValue after creating each log (only for completed/partial status)
+            if (status === CompletionStatus.completed || status === CompletionStatus.partial) {
+              currentValue += logValue
+            }
+
+            // Update milestones for each log
+            await updateMilestoneProgress(habit.id, habit.goalValue, durationMinutes, habit.goalMetric)
+          }
+          
+          // Update streak and statistics after creating all logs for the week
+          if (hasCompletedLog || numLogs > 0) {
             currentStreak++
             longestStreak = Math.max(longestStreak, currentStreak)
-            // Only increment totalCompletions when status is completed
-            if (status === CompletionStatus.completed) {
+            // Only increment totalCompletions when at least one log is completed
+            if (hasCompletedLog) {
               totalCompletions++
             }
             nextDueDate = calculateNextDueDate(habit.frequency, currentDate)
-            
-            // Generate 1-3 log entries for this week
-            const numLogs = randomInt(1, Math.min(3, habit.goalValue))
-            for (let i = 0; i < numLogs; i++) {
-              // Ensure log date doesn't exceed current time
-              const weekEnd = addDays(currentDate, 6)
-              const maxLogDate = weekEnd > now ? now : weekEnd
-              const logDate = randomDate(currentDate, maxLogDate)
-              
-              // Ensure log time doesn't exceed current time
-              const dayStart = startOfDay(logDate)
-              const dayEnd = addDays(dayStart, 1)
-              const maxTime = dayEnd > now ? now : dayEnd
-              const logTime = randomDate(dayStart, maxTime)
-              const durationMinutes = Math.random() > 0.3 ? randomInt(15, 180) : null
-
-              const customFields: any = {}
-              for (const fieldDef of customFieldDefs) {
-                if (fieldDef.type === FieldType.number) {
-                  customFields[fieldDef.title] = randomInt(1, 100)
-                } else if (fieldDef.type === FieldType.text) {
-                  customFields[fieldDef.title] = `Sample ${fieldDef.title.toLowerCase()}`
-                } else if (fieldDef.type === FieldType.select && fieldDef.options) {
-                  const options = fieldDef.options as string[]
-                  customFields[fieldDef.title] = randomElement(options)
-                } else if (fieldDef.type === FieldType.boolean) {
-                  customFields[fieldDef.title] = Math.random() > 0.5
-                }
-              }
-
-              await prisma.habitLogs.create({
-                data: {
-                  habitId: habit.id,
-                  userId,
-                  completionStatus: status,
-                  value: habit.goalValue,
-                  durationMinutes,
-                  notes: Math.random() > 0.7 ? `Weekly log entry` : null,
-                  customFields: Object.keys(customFields).length > 0 ? customFields : null,
-                  createdAt: logTime
-                }
-              })
-              totalLogs++
-
-              // Update milestones for each log
-              await updateMilestoneProgress(habit.id, habit.goalValue, durationMinutes, habit.goalMetric)
-            }
           }
         }
 
