@@ -78,6 +78,34 @@ function calculateNextDueDate(frequency: Frequency, currentDate: Date): Date {
 }
 
 /**
+ * Calculate estimated completion date based on habit frequency and goal value
+ * Assumes an average completion rate of ~85% for daily habits, ~80% for weekly habits
+ */
+function calculateEstimatedCompletionDate(frequency: Frequency, goalValue: number, startDate: Date): Date {
+  const estimatedDate = new Date(startDate)
+  const completionRate = frequency === Frequency.daily ? 0.85 : frequency === Frequency.weekly ? 0.80 : 0.75
+  
+  // Calculate how many occurrences needed to reach goal
+  const occurrencesNeeded = Math.ceil(goalValue / completionRate)
+  
+  switch (frequency) {
+    case Frequency.daily:
+      estimatedDate.setDate(estimatedDate.getDate() + occurrencesNeeded)
+      break
+    case Frequency.weekly:
+      estimatedDate.setDate(estimatedDate.getDate() + (occurrencesNeeded * 7))
+      break
+    case Frequency.monthly:
+      estimatedDate.setMonth(estimatedDate.getMonth() + occurrencesNeeded)
+      break
+    default:
+      estimatedDate.setDate(estimatedDate.getDate() + occurrencesNeeded)
+  }
+  
+  return startOfDay(estimatedDate)
+}
+
+/**
  * Ensure nextDueDate is in the future or present (at midnight of today)
  * If it's in the past or null, set it to today at midnight (worst case)
  * Otherwise, ensure it's normalized to start of day
@@ -621,6 +649,13 @@ async function seedData(userId: string) {
   for (const category of categories) {
     const templates = HABIT_TEMPLATES[category.name] || []
     for (const template of templates) {
+      // Calculate estimated completion date based on frequency and goal
+      const estimatedCompletionDate = calculateEstimatedCompletionDate(
+        template.frequency,
+        template.goalValue,
+        todayStart
+      )
+      
       const habit = await prisma.habit.create({
         data: {
           name: template.name,
@@ -629,6 +664,8 @@ async function seedData(userId: string) {
           frequency: template.frequency,
           goalValue: template.goalValue,
           goalMetric: template.goalMetric,
+          currentTargetValue: template.goalValue, // Start with goal value as current target
+          estimatedCompletionDate: estimatedCompletionDate,
           timeOfDay: `${randomInt(6, 22)}:00`,
           initialValue: 0,
           difficultyRate: randomInt(1, 5),
