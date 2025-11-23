@@ -52,6 +52,8 @@ export default defineEventHandler(async (event) => {
         icon: true,
         timeOfDay: true,
         isCompleted: true,
+        goalMetric: true,
+        currentTargetValue: true,
         category: {
           select: {
             id: true,

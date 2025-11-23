@@ -1,26 +1,73 @@
 <template>
-  <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
-    <DialogContent class="max-w-md max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>{{habitName || 'Record Progress'}}</DialogTitle>
-        <DialogDescription>
-          {{ habitName ? `Track your progress for ${habitName}` : "Record your habit completion" }}
-        </DialogDescription>
-      </DialogHeader>
+  <TooltipProvider>
+    <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
+      <DialogContent class="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{{habit?.name || 'Record Progress'}}</DialogTitle>
+          <DialogDescription>
+            {{ habit ? `Track your progress for ${habit?.name}` : "Record your habit completion" }}
+          </DialogDescription>
+        </DialogHeader>
 
-      <!-- loading skeleton -->
-      <div v-if="isLoading" class="flex flex-col gap-4">
-        <Skeleton class="w-full h-9 rounded-sm" />
-        <Skeleton class="w-full h-9 rounded-sm" />
-        <Skeleton class="w-full h-9 rounded-sm" />
-        <Skeleton class="w-full h-[78px] rounded-sm" />
-      </div>
-      <div v-else class="space-y-4">
-        <!-- Duration -->
-        <div class="space-y-2">
-          <Label for="duration">Duration in Minutes (optional)</Label>
-          <Input id="duration" type="number" v-model="durationMinutes" min="0" placeholder="e.g., 30" />
+        <!-- loading skeleton -->
+        <div v-if="isLoading" class="flex flex-col gap-4">
+          <Skeleton class="w-full h-9 rounded-sm" />
+          <Skeleton class="w-full h-9 rounded-sm" />
+          <Skeleton class="w-full h-9 rounded-sm" />
+          <Skeleton class="w-full h-[78px] rounded-sm" />
         </div>
+        <div v-else class="space-y-4">
+          <!-- Goal Metric Value -->
+          <div v-if="habit?.goalMetric" class="space-y-2">
+            <div class="flex items-center justify-between">
+              <Label :for="`goal-metric-${habit?.goalMetric}`" class="flex items-center gap-2">
+                {{ capitalizeFirst(habit?.goalMetric) }}
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <button type="button" class="text-muted-foreground hover:text-foreground">
+                      <IconInfo class="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Enter the value you achieved for this habit.</p>
+                    <p class="text-xs mt-1">Example: If your goal metric is "Pages", enter how many pages you read.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </Label>
+              <div v-if="habit.currentTargetValue && habit.currentTargetValue > 0" class="text-sm text-muted-foreground">
+                Target: {{ habit.currentTargetValue }} {{ habit.goalMetric }}
+              </div>
+            </div>
+            <Input 
+              :id="`goal-metric-${habit.goalMetric}`" 
+              type="number" 
+              v-model="goalMetricValue" 
+              min="0" 
+              :placeholder="`e.g., ${habit.currentTargetValue || 1}`"
+            />
+            <p v-if="goalMetricValue && habit.currentTargetValue > Number(goalMetricValue)" class="text-xs text-muted-foreground">
+              💡 You should add {{ habit.currentTargetValue }} {{ habit.goalMetric }} to complete today's task
+            </p>
+          </div>
+
+          <!-- Duration -->
+          <div class="space-y-2">
+            <Label for="duration" class="flex items-center gap-2">
+              Duration in Minutes (optional)
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <button type="button" class="text-muted-foreground hover:text-foreground">
+                    <IconInfo class="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>How long you spent on this habit.</p>
+                  <p class="text-xs mt-1">Optional: Only fill this if you want to track time spent.</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Input id="duration" type="number" v-model="durationMinutes" min="0" placeholder="e.g., 30" />
+          </div>
 
         <!-- Custom Fields -->
         <template v-if="customFieldsConfig && customFieldsConfig.length > 0">
@@ -28,19 +75,66 @@
             <!-- Text -->
             <Input v-if="fieldConfig.type === 'text'" :id="`custom-${fieldConfig.id}`" type="text"
               v-model="customFieldsValues[fieldConfig.id]" :placeholder="fieldConfig.placeholder"
-              :label="fieldConfig.title" :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`" />
+              :rules="fieldConfig.isRequired ? 'required' : ''"
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`">
+              <template #field-label>
+                <Label class="flex items-center gap-2">
+                  {{ fieldConfig.title }}
+                  <Tooltip>
+                    <TooltipTrigger as-child>
+                      <button type="button" class="text-muted-foreground hover:text-foreground">
+                        <IconInfo class="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{{ fieldConfig.placeholder || `Enter ${fieldConfig.title.toLowerCase()}` }}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+              </template>
+            </Input>
 
             <!-- Number -->
             <Input v-else-if="fieldConfig.type === 'number'" :id="`custom-${fieldConfig.id}`" type="number"
               v-model="customFieldsValues[fieldConfig.id]" :placeholder="fieldConfig.placeholder"
-              :label="fieldConfig.title" :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`" />
+              :rules="fieldConfig.isRequired ? 'required' : ''"
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`">
+              <template #field-label>
+                <Label class="flex items-center gap-2">
+                  {{ fieldConfig.title }}
+                  <Tooltip>
+                    <TooltipTrigger as-child>
+                      <button type="button" class="text-muted-foreground hover:text-foreground">
+                        <IconInfo class="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{{ fieldConfig.placeholder || `Enter ${fieldConfig.title.toLowerCase()}` }}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+              </template>
+            </Input>
 
             <!-- Select -->
             <Select v-else-if="fieldConfig.type === 'select'" v-model="customFieldsValues[fieldConfig.id]"
               :rules="fieldConfig.isRequired ? 'required' : ''"
-              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :label="fieldConfig.title" :custom-error-message="`${fieldConfig.title} is required`">
+              :name="fieldConfig.title.toLowerCase().replace(' ', '_')" :custom-error-message="`${fieldConfig.title} is required`">
+              <template #field-label>
+                <Label class="flex items-center gap-2">
+                  {{ fieldConfig.title }}
+                  <Tooltip>
+                    <TooltipTrigger as-child>
+                      <button type="button" class="text-muted-foreground hover:text-foreground">
+                        <IconInfo class="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Select an option for {{ fieldConfig.title.toLowerCase() }}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+              </template>
               <SelectTrigger>
                 <SelectValue :placeholder="fieldConfig.placeholder || 'Select an option'" />
               </SelectTrigger>
@@ -53,36 +147,59 @@
 
             <!-- checkbox/switch -->
             <div v-else-if="fieldConfig.type === 'boolean'" class="flex items-center justify-between">
-              <Label :for="`custom-${fieldConfig.id}`">
+              <Label :for="`custom-${fieldConfig.id}`" class="flex items-center gap-2">
                 {{ fieldConfig.title }}
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <button type="button" class="text-muted-foreground hover:text-foreground">
+                      <IconInfo class="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Toggle {{ fieldConfig.title.toLowerCase() }}</p>
+                  </TooltipContent>
+                </Tooltip>
               </Label>
               <Switch :id="`custom-${fieldConfig.id}`" v-model="customFieldsValues[fieldConfig.id]" />
             </div>
           </div>
         </template>
 
-        <!-- Notes -->
-        <div class="space-y-2">
-          <Label for="notes">Notes (optional)</Label>
-          <Textarea id="notes" v-model="notes" placeholder="How did it go?" rows="3" />
+          <!-- Notes -->
+          <div class="space-y-2">
+            <Label for="notes" class="flex items-center gap-2">
+              Notes (optional)
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <button type="button" class="text-muted-foreground hover:text-foreground">
+                    <IconInfo class="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Add any additional notes about your progress.</p>
+                  <p class="text-xs mt-1">Optional: Use this to record how you felt or any observations.</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Textarea id="notes" v-model="notes" placeholder="How did it go?" rows="3" />
+          </div>
         </div>
-      </div>
 
-      <DialogFooter>
-        <Button @click="handleSubmit" class="flex-1" :is-loading="isSubmitting || isLoading">
-          Save Progress
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
+        <DialogFooter>
+          <Button @click="handleSubmit" class="flex-1" :is-loading="isSubmitting || isLoading">
+            Save Progress
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </TooltipProvider>
 </template>
 
 <script setup lang="ts">
 const { validate } = useForm()
 // Props
 const props = defineProps<{
-  habitId?: string | number
-  habitName?: string
+  habit: { id: string, name: string, goalMetric: string; currentTargetValue: number } | null
 }>()
 
 const emit = defineEmits<{
@@ -94,6 +211,7 @@ const isDialogOpen = defineModel<boolean>('isDialogOpen', { default: false })
 const { toast } = useToast()
 
 // Reactive state
+const goalMetricValue = ref<string>("")
 const durationMinutes = ref<string>("")
 const notes = ref<string>("")
 const customFieldsValues = reactive<Record<string, any>>({})
@@ -101,12 +219,21 @@ const customFieldsConfig = ref<any[]>([])
 const isSubmitting = ref(false)
 const isLoading = ref(false)
 
+// Helper function to capitalize first letter of each word
+function capitalizeFirst(str: string) {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 // Watch for dialog open/close changes
 watch(isDialogOpen, (open) => {
-  if (open && props.habitId) {
+  if (open && props.habit?.id) {
     fetchCustomFields()
   } else {
     // Reset form when closing
+    goalMetricValue.value = ""
     durationMinutes.value = ""
     notes.value = ""
     Object.keys(customFieldsValues).forEach((key) => (customFieldsValues[key] = ""))
@@ -114,11 +241,11 @@ watch(isDialogOpen, (open) => {
 })
 
 async function fetchCustomFields() {
-  if (!props.habitId) return
+  if (!props.habit) return
   isLoading.value = true
 
   try {
-    const response = await $fetch<{ success: boolean; data: any[] }>(`/api/habits/${props.habitId}/custom-fields`)
+    const response = await $fetch<{ success: boolean; data: any[] }>(`/api/habits/${props.habit.id}/custom-fields`)
 
     if (!response.success || !response.data) {
       throw new Error("Failed to fetch custom fields")
@@ -155,7 +282,8 @@ async function handleSubmit() {
     const response = await $fetch<{ success: boolean; message?: string; data?: any }>('/api/habit-logs', {
       method: 'POST',
       body: {
-        habitId: props.habitId,
+        habitId: props.habit?.id,
+        value: goalMetricValue.value ? parseInt(goalMetricValue.value) : 0,
         durationMinutes: durationMinutes.value ? parseInt(durationMinutes.value) : null,
         notes: notes.value.trim() || null,
         customFields: Object.keys(customFieldsValues).length > 0 ? { ...customFieldsValues } : null,
@@ -172,6 +300,7 @@ async function handleSubmit() {
     })
 
     // Reset form
+    goalMetricValue.value = ""
     durationMinutes.value = ""
     notes.value = ""
     Object.keys(customFieldsValues).forEach((key) => (customFieldsValues[key] = ""))

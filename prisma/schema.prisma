@@ -91,6 +91,7 @@ model Habit {
   difficultyRate          Int       @default(1)
   goalValue               Int       @default(0)
   goalMetric              String    @default("sessions") @db.VarChar(50)
+  currentTargetValue      Int       @default(0) // Current target value based on initial value + weekly increases
   estimatedCompletionDate DateTime? @db.Date
   nextDueDate             DateTime? @db.Date
   isCompleted             Boolean   @default(false)

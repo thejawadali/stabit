@@ -29,7 +29,7 @@
           <Button 
             :size="'sm'" 
             :variant="isHabitCompleted(habit.id) ? 'outline' : 'default'"
-            @click="addRecord(habit.id, habit.name)"
+            @click="addRecord(habit)"
             :disabled="isHabitCompleted(habit.id)"
           >
             {{ isHabitCompleted(habit.id) ? 'Completed' : 'Complete' }}
@@ -50,8 +50,7 @@
     </CardContent>
   </Card>
   <HabitLogDialog 
-    :habit-id="selectedHabitToLog?.id" 
-    :habit-name="selectedHabitToLog?.name"
+    :habit="selectedHabitToLog" 
     v-model:is-dialog-open="isLogHabitDialogOpen" 
     @refresh="handleRefresh" 
   />
@@ -71,12 +70,12 @@ const emit = defineEmits<{
 }>()
 
 const isLogHabitDialogOpen = ref(false)
-const selectedHabitToLog = ref<{ id: string, name: string } | null>(null)
+const selectedHabitToLog = ref<{ id: string, name: string, goalMetric: string, currentTargetValue: number } | null>(null)
 const completedHabitIds = ref<Set<string>>(new Set())
 
-const addRecord = (habitId: string | undefined, habitName: string | undefined) => {
-  if (!habitId || !habitName) return
-  selectedHabitToLog.value = { id: habitId, name: habitName }
+const addRecord = (habit: TodayHabit) => {
+  if (!habit) return
+  selectedHabitToLog.value = { id: habit.id || '', name: habit.name || '', goalMetric: habit.goalMetric || '', currentTargetValue: habit.currentTargetValue || 0 }
   isLogHabitDialogOpen.value = true
 }
 

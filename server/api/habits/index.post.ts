@@ -38,6 +38,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Initialize currentTargetValue to initialValue if not provided
+    const initialValue = rest.initialValue ?? 0
+    const currentTargetValue = rest.currentTargetValue ?? initialValue
+
     // ✅ Atomic creation using transaction
     const [habit] = await prisma.$transaction([
       prisma.habit.create({
@@ -46,6 +50,7 @@ export default defineEventHandler(async (event) => {
           name,
           categoryId,
           userId: user.sub,
+          currentTargetValue,
           customFields: customFields.length
             ? {
                 create: customFields.map((field: any) => ({

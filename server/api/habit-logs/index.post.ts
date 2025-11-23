@@ -67,6 +67,7 @@ export default defineEventHandler(async (event) => {
 
     const {
       habitId,
+      value,
       durationMinutes,
       notes,
       customFields
@@ -79,9 +80,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'habitId is required'
       })
     }
-
-    // Only allow completed status - missed logs are created by cron job
-    const completionStatus = 'completed'
 
     // Check if habit exists and belongs to user
     const habit = await prisma.habit.findFirst({
@@ -99,13 +97,35 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Parse value (default to 0 if not provided)
+    const logValue = value !== undefined && value !== null ? parseInt(String(value)) : 0
+
+    // Determine completion status based on value vs currentTargetValue
+    // If value is less than currentTargetValue, status is partial
+    let completionStatus: CompletionStatus = 'completed'
+    if (habit.currentTargetValue > 0 && logValue < habit.currentTargetValue) {
+      completionStatus = 'partial'
+    }
+
+    // Calculate weeks since habit creation and update currentTargetValue if needed
+    const now = new Date()
+    const createdAt = new Date(habit.createdAt)
+    const daysSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+    
+    // Calculate new currentTargetValue based on weeks passed
+    // Formula: initialValue + (weeksSinceCreation * difficultyRate)
+    // But don't exceed goalValue
+    const weeksSinceCreation = Math.floor(daysSinceCreation / 7)
+    const calculatedTargetValue = habit.initialValue + (weeksSinceCreation * habit.difficultyRate)
+    const newCurrentTargetValue = Math.min(calculatedTargetValue, habit.goalValue)
+
     // Create habit log
     const habitLog = await prisma.habitLogs.create({
       data: {
         habitId,
         userId: user.sub,
-        completionStatus: completionStatus as CompletionStatus,
-        value: 0, // Default value since quantity is removed
+        completionStatus: completionStatus,
+        value: logValue,
         durationMinutes: durationMinutes ? parseInt(String(durationMinutes)) : null,
         notes: notes?.trim() || null,
         customFields: customFields && Object.keys(customFields).length > 0 
@@ -123,27 +143,35 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    // Update habit statistics - only for completed status
     const updateData: any = {}
 
-    // Increment current streak
-    const newCurrentStreak = habit.currentStreak + 1
-    updateData.currentStreak = newCurrentStreak
-    
-    if (newCurrentStreak > habit.longestStreak) {
-      updateData.longestStreak = newCurrentStreak
+    // Update currentTargetValue if it has changed
+    if (newCurrentTargetValue !== habit.currentTargetValue) {
+      updateData.currentTargetValue = newCurrentTargetValue
+    }
+
+    // Increment current streak for completed or partial status
+    if (completionStatus === 'completed' || completionStatus === 'partial') {
+      const newCurrentStreak = habit.currentStreak + 1
+      updateData.currentStreak = newCurrentStreak
+      
+      if (newCurrentStreak > habit.longestStreak) {
+        updateData.longestStreak = newCurrentStreak
+      }
     }
     
-    // Increment total completions
-    updateData.totalCompletions = { increment: 1 }
+    // Increment total completions for completed or partial status
+    if (completionStatus === 'completed' || completionStatus === 'partial') {
+      updateData.totalCompletions = { increment: 1 }
+    }
     
     // Update next due date
     updateData.nextDueDate = calculateNextDueDate(habit.frequency)
     
-    // Update milestones
+    // Update milestones (pass the actual value)
     await updateMilestones(
       habitId, 
-      0, 
+      logValue, 
       durationMinutes ? parseInt(String(durationMinutes)) : null
     )
 

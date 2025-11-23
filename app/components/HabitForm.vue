@@ -39,6 +39,7 @@
       <TabsContent value="growth" class="space-y-4">
         <HabitGrowth v-model:initialValue="formData.initialValue" v-model:difficultyRate="formData.difficultyRate"
           v-model:goalValue="formData.goalValue" v-model:goalMetric="formData.goalMetric"
+          v-model:customGoalMetric="formData.customGoalMetric"
           v-model:estimatedDate="formData.estimatedCompletionDate" />
       </TabsContent>
 
@@ -86,6 +87,7 @@ const INITIAL_FORM_DATA: HabitFormData = {
   enableNotifications: true,
 
   goalMetric: "sessions",
+  customGoalMetric: "",
   goalValue: 0,
   estimatedCompletionDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
   initialValue: 0,
@@ -125,6 +127,12 @@ const customFields = ref<CustomField[]>([])
 onMounted(() => {
   if (props.isEditMode && props.habit) {
     Object.assign(formData, props.habit)
+    
+    // Handle custom goal metric using composable
+    const parsed = parseGoalMetricFromApi(formData.goalMetric)
+    formData.goalMetric = parsed.goalMetric
+    formData.customGoalMetric = parsed.customGoalMetric
+    
     // Map custom fields from API format to component format
     const apiCustomFields = (props.habit as any).customFields || []
     customFields.value = apiCustomFields.map((field: any) => ({
@@ -162,11 +170,17 @@ async function handleSave() {
       isRequired: !!required,
     }))
 
+  // Prepare goal metric for API using composable
+  const finalGoalMetric = prepareGoalMetricForApi(formData.goalMetric || '', formData.customGoalMetric || '')
+
   const payload = {
     ...formData,
+    goalMetric: finalGoalMetric,
     customFields: cleanFields,
   }
 
+  // Remove customGoalMetric from payload as API doesn't need it
+  delete (payload as any).customGoalMetric
 
   if (props.isEditMode) {
     emit('update', payload)

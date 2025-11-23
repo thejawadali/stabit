@@ -53,6 +53,7 @@ interface Habit {
   totalSkipped: number
   currentStreak: number
   longestStreak: number
+  currentTargetValue: number
 }
 
 interface TodayHabit extends Partial<Habit> {
@@ -110,6 +111,7 @@ type HabitFormData = {
   difficultyRate?: number
   goalValue?: number
   goalMetric?: string
+  customGoalMetric?: string
   estimatedCompletionDate?: Date
   enableNotifications?: boolean
   reminderTimes?: string[]

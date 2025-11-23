@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
         goalValue: true,
         isArchived: true,
         goalMetric: true,
+        currentTargetValue: true,
         nextDueDate: true,
         habitLogs: {
           take: 1,
