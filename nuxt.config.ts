@@ -54,6 +54,9 @@ export default defineNuxtConfig({
       exclude: ['/', '/signup', '/auth/callback']
     }
   },
+  prisma: {
+    skipPrompts: true
+  },
   components: [
     {
       path: '~/components/dashboard',
