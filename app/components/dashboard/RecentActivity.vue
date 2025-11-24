@@ -7,7 +7,7 @@
       <div class="space-y-3">
         <div v-for="activity in activities" :key="activity.id"
           :class="[
-            'flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer',
+            'flex items-center justify-between p-3 rounded-lg transition-colors cursor-default',
             activity.completionStatus === 'completed' ? 'bg-success/10 hover:bg-success/20 border border-success/20' :
             activity.completionStatus === 'partial' ? 'bg-warning/10 hover:bg-warning/20 border border-warning/20' :
             activity.completionStatus === 'missed' ? 'bg-destructive/10 hover:bg-destructive/20 border border-destructive/20' :

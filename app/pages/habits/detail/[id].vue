@@ -59,7 +59,7 @@
 
           <div v-for="log in logs.slice(0, 10)" :key="log.id"
             :class="[
-              'flex items-center justify-between p-3 rounded-lg transition-colors',
+              'flex items-center justify-between p-3 rounded-lg transition-colors cursor-default',
               log.completionStatus === 'completed' ? 'bg-success/10 border border-success/20' :
               log.completionStatus === 'partial' ? 'bg-warning/10 border border-warning/20' :
               log.completionStatus === 'missed' ? 'bg-destructive/10 border border-destructive/20' :
