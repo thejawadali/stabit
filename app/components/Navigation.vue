@@ -49,8 +49,8 @@
       </div>
 
       <!-- Mobile menu -->
-      <div class="md:hidden py-4 border-t border-border">
-        <div v-if="isMenuOpen" class="flex flex-col space-y-4">
+      <div v-if="isMenuOpen" class="md:hidden py-4 border-t border-border">
+        <div class="flex flex-col space-y-4">
           <template v-if="isHomePage">
             <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors">
               Features
