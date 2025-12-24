@@ -28,8 +28,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-lucide-icons',
     '@nuxtjs/supabase',
-    'dayjs-nuxt',
-    '@prisma/nuxt',
+    'dayjs-nuxt'
   ],
   colorMode: {
     preference: 'system', // default value of $colorMode.preference
@@ -53,9 +52,6 @@ export default defineNuxtConfig({
       callback: '/auth/callback',
       exclude: ['/', '/signup', '/auth/callback']
     }
-  },
-  prisma: {
-    skipPrompts: true
   },
   components: [
     {
