@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client"
+import { prisma } from '../../utils/prisma'
 import { serverSupabaseUser } from '#supabase/server'
-import { seedDefaultCategories } from '../../utils/seedCategories'
 
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
-  const prisma = new PrismaClient()
 
   // verify if profile already exists
   const profile = await prisma.userProfile.findUnique({
@@ -30,13 +28,13 @@ export default defineEventHandler(async (event) => {
     })
 
     // Seed default categories for new user
-    if (user?.sub) {
-      try {
-        await seedDefaultCategories(prisma, user.sub)
-      } catch (seedError) {
-        console.error('Failed to seed default categories:', seedError)
-      }
-    }
+    // if (user?.sub) {
+    //   try {
+    //     await seedDefaultCategories(prisma, user.sub)
+    //   } catch (seedError) {
+    //     console.error('Failed to seed default categories:', seedError)
+    //   }
+    // }
 
     return created
   } catch (error: any) {

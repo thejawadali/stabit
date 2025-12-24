@@ -68,14 +68,14 @@ export default defineNuxtConfig({
       }
     ]
   },
-  nitro: {
-    debug: process.env.NODE_ENV === 'development',
-    experimental: {
-      tasks: true
-    },
-    scheduledTasks: {
-      // '* * * * *': ['habit:check-status'] for dev
-      '0 0 * * *': ['habit:check-status'] // run every day at midnight
-    }
-  }
+  // nitro: {
+  //   debug: process.env.NODE_ENV === 'development',
+  //   experimental: {
+  //     tasks: true
+  //   },
+  //   scheduledTasks: {
+  //     // '* * * * *': ['habit:check-status'] for dev
+  //     '0 0 * * *': ['habit:check-status'] // run every day at midnight
+  //   }
+  // }
 })

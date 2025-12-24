@@ -7,8 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "seed": "tsx scripts/seed-data.ts"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@internationalized/date": "^3.10.0",
