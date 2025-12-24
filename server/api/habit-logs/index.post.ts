@@ -1,6 +1,6 @@
 import { serverSupabaseUser } from '#supabase/server'
 import { CompletionStatus, MilestoneStatus } from '@prisma/client'
-import prisma from '../../../lib/prisma'
+import { prisma } from '../../utils/prisma'
 import calculateNextDueDate from '../../utils/getNextDueDate'
 
 

@@ -1,4 +1,4 @@
-import prisma from '../../lib/prisma'
+import { prisma } from '../utils/prisma'
 import { CompletionStatus, MilestoneStatus } from '@prisma/client'
 import calculateNextDueDate from './getNextDueDate'
 

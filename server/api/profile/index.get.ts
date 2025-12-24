@@ -1,10 +1,10 @@
-import { PrismaClient, type UserProfile } from "@prisma/client"
+import { type UserProfile } from "@prisma/client"
 import { serverSupabaseUser } from '#supabase/server'
+import { prisma } from '../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
-  const prisma = new PrismaClient()
 
   const profile: UserProfile | null = await prisma.userProfile.findUnique({
     where: {

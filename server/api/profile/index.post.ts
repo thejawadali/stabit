@@ -1,11 +1,10 @@
-import { PrismaClient } from "@prisma/client"
+import { prisma } from '../../utils/prisma'
 import { serverSupabaseUser } from '#supabase/server'
 import { seedDefaultCategories } from '../../utils/seedCategories'
 
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
-  const prisma = new PrismaClient()
 
   // verify if profile already exists
   const profile = await prisma.userProfile.findUnique({

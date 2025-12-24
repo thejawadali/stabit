@@ -1,9 +1,8 @@
 import { serverSupabaseUser } from "#supabase/server"
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const prisma = new PrismaClient()
   const user = await serverSupabaseUser(event)
   
   try {
