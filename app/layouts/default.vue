@@ -5,7 +5,7 @@
     </Navigation> -->
     <AppSidebar />
     <SidebarInset>
-      <main class="w-full min-h-screen sm:p-6 lg:p-8 pt-24 pb-12 mx-auto">
+      <main class="w-full min-h-screen px-2 sm:p-6 lg:p-8 py-4 mx-auto">
         <slot />
       </main>
     </SidebarInset>

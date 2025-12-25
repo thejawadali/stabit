@@ -9,7 +9,7 @@
       <!-- Habits List -->
       <div v-if="habits.length > 0" class="space-y-3">
         <div v-for="habit in habits" :key="habit.id"
-          class="flex items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
+          class="flex items-start md:items-center justify-between p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
           <div class="flex items-center space-x-3 flex-1">
             <div class="flex-1">
               <div class="flex items-center space-x-2">
@@ -19,15 +19,16 @@
                 </span>
               </div>
               <div class="flex items-center space-x-2 mt-1">
-                <IconClock class="w-3 h-3 text-muted-foreground" />
+                <IconClock class="w-3 h-3 text-muted-foreground ml-1" />
                 <span class="text-xs text-muted-foreground">{{ formatTime(habit.timeOfDay) }}</span>
-                <Badge variant="outline" class="text-xs">{{ habit.category.name }}</Badge>
+                <Badge variant="outline" class="hidden md:block text-xs">{{ habit.category.name }}</Badge>
               </div>
             </div>
           </div>
 
           <Button 
             :size="'sm'" 
+            class="mt-1 md:mt-0"
             :variant="isHabitCompleted(habit.id) ? 'outline' : 'default'"
             @click="addRecord(habit)"
             :disabled="isHabitCompleted(habit.id)"
