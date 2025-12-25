@@ -27,7 +27,7 @@
           <!-- Missed Habits -->
           <MissedHabits :missedHabitLogs="missedHabits" />
           <!-- Recent Activity -->
-          <RecentActivity :activities="recentLogsData?.logs ?? []"
+          <RecentActivities :activities="recentLogsData?.logs ?? []"
             :has-more="recentLogsData?.pagination?.hasMore ?? false" :loading="recentLogsLoading"
             @load-more="loadRecentLogs" />
         </div>
