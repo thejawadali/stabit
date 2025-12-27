@@ -2,12 +2,12 @@
   <div>
     <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 mx-auto w-full">
       <!-- Header -->
-      <div class="mb-6 flex items-start justify-between">
+      <div class="mb-6 flex flex-col md:flex-row gap-3 items-start justify-between">
         <div>
           <h1 class="text-3xl font-bold mb-2">My Habits</h1>
           <p class="text-muted-foreground">Manage and track all your habits</p>
         </div>
-        <Button @click="navigateToCreateHabit">
+        <Button @click="navigateToCreateHabit" class="w-full md:w-auto">
           <IconPlus class="w-4 h-4 mr-2" />
           Create Habit
         </Button>
@@ -19,51 +19,58 @@
 
 
       <div class="space-y-4 mb-6">
-        <div class="flex flex-wrap gap-3">
-          <div class="relative flex-1 min-w-[200px]">
-            <IconSearch class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search habits..." v-model="searchQuery" class="pl-10" />
+        <div class="flex items-center gap-3">
+          <div class="grid grid-cols-12 gap-3 w-full">
+            <!-- search input -->
+            <div class="relative col-span-12 xl:col-span-6">
+              <IconSearch class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search habits..." v-model="searchQuery" class="pl-10" />
+            </div>
+
+            <!-- Filters -->
+            <div class="col-span-6 md:col-span-4 xl:col-span-2">
+              <Select v-model="categoryFilter">
+                <SelectTrigger>
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.icon }} {{ cat.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div class="col-span-6 md:col-span-4 xl:col-span-2">
+              <Select v-model="frequencyFilter">
+                <SelectTrigger>
+                  <SelectValue placeholder="Frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Frequency</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div class="col-span-6 md:col-span-4 xl:col-span-2">
+              <Select v-model="dueDateFilter">
+                <SelectTrigger>
+                  <SelectValue placeholder="Due Date" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Dates</SelectItem>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="tomorrow">Tomorrow</SelectItem>
+                  <SelectItem value="thisWeek">This Week</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-
-          <!-- Filters -->
-          <Select v-model="categoryFilter">
-            <SelectTrigger class="w-[150px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.icon }} {{ cat.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-
-          <Select v-model="frequencyFilter">
-            <SelectTrigger class="w-[150px]">
-              <SelectValue placeholder="Frequency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Frequency</SelectItem>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select v-model="dueDateFilter">
-            <SelectTrigger class="w-[150px]">
-              <SelectValue placeholder="Due Date" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Dates</SelectItem>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="tomorrow">Tomorrow</SelectItem>
-              <SelectItem value="thisWeek">This Week</SelectItem>
-            </SelectContent>
-          </Select>
-
           <!-- view mode buttons -->
-          <div class="flex gap-2 ml-auto">
+          <div class="hidden xl:flex gap-2 ml-auto">
             <Button :variant="viewMode === 'grid' ? 'default' : 'outline'" size="icon" @click="viewMode = 'grid'">
               <IconLayoutGrid class="h-4 w-4" />
             </Button>
@@ -71,6 +78,7 @@
               <IconList class="h-4 w-4" />
             </Button>
           </div>
+
         </div>
 
 
@@ -94,8 +102,8 @@
               @refresh="refreshHabits" />
           </div>
           <div v-else class="space-y-3">
-            <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit"
-              @addRecord="addRecord(habit)" @refresh="refreshHabits" />
+            <HabitListRow v-for="habit in filteredHabits" :key="habit.id" :habit="habit" @addRecord="addRecord(habit)"
+              @refresh="refreshHabits" />
           </div>
         </template>
       </div>
