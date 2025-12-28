@@ -97,7 +97,7 @@
 
         <!-- habits listing -->
         <template v-else>
-          <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-if="viewMode === 'grid'" class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
             <HabitCard v-for="habit in filteredHabits" :key="habit.id" :habit="habit" @addRecord="addRecord(habit)"
               @refresh="refreshHabits" />
           </div>
