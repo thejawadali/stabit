@@ -288,7 +288,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ProfileInfoType } from "~~/types";
 
 
 
