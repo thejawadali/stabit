@@ -54,52 +54,57 @@
         </div>
 
         <!-- initial value -->
-        <Input name="initialValue" type="number" placeholder="e.g., 5 pushups" v-model="initialValue">
-        <template #field-label>
-          <Label class="flex items-center gap-2">
-            Initial Rate / Starting Point
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <button type="button" class="text-muted-foreground hover:text-foreground">
-                  <IconInfo class="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>How much you can currently do at the beginning.</p>
-                <p class="text-xs mt-1">Example: If you can read 2 pages now, enter 2. This will be your starting
-                  target.</p>
-              </TooltipContent>
-            </Tooltip>
-          </Label>
-        </template>
-        </Input>
+        <div class="col-span-2 lg:col-span-1">
+          <Input name="initialValue" type="number" placeholder="e.g., 5 pushups" v-model="initialValue">
+          <template #field-label>
+            <Label class="flex items-center gap-2">
+              Initial Rate / Starting Point
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <button type="button" class="text-muted-foreground hover:text-foreground">
+                    <IconInfo class="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>How much you can currently do at the beginning.</p>
+                  <p class="text-xs mt-1">Example: If you can read 2 pages now, enter 2. This will be your starting
+                    target.</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+          </template>
+          </Input>
+        </div>
 
         <!-- difficulty rate -->
-        <Input name="difficultyRate" type="number" placeholder="e.g., +1" v-model="difficultyRate">
-        <template #field-label>
-          <Label class="flex items-center gap-2">
-            Difficulty Rate Per Week
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <button type="button" class="text-muted-foreground hover:text-foreground">
-                  <IconInfo class="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>How much you want to increase your target each week.</p>
-                <p class="text-xs mt-1">Example: If you want to read 1 more page per week, enter 1. Your target will
-                  automatically increase every 7 days.</p>
-              </TooltipContent>
-            </Tooltip>
-          </Label>
-        </template>
-        <!-- <template #suffix>
+        <div class="col-span-2 lg:col-span-1">
+          <Input name="difficultyRate" type="number" placeholder="e.g., +1" v-model="difficultyRate">
+          <template #field-label>
+            <Label class="flex items-center gap-2">
+              Difficulty Rate Per Week
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <button type="button" class="text-muted-foreground hover:text-foreground">
+                    <IconInfo class="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>How much you want to increase your target each week.</p>
+                  <p class="text-xs mt-1">Example: If you want to read 1 more page per week, enter 1. Your target will
+                    automatically increase every 7 days.</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+          </template>
+          <!-- <template #suffix>
           <span class="text-sm text-muted-foreground w-20">per week</span>
         </template> -->
-        </Input>
+          </Input>
+        </div>
 
         <!-- ultimate goal -->
-        <Input name="goalValue" type="number" placeholder="e.g., 100" v-model="goalValue">
+        <div class="col-span-2 lg:col-span-1">
+          <Input name="goalValue" type="number" placeholder="e.g., 100" v-model="goalValue">
           <template #field-label>
             <Label class="flex items-center gap-2">
               Ultimate Goal
@@ -117,10 +122,13 @@
               </Tooltip>
             </Label>
           </template>
-        </Input>
+          </Input>
+        </div>
 
         <!-- estimated completion date -->
-        <DatePicker label="Estimated Completion Date" v-model="estimatedDate" />
+        <div class="col-span-2 lg:col-span-1">
+          <DatePicker label="Estimated Completion Date" v-model="estimatedDate" />
+        </div>
 
         <!-- TODO: in phase 2
           <div class="flex items-center justify-between">

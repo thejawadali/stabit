@@ -29,7 +29,7 @@
             </Button>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Input name="title" label="Field Title" placeholder="e.g., Duration, Mood, Reps" v-model="field.title" />
 
             <Select name="type" label="Field Type" v-model="field.type">

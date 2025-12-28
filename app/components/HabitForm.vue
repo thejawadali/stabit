@@ -50,15 +50,15 @@
     </Tabs>
 
     <!-- Action Buttons -->
-    <div class="flex items-center justify-between mt-6">
-      <Button variant="outline" @click="navigateTo('/habits')">
+    <div class="flex flex-col-reverse md:flex-row items-center justify-between gap-3 mt-4 lg:mt-6">
+      <Button variant="outline" @click="navigateTo('/habits')" class="w-full md:w-auto">
         Cancel
       </Button>
-      <div class="flex items-center gap-3">
-        <Button variant="outline" @click="showPreview = true" :is-loading="loading">
+      <div class="flex flex-col-reverse md:flex-row items-center gap-3 w-full md:w-auto">
+        <Button variant="outline" @click="showPreview = true" :is-loading="loading" class="w-full md:w-auto">
           Preview Summary
         </Button>
-        <Button :is-loading="loading" @click="handleSave">
+        <Button :is-loading="loading" @click="handleSave" class="w-full md:w-auto">
           <IconSave class="w-4 h-4 mr-2" />
           {{ isEditMode ? "Update Habit" : "Save Habit" }}
         </Button>
