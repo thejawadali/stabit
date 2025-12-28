@@ -2,17 +2,17 @@
   <main class="flex-1 p-6 overflow-auto">
     <div class="max-w-7xl mx-auto space-y-6">
       <!-- Header -->
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col md:flex-row gap-2 md:items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold flex items-center gap-2">
-            <IconTrophy class="w-8 h-8 text-warning" />
+          <h1 class="text-3xl font-bold flex md:items-center gap-2">
+            <IconTrophy class="w-8 h-8 text-warning mt-1 md:mt-0" />
             Milestones & Rewards
           </h1>
           <p class="text-muted-foreground mt-1">
             Track your progress and celebrate achievements
           </p>
         </div>
-        <Button class="gap-2" @click="isAddDialogOpen = true">
+        <Button @click="isAddDialogOpen = true" class="w-full md:w-auto gap-2">
         <IconPlus class="w-4 h-4" />
         Add Milestone
       </Button>
