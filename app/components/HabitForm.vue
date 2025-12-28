@@ -1,5 +1,5 @@
 <template>
-  <main class="container mx-auto p-6 w-full max-w-5xl">
+  <main class="container">
     <div class="flex items-start gap-x-4 mb-6">
       <Button v-if="isEditMode" variant="ghost" size="icon" @click="router.push('/habits')">
         <IconArrowLeft class="h-5 w-5" />

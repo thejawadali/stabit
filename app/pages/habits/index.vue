@@ -1,6 +1,6 @@
 <template>
   <div>
-    <main class="flex-1 p-4 sm:p-6 lg:p-8 pt-24 pb-12 mx-auto w-full">
+    <main class="flex-1 mx-auto w-full">
       <!-- Header -->
       <div class="mb-6 flex flex-col md:flex-row gap-3 items-start justify-between">
         <div>

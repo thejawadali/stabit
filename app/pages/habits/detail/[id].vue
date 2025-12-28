@@ -1,11 +1,8 @@
 <template>
-  <main class="container mx-auto p-6 w-full space-y-6 max-w-5xl">
+  <main class="container space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" @click="router.push('/habits')">
-          <IconArrowLeft class="h-5 w-5" />
-        </Button>
         <div>
           <div class="flex items-center space-x-3">
             <span class="text-3xl">{{ habit?.icon }}</span>

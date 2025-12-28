@@ -1,5 +1,5 @@
 <template>
-  <main class="container mx-auto p-6 w-full max-w-5xl">
+  <main class="container">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-3xl font-bold">Settings</h1>
