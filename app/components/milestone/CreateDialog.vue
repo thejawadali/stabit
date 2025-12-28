@@ -7,40 +7,55 @@
           Set up a new milestone and reward for your habit
         </DialogDescription>
       </DialogHeader>
-      <form @submit.prevent="handleSubmit" class="py-4 grid grid-cols-2 gap-4">
+      <form @submit.prevent="handleSubmit" class="py-4 grid grid-cols-2 gap-2 sm:gap-4">
         <!-- milestone name -->
         <div class="col-span-2">
-          <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions" rules="required" custom-error-message="Please enter a milestone name" />
+          <Input name="name" v-model="formData.name" label="Milestone Name" placeholder="e.g., First 10 Sessions"
+            rules="required" custom-error-message="Please enter a milestone name" />
         </div>
 
         <!-- habit -->
-        <Select name="habitId" v-model="formData.habitId" label="Habit" rules="required" custom-error-message="Please select a habit">
-          <SelectTrigger>
-            <SelectValue placeholder="Select habit" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="habit in habits" :key="habit.id" :value="habit.id">
-              {{ habit.icon }} {{ habit.name }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        
+        <div class="col-span-2 sm:col-span-1">
+          <Select name="habitId" v-model="formData.habitId" label="Habit" rules="required"
+            custom-error-message="Please select a habit">
+            <SelectTrigger>
+              <SelectValue placeholder="Select habit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="habit in habits" :key="habit.id" :value="habit.id">
+                {{ habit.icon }} {{ habit.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <!-- icon -->
-        <IconPicker name="rewardIcon" v-model="formData.rewardIcon" label="Icon" />
+        <div class="col-span-2 sm:col-span-1">
+          <IconPicker name="rewardIcon" v-model="formData.rewardIcon" label="Icon" />
+        </div>
 
         <!-- reward -->
-        <Input name="rewardName" v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat" rules="required" custom-error-message="Please enter a reward name" />
+        <div class="col-span-2 sm:col-span-1">
+          <Input name="rewardName" v-model="formData.rewardName" label="Reward" placeholder="e.g., Weekend Treat"
+            rules="required" custom-error-message="Please enter a reward name" />
+        </div>
 
         <!-- target value -->
-        <Input name="targetValue" v-model.number="formData.targetValue" label="Target Value" type="number" placeholder="10"
-          rules="required" custom-error-message="Please enter a target value" />
+        <div class="col-span-2 sm:col-span-1">
+          <Input name="targetValue" v-model.number="formData.targetValue" label="Target Value" type="number"
+            placeholder="10" rules="required" custom-error-message="Please enter a target value" />
+        </div>
 
         <!-- milestone description -->
-        <Textarea v-model="formData.description" label="Milestone Description"
-          placeholder="Describe your milestone..." />
-        
+        <div class="col-span-2 sm:col-span-1">
+          <Textarea v-model="formData.description" label="Milestone Description"
+            placeholder="Describe your milestone..." />
+        </div>
         <!-- reward description -->
-        <Textarea v-model="formData.rewardDescription" label="Reward Description" placeholder="Describe your reward..." />
+        <div class="col-span-2 sm:col-span-1">
+          <Textarea v-model="formData.rewardDescription" label="Reward Description"
+            placeholder="Describe your reward..." />
+        </div>
 
         <DialogFooter class="col-span-2">
           <Button type="button" variant="outline" @click="isAddDialogOpen = false" :disabled="loading">
@@ -81,7 +96,7 @@ withDefaults(defineProps<{
   habits: () => []
 })
 
-const {validate} = useForm()
+const { validate } = useForm()
 const handleSubmit = async () => {
   const { valid } = await validate()
   if (!valid) return
