@@ -13,7 +13,7 @@
           </CardDescription>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4" v-if="false">
             <Avatar class="h-20 w-20">
               <AvatarImage :src="personalInfo.avatarUrl!" alt="Profile picture" />
               <AvatarFallback class="text-lg">
