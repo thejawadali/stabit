@@ -1,7 +1,7 @@
 <template>
   <main class="container space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center space-x-4">
         <div>
           <div class="flex items-center space-x-3">
@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div class="flex space-x-2">
+      <div class="flex space-x-2 self-end sm:self-center">
         <Button variant="outline" @click="router.push(`/habits/${habit?.id}`)">
           <IconEdit class="h-4 w-4 mr-2" />
           Edit
