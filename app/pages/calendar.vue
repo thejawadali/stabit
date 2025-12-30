@@ -1,6 +1,6 @@
 <template>
   <main class="flex-1 p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto space-y-8">
+    <div class="container space-y-8">
       <!-- Header -->
       <div>
         <h1 class="text-3xl font-bold text-foreground mb-2">Calendar</h1>

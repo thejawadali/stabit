@@ -1,6 +1,6 @@
 <template>
   <main class="flex-1 p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto space-y-6">
+    <div class="container space-y-6">
       <!-- Header -->
       <div>
         <h1 class="text-3xl font-bold text-foreground mb-2">Analytics</h1>

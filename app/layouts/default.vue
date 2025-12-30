@@ -1,14 +1,15 @@
 <template>
   <SidebarProvider>
-    <!-- <Navigation>
-      <AppNavConent />
-    </Navigation> -->
+    <Navigation class="lg:hidden">
+      <template #default>
+        <div class="hidden">
+          <AppNavConent />
+        </div>
+      </template>
+    </Navigation>
     <AppSidebar />
     <SidebarInset>
-      <div class="lg:hidden fixed top-4 left-4 z-50">
-        <SidebarTrigger />
-      </div>
-      <main class="w-full min-h-screen px-12 pt-4">
+      <main class="w-full min-h-screen pt-20 lg:pt-4">
         <slot />
       </main>
     </SidebarInset>
@@ -16,5 +17,5 @@
 </template>
 
 <script setup>
-import { SidebarInset, SidebarTrigger } from "#components"
+import { SidebarInset } from "#components"
 </script>

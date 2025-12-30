@@ -7,7 +7,6 @@
     :loading
     @update="handleUpdate" 
   />
-  
 </template>
 
 <script setup lang="ts">

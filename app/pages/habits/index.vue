@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <main class="flex-1 mx-auto w-full">
       <!-- Header -->
       <div class="mb-6 flex flex-col md:flex-row gap-3 items-start justify-between">

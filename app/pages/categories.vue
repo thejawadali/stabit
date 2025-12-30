@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Categories</h1>

@@ -1,5 +1,5 @@
 <template>
-  <Sidebar class="w-56 transition-all duration-300 border-r border-border t-16" collapsible="icon">
+  <Sidebar class="transition-all duration-300 border-r border-border t-16" collapsible="icon">
     <SidebarHeader>
       <NuxtLink to="/" class="flex items-center space-x-2 px-2 py-4">
         <div class="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">

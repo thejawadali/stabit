@@ -1,6 +1,6 @@
 <template>
   <main class="flex-1 overflow-auto">
-    <div class="max-w-7xl mx-auto space-y-6">
+    <div class="container space-y-6">
       <!-- Header -->
       <div class="flex flex-col md:flex-row gap-2 md:items-center justify-between">
         <div>
