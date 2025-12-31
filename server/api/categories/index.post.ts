@@ -1,9 +1,9 @@
 import { prisma } from '../../utils/prisma'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = requireAuth(event)
   try {
     const body = await readBody(event)
     
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         color: body.color || '#3B82F6',
         icon: body.icon || null,
         isActive: body.isActive !== undefined ? body.isActive : true,
-        userId: user?.sub
+        userId: user.id
       },
       include: {
         habits: {

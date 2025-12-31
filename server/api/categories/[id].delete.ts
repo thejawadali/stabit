@@ -1,9 +1,9 @@
-import { serverSupabaseUser } from "#supabase/server"
+import { requireAuth } from '../../utils/auth'
 import { prisma } from '../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = requireAuth(event)
   try {
     const categoryId = getRouterParam(event, 'id')
     
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const existingCategory = await prisma.category.findFirst({
       where: {
         id: categoryId,
-        userId: user?.sub
+        userId: user.id
       },
       include: {
         habits: true

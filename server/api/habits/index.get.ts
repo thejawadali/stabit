@@ -1,22 +1,15 @@
 import { CompletionStatus } from '@prisma/client'
 import { prisma } from '../../utils/prisma'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-    
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
+    const user = requireAuth(event)
 
     const habits = await prisma.habit.findMany({
       where: {
-        userId: user.sub,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -76,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
     const todaysLogsCount = await prisma.habitLogs.count({
       where: {
-        userId: user.sub,
+        userId: user.id,
         completionStatus: CompletionStatus.completed,
         createdAt: {
           gte: today,

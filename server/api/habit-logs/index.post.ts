@@ -1,4 +1,4 @@
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 import { CompletionStatus, MilestoneStatus } from '@prisma/client'
 import { prisma } from '../../utils/prisma'
 import calculateNextDueDate from '../../utils/getNextDueDate'
@@ -54,14 +54,7 @@ async function updateMilestones(habitId: string, value: number, durationMinutes:
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
+    const user = requireAuth(event)
 
     const body = await readBody(event)
 
@@ -85,7 +78,7 @@ export default defineEventHandler(async (event) => {
     const habit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.sub,
+        userId: user.id,
         isArchived: false
       }
     })
@@ -123,7 +116,7 @@ export default defineEventHandler(async (event) => {
     const habitLog = await prisma.habitLogs.create({
       data: {
         habitId,
-        userId: user.sub,
+        userId: user.id,
         completionStatus: completionStatus,
         value: logValue,
         durationMinutes: durationMinutes ? parseInt(String(durationMinutes)) : null,

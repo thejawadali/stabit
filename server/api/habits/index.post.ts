@@ -1,17 +1,10 @@
 import { prisma } from '../../utils/prisma'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event);
-
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
+    const user = requireAuth(event);
 
     const body = await readBody(event);
 
@@ -48,7 +41,7 @@ export default defineEventHandler(async (event) => {
           ...rest,
           name,
           categoryId,
-          userId: user.sub,
+          userId: user.id,
           currentTargetValue,
           customFields: customFields.length
             ? {

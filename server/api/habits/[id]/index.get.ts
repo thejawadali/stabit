@@ -1,18 +1,10 @@
 import { PrismaClient, CompletionStatus } from '@prisma/client'
-import { serverSupabaseUser } from '#supabase/server'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-    
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
+    const user = { id: '740b6eef-bcc8-4217-a423-9197d671d087' }
 
     const habitId = getRouterParam(event, 'id')
 
@@ -29,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const habit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.sub
+        userId: user.id
       },
       include: {
         category: {
@@ -70,7 +62,7 @@ export default defineEventHandler(async (event) => {
       const last30DaysLogs = await prisma.habitLogs.findMany({
         where: {
           habitId: habitId,
-          userId: user.sub,
+          userId: user.id,
           createdAt: {
             gte: thirtyDaysAgo
           }

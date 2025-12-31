@@ -1,15 +1,15 @@
 import { PrismaClient } from "@prisma/client"
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = requireAuth(event)
   const prisma = new PrismaClient()
 
   try {
     // Check if profile exists
     const existingProfile = await prisma.userProfile.findUnique({
       where: {
-        userId: user?.sub,
+        userId: user.id,
       },
     })
 
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
     // Update the profile
     const updatedProfile = await prisma.userProfile.update({
       where: {
-        userId: user?.sub,
+        userId: user.id,
       },
       data: updateData,
     })

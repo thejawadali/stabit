@@ -1,14 +1,14 @@
-import { serverSupabaseUser } from "#supabase/server"
+import { requireAuth } from '../../utils/auth'
 import { prisma } from '../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = requireAuth(event)
   try {
     
     const categories = await prisma.category.findMany({
       where: {
-        userId: user?.sub
+        userId: user.id
       },
       include: {
         _count: {

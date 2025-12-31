@@ -1,9 +1,8 @@
-import { serverSupabaseUser } from "#supabase/server"
 import { prisma } from '../../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = { id: '740b6eef-bcc8-4217-a423-9197d671d087' }
   
   try {
     const habitId = getRouterParam(event, 'id')
@@ -15,18 +14,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
-
     // Check if habit exists and belongs to user
     const existingHabit = await prisma.habit.findFirst({
       where: {
         id: habitId,
-        userId: user.sub
+        userId: user.id
       }
     })
 

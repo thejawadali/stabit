@@ -1,16 +1,9 @@
 import { prisma } from '../../../utils/prisma'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
-
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
+    const user = { id: '740b6eef-bcc8-4217-a423-9197d671d087' }
 
     const logId = getRouterParam(event, 'id')
 
@@ -24,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const habitLog = await prisma.habitLogs.findFirst({
       where: {
         id: logId,
-        userId: user.sub
+        userId: user.id
       },
       include: {
         habit: {

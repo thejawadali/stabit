@@ -27,7 +27,6 @@ export default defineNuxtConfig({
     '@vee-validate/nuxt',
     '@nuxtjs/color-mode',
     'nuxt-lucide-icons',
-    '@nuxtjs/supabase',
     'dayjs-nuxt'
   ],
   colorMode: {
@@ -45,13 +44,6 @@ export default defineNuxtConfig({
   },
   lucide: {
     namePrefix: 'Icon'
-  },
-  supabase: {
-    redirectOptions: {
-      login: '/login',
-      callback: '/auth/callback',
-      exclude: ['/', '/signup', '/auth/callback']
-    }
   },
   components: [
     {

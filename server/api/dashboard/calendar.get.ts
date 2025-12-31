@@ -1,17 +1,11 @@
 import { prisma } from '../../utils/prisma'
-import { serverSupabaseUser } from '#supabase/server'
+import { requireAuth } from '../../utils/auth'
 import { CompletionStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await serverSupabaseUser(event)
+    const user = requireAuth(event)
 
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Unauthorized'
-      })
-    }
 
     const query = getQuery(event)
     const now = new Date()
@@ -41,7 +35,7 @@ export default defineEventHandler(async (event) => {
     // Get all habit logs for the specified month
     const habitLogs = await prisma.habitLogs.findMany({
       where: {
-        userId: user.sub,
+        userId: user.id,
         createdAt: {
           gte: monthStart,
           lte: monthEnd
