@@ -73,24 +73,16 @@ export const useAuth = () => {
   // Sign in with OAuth provider
   const signInWithProvider = async (provider: 'google' | 'github') => {
     try {
-      // TODO: Replace with your new auth system's OAuth API
-      // Update redirectTo to match your new auth system's callback route
-      const response = await $fetch<{ data?: any; error?: any; url?: string }>('/api/auth/oauth', {
-        method: 'POST',
-        body: {
-          provider,
-          redirectTo: `${window.location.origin}/dashboard`, // Update this to your callback route
-        },
-      }) as any
+      const { data, error } = await $auth.signIn.social({
+        provider,
+        callbackURL: '/dashboard',
+      })
 
-      if (response.error) throw response.error
-
-      // Redirect to OAuth provider
-      if (response.data?.url || response.url) {
-        window.location.href = response.data?.url || response.url
+      if (error) {
+        return { data: null, error }
       }
 
-      return { data: response.data || response, error: null }
+      return { data, error: null }
     } catch (error) {
       return { data: null, error }
     }

@@ -60,6 +60,17 @@ export default defineNuxtConfig({
       }
     ]
   },
+  runtimeConfig: {
+    betterAuthUrl: process.env.BETTER_AUTH_URL,
+    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
+    
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      googleClientId: process.env.GOOGLE_CLIENT_ID,
+      githubClientId: process.env.GITHUB_CLIENT_ID,
+    }
+  },
   nitro: {
     debug: process.env.NODE_ENV === 'development',
     experimental: {

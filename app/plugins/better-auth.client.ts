@@ -1,8 +1,9 @@
 import { createAuthClient } from "better-auth/vue"
 
 export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
   const authClient = createAuthClient({
-    baseURL: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    baseURL: config.public.siteUrl,
     basePath: "/api/auth",
   })
 
