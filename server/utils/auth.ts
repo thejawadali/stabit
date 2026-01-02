@@ -1,25 +1,13 @@
-// TODO: Replace this with your new auth system's user type
-export interface AuthUser {
-  id: string // User ID (replaces user.sub from Supabase)
-  email?: string
-  name?: string
-  // Add other user properties as needed
-}
+import { betterAuth } from "better-auth"
+import { prismaAdapter } from "better-auth/adapters/prisma"
+import { prisma } from "./prisma"
 
-// Helper function to get user from event context
-export function getUserFromEvent(event: any): AuthUser | null {
-  return event.context.user || null
-}
-
-// Helper function to require authentication (throws if no user)
-export function requireAuth(event: any): AuthUser {
-  const user = getUserFromEvent(event)
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized'
-    })
-  }
-  return user
-}
-
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+})
