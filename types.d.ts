@@ -154,7 +154,6 @@ interface UserProfile {
   id: string
   name: string | null
   email: string
-  emailVerified: boolean
   image: string | null
   age: number
   gender: Gender

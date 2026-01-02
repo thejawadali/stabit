@@ -1,36 +1,39 @@
 export const useAuth = () => {
   const router = useRouter()
+  const { $auth } = useNuxtApp()
   
-  // TODO: Replace with your new auth system's user state
-  const user = ref(null) // Replace with your auth system's user state
-  const isAuthenticated = computed(() => !!user.value)
+  // Use Better Auth's session hook
+  // const session = $auth.useSession()
+  // const user = computed(() => session.value?.data?.user || null)
+  // const isAuthenticated = computed(() => !!user.value)
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      // TODO: Replace with your new auth system's sign up API
-      const response = await $fetch<{ data?: any; error?: any; user?: any }>('/api/auth/signup', {
-        method: 'POST',
-        body: {
-          email,
-          password,
-          fullName,
-        },
-      }) as any
-
-      if (response.error) throw response.error
-
-      // Update user state
-      user.value = response.data?.user || null
-
-      await $fetch('/api/profile', {
-        method: 'POST',
-        body: {
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
+      const { data, error } = await $auth.signUp.email({
+        email,
+        password,
+        name: fullName,
       })
 
-      return { data: response.data, error: null }
+      if (error) {
+        return { data: null, error }
+      }
+
+      // Create user config/profile after successful signup
+      // try {
+      //   await $fetch('/api/profile', {
+      //     method: 'POST',
+      //     body: {
+      //       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      //     },
+      //   })
+      // } catch (profileError) {
+      //   console.error('Failed to create profile:', profileError)
+      //   // Don't fail signup if profile creation fails
+      // }
+
+      return { data, error: null }
     } catch (error) {
       return { data: null, error }
     }
@@ -39,27 +42,29 @@ export const useAuth = () => {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      // TODO: Replace with your new auth system's sign in API
-      const response = await $fetch<{ data?: any; error?: any; user?: any }>('/api/auth/signin', {
-        method: 'POST',
-        body: {
-          email,
-          password,
-        },
-      }) as any
-
-      if (response.error) throw response.error
-      
-      // Update user state
-      user.value = response.data?.user || null
-
-      await $fetch('/api/timezone', {
-        method: 'PUT',
-        body: {
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
+      const { data, error } = await $auth.signIn.email({
+        email,
+        password,
       })
-      return { data: response.data, error: null }
+
+      if (error) {
+        return { data: null, error }
+      }
+
+      // Update timezone after successful signin
+      // try {
+      //   await $fetch('/api/timezone', {
+      //     method: 'PUT',
+      //     body: {
+      //       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      //     },
+      //   })
+      // } catch (timezoneError) {
+      //   console.error('Failed to update timezone:', timezoneError)
+      //   // Don't fail signin if timezone update fails
+      // }
+
+      return { data, error: null }
     } catch (error: any) {
       return { data: null, error }
     }
@@ -94,17 +99,13 @@ export const useAuth = () => {
   // Sign out
   const signOut = async () => {
     try {
-      // TODO: Replace with your new auth system's sign out API
-      const response = await $fetch<{ error?: any }>('/api/auth/signout', {
-        method: 'POST',
-      }) as any
-      
-      if (response.error) throw response.error
-      
-      // Clear user state
-      user.value = null
-      
-      await router.push('/login')
+      await $auth.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push('/login')
+          },
+        },
+      })
       return { error: null }
     } catch (error) {
       return { error }
@@ -112,8 +113,10 @@ export const useAuth = () => {
   }
 
   return {
-    user: readonly(user),
-    isAuthenticated,
+    // user: readonly(user),
+    // isAuthenticated,
+    // session,
+    user: null,
     signUp,
     signIn,
     signInWithProvider,

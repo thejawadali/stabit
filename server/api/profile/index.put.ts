@@ -35,7 +35,6 @@ export default defineEventHandler(async (event) => {
     // Don't allow updating email, id, or auth-related fields
     delete data.email
     delete data.id
-    delete data.emailVerified
     delete data.createdAt
     delete data.updatedAt
 

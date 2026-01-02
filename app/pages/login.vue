@@ -70,6 +70,7 @@ useHead({
   title: 'Log In'
 })
 
+const { toast } = useToast()
 const email = ref("")
 const password = ref("")
 const isLoading = ref(false)
@@ -85,7 +86,6 @@ if (process.env.NODE_ENV === 'development') {
   password.value = "12345678"
 }
 
-
 const handleSubmit = async () => {
   const { valid } = await validate()
   if (!valid) return
@@ -96,7 +96,11 @@ const handleSubmit = async () => {
     const { error } = await signIn(email.value, password.value)
     if (error) {
       const errorMsg = (error as any).message
-      console.log(errorMsg || 'An error occurred during signin')
+      toast({
+        title: "Error occurred",
+        description: errorMsg || 'An error occurred during signin',
+        variant: "destructive"
+      })
     } else {
       // Redirect to dashboard on successful login
       await router.push('/dashboard')
@@ -114,7 +118,11 @@ const handleOAuthSignin = async (provider: 'google' | 'github') => {
     const { error } = await signInWithProvider(provider)
     if (error) {
       const errorMsg = (error as any).message
-      console.log(errorMsg || 'An error occurred during signin')
+      toast({
+        title: "Error occurred",
+        description: errorMsg || 'An error occurred during signin',
+        variant: "destructive"
+      })
     }
   } catch (error) {
     console.log("An unexpected error occurred. Please try again.")

@@ -15,11 +15,15 @@
       <CardContent class="space-y-4">
         <form class="space-y-4" @submit.prevent="handleSubmit">
           <!-- full name -->
-          <Input v-model="fullName" rules="required" validate-on-blur custom-error-message="Full name is required" name="name" label="Full Name" placeholder="Enter your full name" />
+          <Input v-model="fullName" rules="required" validate-on-blur custom-error-message="Full name is required"
+            name="name" label="Full Name" placeholder="Enter your full name" />
           <!-- email -->
-          <Input v-model="email" rules="required|email" validate-on-blur custom-error-message="Enter a valid email" name="email" label="Email" placeholder="Enter your email" />
+          <Input v-model="email" rules="required|email" validate-on-blur custom-error-message="Enter a valid email"
+            name="email" label="Email" placeholder="Enter your email" />
           <!-- password -->
-          <Input v-model="password" rules="required|min:8|max:16" validate-on-blur custom-error-message="Enter a password between 8 and 16 characters" name="password" label="Password" type="password" placeholder="Create a password" />
+          <Input v-model="password" rules="required|min:8|max:16" validate-on-blur
+            custom-error-message="Enter a password between 8 and 16 characters" name="password" label="Password"
+            type="password" placeholder="Create a password" />
           <Button class="w-full" variant="hero" type="submit" :is-loading>
             Create Account
           </Button>
@@ -66,61 +70,71 @@ definePageMeta({
 useHead({
   title: 'Sign Up'
 })
-
+const { toast } = useToast()
 const fullName = ref("")
 const email = ref("")
 const password = ref("")
 const isLoading = ref(false)
 const errorMessage = ref("")
 
-const {validate} = useForm()
+const { validate } = useForm()
 const { signUp, signInWithProvider } = useAuth()
 const router = useRouter()
 
 const handleSubmit = async () => {
   const { valid } = await validate()
   if (!valid) return
-  
+
   isLoading.value = true
   errorMessage.value = ""
-  
+
   try {
     const { data, error } = await signUp(email.value, password.value, fullName.value)
-    
+
     if (error) {
       const errorMsg = (error as any).message
       errorMessage.value = errorMsg || 'An error occurred during signup'
-    } else if (data) {
-      // Check if email confirmation is required
-      if (data.user && !data.user.email_confirmed_at) {
-        // Show success message for email confirmation
-        errorMessage.value = "Please check your email to confirm your account."
-      } else {
-        // Redirect to dashboard if no email confirmation needed
-        await router.push('/dashboard')
-      }
+    } 
+    else if (data) {
+      // Redirect to dashboard on successful signup
+      await router.push('/dashboard')
     }
   } catch (error) {
     errorMessage.value = "An unexpected error occurred. Please try again."
   } finally {
     isLoading.value = false
+    if (errorMessage.value) {
+    toast({
+      title: "Error occurred",
+        description: errorMessage.value,
+        variant: "destructive"
+      })
+    }
   }
 }
 
 const handleOAuthSignup = async (provider: 'google' | 'github') => {
   isLoading.value = true
   errorMessage.value = ""
-  
+
   try {
     const { error } = await signInWithProvider(provider)
     if (error) {
       // error.message ||
-      errorMessage.value = 'An error occurred during OAuth signup'
+      const errorMsg = (error as any).message
+      errorMessage.value = errorMsg || 'An error occurred during OAuth signup'
     }
   } catch (error) {
     errorMessage.value = "An unexpected error occurred. Please try again."
   } finally {
     isLoading.value = false
+    if (errorMessage.value) {
+    toast({
+      title: "Error occurred",
+        description: errorMessage.value,
+        variant: "destructive"
+      })
+    }
   }
 }
 </script>
