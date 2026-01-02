@@ -13,22 +13,6 @@
           </CardDescription>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div class="flex items-center gap-4" v-if="false">
-            <Avatar class="h-20 w-20">
-              <AvatarImage :src="personalInfo.avatarUrl!" alt="Profile picture" />
-              <AvatarFallback class="text-lg">
-                {{ personalInfo.name?.charAt(0) || 'U' }}
-              </AvatarFallback>
-            </Avatar>
-            <div class="space-y-2">
-              <Button variant="outline" size="sm">
-                Change Avatar
-              </Button>
-              <p class="text-sm text-muted-foreground">
-                JPG, PNG or GIF. Max size 2MB.
-              </p>
-            </div>
-          </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- name -->

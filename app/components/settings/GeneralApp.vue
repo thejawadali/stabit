@@ -13,36 +13,10 @@
           </CardDescription>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- display language -->
-            <Select id="language" v-model="generalData.language" label="Display Language">
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="de">Deutsch</SelectItem>
-                <SelectItem value="it">Italiano</SelectItem>
-                <SelectItem value="pt">Português</SelectItem>
-                <SelectItem value="ja">日本語</SelectItem>
-                <SelectItem value="ko">한국어</SelectItem>
-                <SelectItem value="zh">中文</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <!-- date format -->
-            <Select id="date-format" v-model="generalData.dateFormat" label="Date Format">
-              <SelectTrigger>
-                <SelectValue placeholder="Select date format" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-              </SelectContent>
-            </Select>
+          <div class="p-3 bg-muted rounded-lg">
+            <p class="text-sm text-muted-foreground">
+              Language and date format settings will be available in a future update.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -174,48 +148,10 @@
           </CardDescription>
         </CardHeader>
         <CardContent class="space-y-4">
-          <!-- default dashboard view -->
-          <Select id="default-dashboard-view" v-model="generalData.defaultDashboardView">
-            <template #field-label>
-              <Label for="default-dashboard-view" class="flex items-center gap-2">
-                Default Dashboard View
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <button type="button" class="text-muted-foreground hover:text-foreground">
-                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                        <path d="M12 17h.01" />
-                      </svg>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Choose which dashboard view to show when you first open the app.</p>
-                    <p class="text-xs mt-1">Overview: summary cards | Analytics: charts & insights | Calendar: habit
-                      calendar | Progress: detailed progress</p>
-                  </TooltipContent>
-                </Tooltip>
-              </Label>
-            </template>
-            <SelectTrigger>
-              <SelectValue placeholder="Select default view" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="overview">Overview</SelectItem>
-              <SelectItem value="analytics">Analytics</SelectItem>
-              <SelectItem value="calendar">Calendar</SelectItem>
-              <SelectItem value="progress">Progress</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-medium">Show Welcome Message</p>
-              <p class="text-sm text-muted-foreground">
-                Display helpful tips and welcome messages
-              </p>
-            </div>
-            <Switch v-model="generalData.showWelcomeMessage" />
+          <div class="p-3 bg-muted rounded-lg">
+            <p class="text-sm text-muted-foreground">
+              Dashboard preferences will be available in a future update.
+            </p>
           </div>
         </CardContent>
       </Card>

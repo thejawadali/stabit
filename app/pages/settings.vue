@@ -68,7 +68,6 @@ const { data: profile } = await useFetch('/api/profile')
 const profileInfo = reactive<ProfileInfoType>({
   name: profile.value?.name || '',
   email: profile.value?.email || '',
-  avatarUrl: profile.value?.avatarUrl || '',
   age: profile.value?.age || 0,
   height: profile.value?.height || 0,
   gender: profile.value?.gender as Gender,
@@ -83,12 +82,6 @@ const profileInfo = reactive<ProfileInfoType>({
 
 
 const generalSettings = reactive<GeneralSettingsType>({
-  language: profile.value?.language as string,
-  dateFormat: profile.value?.dateFormat as string,
-  autoSync: profile.value?.autoSync || true,
-  lastSyncTime: profile.value?.lastSyncTime ? new Date(profile.value.lastSyncTime) : null,
-  defaultDashboardView: profile.value?.defaultDashboardView as DashboardView,
-  showWelcomeMessage: profile.value?.showWelcomeMessage || true,
   notificationsEnabled: profile.value?.notificationsEnabled || false,
 })
 

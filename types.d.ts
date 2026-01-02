@@ -149,29 +149,32 @@ interface Category {
 
 
 
-// User Profile & Settings Types
+// User Profile Types (basic user information)
 interface UserProfile {
-  userId: string
-  name: string
+  id: string
+  name: string | null
   email: string
-  avatarUrl: string
-  timezone: string
-  language: string
-  dateFormat: string
-  theme: Theme
+  emailVerified: boolean
+  image: string | null
   age: number
   gender: Gender
   height: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Config Types (user preferences and configuration)
+interface UserConfig {
+  id: string
+  userId: string
+  timezone: string
+  theme: Theme
   isActive: boolean
   personalGoals: string
   preferredTimeUnits: TimeUnit
   preferredCountUnits: CountUnit
   defaultTrackingType: TrackingType
   defaultGoalFrequency: GoalFrequency
-  autoSync: boolean
-  lastSyncTime: Date | null
-  defaultDashboardView: DashboardView
-  showWelcomeMessage: boolean
   notificationsEnabled: boolean
   enableReminders: boolean
   enableMilestones: boolean
@@ -193,9 +196,9 @@ interface UserProfile {
   updatedAt: Date
 }
 
-type ProfileInfoType = Pick<UserProfile, 'name' | 'email' | 'avatarUrl' | 'age' | 'height' | 'gender' | 'personalGoals' | 'preferredTimeUnits' | 'preferredCountUnits' | 'defaultReminderTime' | 'defaultTrackingType' | 'defaultGoalFrequency' | 'theme'>
+type ProfileInfoType = Pick<UserProfile, 'name' | 'email' | 'age' | 'height' | 'gender'> & Pick<UserConfig, 'personalGoals' | 'preferredTimeUnits' | 'preferredCountUnits' | 'defaultReminderTime' | 'defaultTrackingType' | 'defaultGoalFrequency' | 'theme'>
 
-type GeneralSettingsType = Pick<UserProfile, 'language' | 'dateFormat' | 'autoSync' | 'lastSyncTime' | 'defaultDashboardView' | 'showWelcomeMessage' | 'notificationsEnabled'>
+type GeneralSettingsType = Pick<UserConfig, 'notificationsEnabled'>
 
 type NotificationSettingsType = Pick<UserProfile, 'enableReminders' | 'enableMilestones' | 'enableStreaks' | 'defaultReminderTime' | 'reminderTone' | 'smartReminders' | 'inAppNotifications' | 'emailNotifications' | 'pushNotifications' | 'quietHoursEnabled' | 'quietHoursStart' | 'quietHoursEnd' | 'snoozeDuration' | 'isSnoozed' | 'snoozeUntil'> & {
   quietHoursDays: string[]
