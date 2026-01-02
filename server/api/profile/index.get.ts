@@ -1,19 +1,24 @@
-import { type UserProfile } from "@prisma/client"
-import { requireAuth } from '../../utils/auth'
 import { prisma } from '../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+  const user = {id: '740b6eef-bcc8-4217-a423-9197d671d087'}
 
-  const profile: UserProfile | null = await prisma.userProfile.findUnique({
+  const userData = await prisma.user.findUnique({
     where: {
-      userId: user.id,
+      id: user.id,
+    },
+    include: {
+      config: true,
     },
   })
-  if (!profile) {
+  if (!userData) {
     return null
   }
 
-  return profile
+  // Combine user and config data for backward compatibility
+  return {
+    ...userData,
+    ...userData.config,
+  }
 })

@@ -1,5 +1,4 @@
 import { prisma } from '../../utils/prisma'
-import { requireAuth } from '../../utils/auth'
 import { CompletionStatus, Frequency, MilestoneStatus } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {

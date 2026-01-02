@@ -1,5 +1,4 @@
 import { prisma } from '../../../utils/prisma'
-import { requireAuth } from '../../utils/auth'
 import type { Prisma } from '@prisma/client'
 
 

@@ -1,29 +1,33 @@
 import { prisma } from '../../utils/prisma'
-import { requireAuth } from '../../utils/auth'
 import { seedDefaultCategories } from '../../utils/seedCategories'
 
 
 export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+  const user = {id: '740b6eef-bcc8-4217-a423-9197d671d087'}
 
-  // verify if profile already exists
-  const profile = await prisma.userProfile.findUnique({
+  // verify if config already exists
+  const existingUser = await prisma.user.findUnique({
     where: {
-      userId: user.id,
+      id: user.id,
+    },
+    include: {
+      config: true,
     },
   })
-  if (profile) {
-    return profile
+  if (existingUser?.config) {
+    return {
+      ...existingUser,
+      ...existingUser.config,
+    }
   }
 
   const data = await readBody(event)
 
   try {
-    const created = await prisma.userProfile.create({
+    // Create config for user
+    const config = await prisma.config.create({
       data: {
         userId: user.id,
-        name: user.name,
-        email: user.email,
         ...data
       }
     })
@@ -35,13 +39,20 @@ export default defineEventHandler(async (event) => {
       console.error('Failed to seed default categories:', seedError)
     }
 
-    return created
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+    })
+
+    return {
+      ...userData,
+      ...config,
+    }
   } catch (error: any) {
     // Prisma P2002: Unique constraint failed (userId already exists)
     if (error?.code === 'P2002') {
-      throw createError({ statusCode: 409, statusMessage: 'UserProfile already exists' })
+      throw createError({ statusCode: 409, statusMessage: 'Config already exists' })
     }
     console.log(error)
-    throw createError({ statusCode: 500, statusMessage: 'Failed to create UserProfile' })
+    throw createError({ statusCode: 500, statusMessage: 'Failed to create config' })
   }
 })

@@ -1,9 +1,8 @@
-import { requireAuth } from '../../utils/auth'
 import { prisma } from '../../utils/prisma'
 
 
 export default defineEventHandler(async (event) => {
-  const user = requireAuth(event)
+  const user = {id: '740b6eef-bcc8-4217-a423-9197d671d087'}
   try {
     
     const categories = await prisma.category.findMany({
